@@ -1,0 +1,31 @@
+{% if law_items %}
+<table style="width: 100%; margin-top: 4px">
+    <colgroup>
+        <col style="width: 175px">
+        <col style="width: 155px">
+    </colgroup>
+    <thead>
+        <tr>
+            <th>{{ res_value('SUBMISSION_DATE') }}</th>
+            <th>{{ res_value('DECISION_DATE') }}</th>
+            <th>{{ res_value('LAW_DECISION') }}</th>
+            <th>{{ res_value('ORG_NAME') }}</th>
+            <th>{{ res_value('EMPLOYEE') }}</th>
+        </tr>
+    </thead>
+    <tfoot></tfoot>
+    <tbody>
+        {% for item in law_items %}
+        <tr>
+            <td>{{ item.submission_date }}</td>
+            <td>{{ item.decision_date }}</td>
+            <td style="text-align: left">{{ item.decision }}</td>
+            <td style="text-align: left">{{ item.orgname }}</td>
+            <td style="text-align: left">{{ item.employee }}</td>
+        <tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>{{ res_value('NONE_LAW_ITEMS') }}</p>
+{% endif %}

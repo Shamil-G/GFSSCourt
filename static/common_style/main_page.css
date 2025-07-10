@@ -1,0 +1,74 @@
+.container {
+    margin: auto;
+    padding: 20px;
+    font-family: sans-serif;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.documents {
+    margin-bottom: 30px;
+
+    flex: 1 1 auto;
+    overflow: auto;
+    min-height: 150px;
+    max-height: 60%;
+    border-bottom: 1px solid #ccc;
+}
+.tabs {
+    padding: 8px 16px;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+/* јктивна€ вкладка Ч "вдавленна€" */
+.tab.active {
+    z-index: 1;
+    position: relative;
+}
+select {
+    padding: 8px;
+    font-size: 16px;
+    width: 100%;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-bottom: 1px solid #bbb;
+}
+
+.tab {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+input[type="text"] {
+    /*width: 100%;*/
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 6px 0;
+    border-bottom: 1px solid #ddd;
+}

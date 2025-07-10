@@ -1,0 +1,5 @@
+#systemctl get-default
+systemctl daemon-reload
+systemctl enable /home/court/GFSSCourt/service/court.service
+systemctl start court
+systemctl status -l court
