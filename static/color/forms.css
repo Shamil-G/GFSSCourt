@@ -11,6 +11,9 @@ form {
     grid-gap: 2px;
     align-items: flex-start;
 }
+.form_op {
+    background: #d0ebe2;
+}
 
 .input_s {
     color: #444;

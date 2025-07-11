@@ -115,7 +115,7 @@
             <div id="pretrial" class="tab-panel">
                 <button class="add-button" onclick="togglePretrialForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form id="pretrialForm" style="display: none; margin-top: 15px; background: #444;" method="POST" action="/add_pretrial">
+                <form class="form_op" id="pretrialForm" style="display: none; margin-top: 15px;" method="POST" action="/add_pretrial">
                     <!--<input type="hidden" name="order_num" id="pretrialOrderNum">-->
 
                     <label style="font-size: 18px">
@@ -139,7 +139,7 @@
             <div id="law" class="tab-panel">
                 <button class="add-button" onclick="toggleLawForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form id="lawForm" style="display: none; margin-top: 15px; background: #444;" method="POST" action="/add_law">
+                <form class="form_op" id="lawForm" style="display: none; margin-top: 15px;" method="POST" action="/add_law">
                     <!--<input type="hidden" name="order_num" id="lawOrderNum">-->
 
                     <label style="font-size: 18px">
@@ -173,7 +173,7 @@
             <div id="court" class="tab-panel">
                 <button class="add-button" onclick="toggleCourtForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form id="courtForm" style="display: none; margin-top: 15px; background: #444;" method="POST" action="/add_court">
+                <form class="form_op" id="courtForm" style="display: none; margin-top: 15px;" method="POST" action="/add_court">
                     <ul id="courtList">
                         <li>№123/2023</li>
                         <li>№456/2024</li>
@@ -189,7 +189,7 @@
             <div id="appeal" class="tab-panel">
                 <button class="add-button" onclick="toggleAppealForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form id="appealForm" style="display: none; margin-top: 15px; background: #444;" method="POST" action="/add_appeal">
+                <form class="form_op" id="appealForm" style="display: none; margin-top: 15px;" method="POST" action="/add_appeal">
                     <ul id="appealList">
                         <li>№123/2023</li>
                         <li>№456/2024</li>
@@ -205,7 +205,7 @@
             <div id="execution" class="tab-panel">
                 <button class="add-button" onclick="toggleExecutionForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form id="appealForm" style="display: none; margin-top: 15px; background: #444;" method="POST" action="/add_execution">
+                <form class="form_op" id="appealForm" style="display: none; margin-top: 15px;" method="POST" action="/add_execution">
                     <ul id="executionList">
                         <li>№123/2023</li>
                         <li>№456/2024</li>
