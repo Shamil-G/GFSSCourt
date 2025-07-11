@@ -10,10 +10,10 @@ wsgi_app = "wsgi:app"
 loglevel = 'info'
 
 access_log_format = '%({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s"  "%(a)s"'
-accesslog = "logs/aktuar-gunicorn-access.log"
+accesslog = "logs/court-gunicorn-access.log"
 error_log_format = '%({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s"  "%(a)s"'
-errorlog = "logs/aktuar-gunicorn-error.log"
-proc_name = 'AKTUAR-GFSS'
+errorlog = "logs/court-gunicorn-error.log"
+proc_name = 'COURT-GFSS'
 # Перезапуск после N кол-во запросов
 max_requests = 100
 # Перезапуск, если ответа не было более 60 сек
