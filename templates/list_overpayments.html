@@ -20,7 +20,7 @@
 
 
 {% block body %}
-<!--<div class="container">-->
+<div class="container">
     <!-- Верхняя область: список документов -->
     <div class="documents">
             <table>
@@ -113,114 +113,44 @@
         <div class="tab-content active">
 
             <div id="pretrial" class="tab-panel">
-                <button class="add-button" onclick="togglePretrialForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <!--<button class="add-button" onclick="toggleForm('pretrialForm')">{{ res_value('BUTTON_ADD') }}</button>-->
+                <button onclick="toggleForm('pretrialForm', 'pretrial')">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form class="form_op" id="pretrialForm" style="display: none; margin-top: 15px;" method="POST" action="/add_pretrial">
-                    <!--<input type="hidden" name="order_num" id="pretrialOrderNum">-->
-
-                    <label style="font-size: 18px">
-                        📅 {{ res_value('AGREEMENT_DATE') }}:&emsp;
-                        <input style="font-size: 18px" type="date" name="agreement_date" required>
-                    </label>
-                    <!--<br><br>-->
-                    <label style="margin-left: 64px; font-size: 18px">
-                        📆 {{ res_value('MATURITY_DATE') }}:&emsp;
-                        <input style="font-size: 18px" type="date" name="execution_date" required>
-                    </label>
-                    <br><br>
-                    <button type="submit">💾 {{ res_value('BUTTON_SAVE') }}</button>
-                </form>
-
-                <div id="pretrialContent">
-                    <!-- Here will be fragment _pretrial_items -->
-                </div>
+                <div id="pretrialFormContainer"></div>
+                <div id="pretrialContent"><!-- Here will be fragment _pretrial_items --></div>
             </div>
 
             <div id="law" class="tab-panel">
-                <button class="add-button" onclick="toggleLawForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button onclick="toggleForm('lawForm', 'law')">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form class="form_op" id="lawForm" style="display: none; margin-top: 15px;" method="POST" action="/add_law">
-                    <!--<input type="hidden" name="order_num" id="lawOrderNum">-->
-
-                    <label style="font-size: 18px">
-                        📅 {{ res_value('SUBMISSION_DATE') }}:&emsp;
-                        <input style="font-size: 18px" type="date" name="submission_date" required>
-                    </label>
-                    <!--<br><br>-->
-                    <label style="margin-left: 64px; font-size: 18px">
-                        📆 {{ res_value('DECISION_DATE') }}:&emsp;
-                        <input style="font-size: 18px" type="date" name="decision_date" required>
-                    </label>
-                    <br><br>
-                    <label style=font-size: 18px">
-                        {{ res_value('LAW_DECISION') }}:&emsp;
-                        <input style="font-size: 18px; width: 840px" type="text" name="decision" required>
-                    </label>
-                    <br><br>
-                    <label style="font-size: 18px">
-                        {{ res_value('ORG_NAME') }}:&emsp;
-                        <input style="font-size: 18px; width: 840px" type="text" name="orgname" required>
-                    </label>
-                    <br>
-                    <button type="submit">💾 {{ res_value('BUTTON_SAVE') }}</button>
-                </form>
-
-                <div id="lawContent">
-                    <!-- Here will be fragment _law_items -->
-                </div>
+                <div id="lawFormContainer"><!-- Here will be FORM _law_items --></div>
+                <div id="lawContent"><!-- Here will be fragment _law_items --></div>
             </div>
 
             <div id="court" class="tab-panel">
-                <button class="add-button" onclick="toggleCourtForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button class="add-button" onclick="toggleForm('courtForm', 'court')">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form class="form_op" id="courtForm" style="display: none; margin-top: 15px;" method="POST" action="/add_court">
-                    <ul id="courtList">
-                        <li>№123/2023</li>
-                        <li>№456/2024</li>
-                        <li>№789/2025</li>
-                    </ul>
-                </form>
-
-                <div id="courtContent">
-                    <!-- Here will be fragment _court_items -->
-                </div>
+                <div id="courtFormContainer"><!-- Here will be FORM _court_items --></div>
+                <div id="courtContent"><!-- Here will be fragment _court_items --></div>
             </div>
 
             <div id="appeal" class="tab-panel">
-                <button class="add-button" onclick="toggleAppealForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button class="add-button" onclick="toggleForm('appealForm', 'appeal')">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form class="form_op" id="appealForm" style="display: none; margin-top: 15px;" method="POST" action="/add_appeal">
-                    <ul id="appealList">
-                        <li>№123/2023</li>
-                        <li>№456/2024</li>
-                        <li>№789/2025</li>
-                    </ul>
-                </form>
-
-                <div id="appealContent">
-                    <!-- Here will be fragment _court_items -->
-                </div>
+                <div id="appealFormContainer"><!-- Here will be FORM _appeal_items --></div>
+                <div id="appealContent"><!-- Here will be fragment _appeal_items --></div>
             </div>
 
             <div id="execution" class="tab-panel">
-                <button class="add-button" onclick="toggleExecutionForm()">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button class="add-button" onclick="toggleForm('executionForm','execution')">➕ {{ res_value('BUTTON_ADD') }}</button>
 
-                <form class="form_op" id="appealForm" style="display: none; margin-top: 15px;" method="POST" action="/add_execution">
-                    <ul id="executionList">
-                        <li>№123/2023</li>
-                        <li>№456/2024</li>
-                        <li>№789/2025</li>
-                    </ul>
-                </form>
-
-                <div id="executionContent">
-                    <!-- Here will be fragment _court_items -->
-                </div>
+                <div id="executionFormContainer"><!-- Here will be FORM _execution_items --></div>
+                <div id="executionContent"><!-- Here will be fragment _execution_items --></div>
             </div>
 
 
         </div>
     </div>
-<!--</div>-->
+</div>
 <script src="static/js/list_op.js"></script>
 {% endblock %}

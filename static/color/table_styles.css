@@ -9,9 +9,13 @@ tr > th {
 tr > td {
     border: 1px solid grey;
 }
+/*светло-синий, можно заменить*/
+tr.active-row {
+    background-color: #d0ebff;
+}
 /* Подсвечиваем строки на котором стоит курсор*/
 table tbody > tr:hover {
-    background-color: rgb(248, 240, 192, 0.17);
+    background-color: #d0ebff55;
     box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.2);
 }
 .news-container {

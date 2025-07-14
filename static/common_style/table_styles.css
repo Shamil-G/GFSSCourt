@@ -20,15 +20,10 @@ tr > td {
 }
 tr.disabled-row:hover {
     background-color: inherit;
-/*    cursor: not-allowed;
-*/
+    box-shadow: none;
 }
 
-tr.active-row {
-    background-color: #d0ebff; /* светло-синий, можно заменить */
-}
-
-.news-container {
+/*.news-container {
     max-height: 830px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -38,7 +33,7 @@ tr.active-row {
     max-height: 700px;
     overflow-y: auto;
     overflow-x: hidden;
-}
+}*/
 .table-scroll-800 {
     height: 830px;
     overflow-y: auto;

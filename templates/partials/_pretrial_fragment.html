@@ -3,11 +3,10 @@
     <colgroup>
         <col style="width: 176px">
         <col style="width: 176px">
-        <col style="text-align: left; margin: 4px;">
     </colgroup>
     <thead>
         <tr>
-            <th>{{ res_value('PRETRIAL_DATE') }}</th>
+            <td style="">{{ res_value('PRETRIAL_DATE') }}</td>
             <th>{{ res_value('MATURITY_DATE') }}</th>
             <th>{{ res_value('EMPLOYEE') }}</th>
         </tr>
@@ -19,9 +18,9 @@
             <td>{{ item.pretrial_date }}</td>
             <td>{{ item.maturity_date }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
-        <tr>
-            {% endfor %}
-    </tbody>
+        </tr>
+        {% endfor %}
+</tbody>
 </table>
 {% else %}
 <p>{{ res_value('NONE_PRETRIAL_ITEMS') }}</p>

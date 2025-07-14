@@ -1,0 +1,34 @@
+﻿<form class="form_op" id="executionForm" style=margin-top: 15px;" method="POST" action="/add_execution">
+    <input type="hidden" name="order_num" id="executionOrderNum">
+
+    <table style="width: 960px; margin:4px 0px 4px 0px; box-shadow: none">
+        <colgroup>
+            <col style="width: 176px">
+            <col style="width: 176px">
+        </colgroup>
+        <tbody>
+            <tr class="disabled-row">
+                <td style="border: none; width: 260px; text-align: left">📅 {{ res_value('SUBMISSION_DATE') }}:</td>
+                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="submission_date" required></td>
+            </tr>
+            <tr class="disabled-row">
+                <td style="border: none; text-align: left">📆 {{ res_value('DECISION_DATE') }}:</td>
+                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="decision_date" required></td>
+            </tr>
+
+            <tr class="disabled-row">
+                <td style="border: none; text-align: left">{{ res_value('LAW_DECISION') }}:</td>
+                <td style="border: none; text-align: left"><input style="font-size: 18px; width: 840px;" type="text" name="orgname" required></td>
+            </tr>
+
+            <tr class="disabled-row">
+                <td style="border: none; text-align: left">{{ res_value('ORG_NAME') }}:</td>
+                <td style="border: none; text-align: left"><input style="font-size: 18px; width: 840px;" type="text" name="orgname" required></td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <hr>
+    <button type="submit">💾 {{ res_value('BUTTON_SAVE') }}</button>
+</form>

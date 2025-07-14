@@ -111,34 +111,28 @@ function showTab(id) {
 
   loadTabContent(currentTabId);
 }
+
 // End ShowTab
 //////////////////////////////////////////////////////////////////////////////////
 // Переключаем область видимости на кнопке "Добавить" в области TAB
-function togglePretrialForm() {
-  const form = document.getElementById('pretrialForm');
-  form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}
+function toggleForm(formName,formType) {
+  const container = document.getElementById(`${formName}Container`);
+  const form = document.getElementById(formName);
 
-// Переключаем область видимости на кнопке "Добавить" в области TAB
-function toggleLawForm() {
-  const form = document.getElementById('lawForm');
-  form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}
-
-// Переключаем область видимости на кнопке "Добавить" в области TAB
-function toggleCourtForm() {
-  const form = document.getElementById('courtForm');
-  form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}
-// Переключаем область видимости на кнопке "Добавить" в области TAB
-function toggleAppealForm() {
-  const form = document.getElementById('appealForm');
-  form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}
-// Переключаем область видимости на кнопке "Добавить" в области TAB
-function toggleExecutionForm() {
-  const form = document.getElementById('executionForm');
-  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  console.log("toggleForm triggered:", formName, formType);
+  if (form) {
+    // Если форма уже загружена — удалим
+    container.innerHTML = '';
+  } else {
+    // Загружаем HTML по fetch
+    fetch(`/form_fragment?form=${formType}&order_num=${getOrderNum()}`)
+      .then(response => response.text())
+      .then(html => {
+        container.innerHTML = html;
+        syncOrderNumToForms(); // вставить значение в форму
+      })
+      .catch(error => console.error('Error load fragment form: ${formType}:', error));
+  }
 }
 
 // При первоначальной загрузке страницы должна получить первый order_num

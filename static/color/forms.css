@@ -15,10 +15,10 @@ form {
     background: #d0ebe2;
 }
 
-.input_s {
+.input_s, .input_d, .input_s_form {
     color: #444;
     background-color: #efefd3e6;
-    border: 1px solid rgba(180, 180, 180, 0.3);
+    border: 1px solid rgba(180, 180, 180, 0.1);
     box-shadow: 6px 6px 8px rgba(70, 205, 79, 0.2);
 }
 

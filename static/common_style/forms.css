@@ -3,6 +3,11 @@ form {
     padding: 24px 15px 24px 24px;
     text-shadow: none;
 }
+.form_op {
+    margin: 1px 1px;
+    padding: 4px 12px 4px 12px;
+    text-shadow: none;
+}
 .upload-file__label {
     margin: 9px 0px;
     padding: 9px;
@@ -53,6 +58,22 @@ div.field label {
     align-items: center;
     border-radius: 5px;
     width: 260px;
+}
+.input_s_form {
+    padding: 9px;
+    font-size: 18px;
+
+    width: 840px;
+    border-radius: 5px;
+    border: none
+}
+.input_d {
+    padding: 9px;
+    font-size: 18px;
+    align-items: center;
+    border-radius: 5px;
+    width: 160px;
+    cursor: pointer;
 }
 select {
     padding: 5px;

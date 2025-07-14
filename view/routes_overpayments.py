@@ -58,6 +58,29 @@ def view_pretrial_add():
     return redirect(url_for('view_list_overpayments', order_num=order_num))
 
 
+@app.route('/form_fragment')
+def pretrial_form_fragment():
+    form_type = request.args.get('form')
+    order_num = request.args.get('order_num')
+
+    match form_type:
+        case 'pretrial':
+            return render_template('partial_forms/_pretrial_form.html', order_num=order_num)
+        case 'law':
+            return render_template('partial_forms/_law_form.html', order_num=order_num)
+        case 'court':
+            return render_template('partial_forms/_court_form.html', order_num=order_num)
+        case 'appeal':
+            return render_template('partial_forms/_appeal_form.html', order_num=order_num)
+        case 'execution':
+            return render_template('partial_forms/_execution_form.html', order_num=order_num)
+        case _:
+            return render_template('partial_forms/_pretrial_form.html', order_num=order_num)
+
+    log.info(f'PRETRIAL_FORM_FRAGMENT\n\tFORM_TYPE: {form_type}\n\tORDER_NUM: {order_num}')
+    return render_template('partial_forms/_pretrial_form.html', order_num=order_num)
+
+
 @app.route('/pretrial_fragment')
 @login_required
 def view_pretrial_fragment():
