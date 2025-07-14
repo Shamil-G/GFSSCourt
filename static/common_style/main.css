@@ -9,8 +9,8 @@ html, body {
     height: 100%;
     width: 100%;
     font-family: Calibri;
-    /*overflow: hidden;*/ /* чтобы не было двойного скролла */
-    overflow: auto; /* чтобы не было двойного скролла */
+    overflow: hidden; /* чтобы не было двойного скролла */
+    /*overflow: auto;*/ /* чтобы не было двойного скролла */
 }
 common-container {
     height: 100vh;
