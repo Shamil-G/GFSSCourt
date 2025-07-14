@@ -1,4 +1,5 @@
-.container {
+/* Class container  - аналого ARTICLE */
+.container { 
     margin: auto;
     padding: 20px;
     font-family: sans-serif;
@@ -9,12 +10,12 @@
 }
 
 .documents {
-    margin-bottom: 30px;
-
     flex: 1 1 auto;
-    overflow: auto;
-    min-height: 150px;
-    max-height: 60%;
+    overflow-y: auto;
+
+    min-height: 0;
+    margin-bottom: 30px;
+    flex: 1 1 auto;
     border-bottom: 1px solid #ccc;
 }
 .tabs {
@@ -23,6 +24,8 @@
     border-radius: 8px 8px 0 0;
     cursor: pointer;
     transition: background 0.2s;
+
+    flex: 0 0 auto;
 }
 /* јктивна€ вкладка Ч "вдавленна€" */
 .tab.active {
