@@ -47,7 +47,6 @@ def try_auto_login():
 
 
 @app.route('/')
-@login_required
 def view_root():
     if g and g.user.is_anonymous:
         # LOGIN with session variable
