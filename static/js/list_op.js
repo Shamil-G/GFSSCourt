@@ -1,24 +1,102 @@
-let currentTabId = null;
+п»їlet currentTabId = null;
+const tabCache = {};
+const tabCacheOrder = [];
 
+// РџСЂРµРґР»Р°РіР°РµРј РѕР±РЅРѕРІРёС‚СЊ РґР°РЅРЅС‹Рµ, РµСЃР»Рё РїСЂРѕС€Р»Рѕ 10 РјРёРЅСѓС‚
+const REFRESH_RECOMMENDED_THRESHOLD = 10 * 60 * 1000; // 10 РјРёРЅСѓС‚
+// РЈРґР°Р»СЏРµРј РёР· РєСЌС€Р° РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕ, РµСЃР»Рё РїСЂРѕС€Р»Рѕ 2 С‡Р°СЃР°
+const CACHE_LIFETIME = 2 * 60 * 60 * 1000; // 2 С‡Р°СЃР° РІ РјСЃ
+// Р’ РєСЌС€Рµ С…СЂР°РЅРёРј 512 РґРѕРєСѓРјРµРЅС‚РѕРІ
+const MAX_CACHE_SIZE = 512;
+//////////////////////////////////////////////////////////////////////////////
 function getOrderNum() {
   return document.getElementById('sharedOrderNum')?.value || '';
 }
+//////////////////////////////////////////////////////////////////////////////
+function updateRefreshButton(id){
+  const orderNum = getOrderNum();
+  if (!orderNum) return;
 
-// Главная таблица переплат в LIST_OVERPAYMENTS.HTML
-// Когда щелкаем мышкой по записям TR надо менять фильтр orderNum для TABS
+  const cacheKey = `${id}_${orderNum}`;
+  const cached = tabCache[cacheKey];
+  if (!cached) return;
+
+  const age = Date.now() - cached.timestamp;
+
+  const refreshTarget = document.getElementById(`${id}RefreshButton`);
+  if (!refreshTarget) return;
+
+  if (age > REFRESH_RECOMMENDED_THRESHOLD) {
+    refreshTarget.textContent = 'рџ”Ѓ Р РµРєРѕРјРµРЅРґСѓРµРј РѕР±РЅРѕРІРёС‚СЊ';
+    refreshTarget.classList.add('recommend');
+    refreshTarget.title = `Р—Р°РіСЂСѓР¶РµРЅРѕ ${formatAge(cached.timestamp)} РЅР°Р·Р°Рґ`;
+  } else {
+    refreshTarget.textContent = 'рџ”„ РћР±РЅРѕРІРёС‚СЊ';
+    refreshTarget.classList.remove('recommend');
+    refreshTarget.title = `РћР±РЅРѕРІР»РµРЅРѕ ${formatAge(cached.timestamp)} РЅР°Р·Р°Рґ`;
+  }
+}
+//////////////////////////////////////////////////////////////////////////////
+function formatAge(timestamp) {
+  const now = Date.now();
+  const delta = now - timestamp;
+
+  const mins = Math.floor(delta / 60000);
+  if (mins < 1) return 'С‚РѕР»СЊРєРѕ С‡С‚Рѕ';
+  if (mins < 60) return `${mins} РјРёРЅ РЅР°Р·Р°Рґ`;
+  const hrs = Math.floor(mins / 60);
+  return `${hrs} С‡ РЅР°Р·Р°Рґ`;
+}
+/////////////////////////////////////////////////////////////////////////////
+function addToCache(key, html) {
+  const now = Date.now();
+
+  // РЈРґР°Р»РёРј СЃС‚Р°СЂС‹Рµ
+  for (const [k, v] of Object.entries(tabCache)) {
+    if (now - v.timestamp > CACHE_LIFETIME) {
+      delete tabCache[k];
+      const index = tabCacheOrder.indexOf(k);
+      if (index !== -1) tabCacheOrder.splice(index, 1);
+    }
+  }
+
+  // РћРіСЂР°РЅРёС‡РµРЅРёРµ РїРѕ СЂР°Р·РјРµСЂСѓ
+  if (tabCacheOrder.length >= MAX_CACHE_SIZE) {
+    const oldestKey = tabCacheOrder.shift();
+    delete tabCache[oldestKey];
+  }
+
+  // Р”РѕР±Р°РІРёРј СЃРІРµР¶РёР№
+  tabCache[key] = { html, timestamp: now };
+  tabCacheOrder.push(key);
+}
+///////////////////////////////////////////////////////////////////////////
+// РљРЅРѕРїРєР° Refresh
+function refreshTab(id) {
+  const orderNum = getOrderNum();
+  if (!orderNum) return;
+
+  const cacheKey = `${id}_${orderNum}`;
+
+  delete tabCache[cacheKey];
+
+  loadTabContent(id); // Р·Р°РіСЂСѓР·РёРј Р·Р°РЅРѕРІРѕ
+}
+///////////////////////////////////////////////////////////////////////////
+// Р“Р»Р°РІРЅР°СЏ С‚Р°Р±Р»РёС†Р° РїРµСЂРµРїР»Р°С‚ РІ LIST_OVERPAYMENTS.HTML
+// РљРѕРіРґР° С‰РµР»РєР°РµРј РјС‹С€РєРѕР№ РїРѕ Р·Р°РїРёСЃСЏРј TR РЅР°РґРѕ РјРµРЅСЏС‚СЊ С„РёР»СЊС‚СЂ orderNum РґР»СЏ TABS
 function filterByOrder(orderNum) {
-  // После клика мышкой - делаем подсветку выбранной строки
+  // РџРѕСЃР»Рµ РєР»РёРєР° РјС‹С€РєРѕР№ - РґРµР»Р°РµРј РїРѕРґСЃРІРµС‚РєСѓ РІС‹Р±СЂР°РЅРЅРѕР№ СЃС‚СЂРѕРєРё
   const rows = document.querySelectorAll('table tbody tr[data-order]');
   rows.forEach(row => {
       row.classList.toggle('active-row', row.dataset.order === orderNum);
   });
 
-  // Установить общее поле
+  // РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РѕР±С‰РµРµ РїРѕР»Рµ
   const shared = document.getElementById('sharedOrderNum');
   if (shared) shared.value = orderNum;
 
-  console.log('filter By Order: ' + orderNum, "TAB: " + currentTabId);
-  // Синхронизировать ORDER_NUM во все формы
+  // РЎРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°С‚СЊ ORDER_NUM РІРѕ РІСЃРµ С„РѕСЂРјС‹
   syncOrderNumToForms();
 
   loadTabContent(currentTabId);
@@ -30,13 +108,13 @@ function syncOrderNumToForms() {
 
   const value = shared.value;
 
-  // Найти все input[name="order_num"] с атрибутом form
+  // РќР°Р№С‚Рё РІСЃРµ input[name="order_num"] СЃ Р°С‚СЂРёР±СѓС‚РѕРј form
   document.querySelectorAll('input[name="order_num"][form]').forEach(input => {
     input.value = value;
   });
 }
 ////////////////////////////////////////////////////////////////////////////////////
-// По выбранному TAB загружаем его содержимое
+// РџРѕ РІС‹Р±СЂР°РЅРЅРѕРјСѓ TAB Р·Р°РіСЂСѓР¶Р°РµРј РµРіРѕ СЃРѕРґРµСЂР¶РёРјРѕРµ
 function loadTabContent(id) {
   const orderNum = getOrderNum();
   if (!orderNum) return;
@@ -70,72 +148,100 @@ function loadTabContent(id) {
       return;
   }
 
+  const cacheKey = `${id}_${orderNum}`;
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.error(`Container "${containerId}" not found`);
+    return;
+  }
+
+  // вњ… Р•СЃР»Рё РµСЃС‚СЊ РІ РєСЌС€Рµ вЂ” СЃСЂР°Р·Сѓ РІСЃС‚Р°РІР»СЏРµРј
+  if (tabCache[cacheKey]) {
+    const cached = tabCache[cacheKey];
+    container.innerHTML = cached.html;
+    updateRefreshButton(id);
+
+    document.getElementById(`${id}Timestamp`).textContent = `рџ•“ Р—Р°РіСЂСѓР¶РµРЅРѕ ${formatAge(cached.timestamp)}`;
+    return;
+  }
+
+  // рџ”№ РџРѕРєР°Р· СЃРѕРѕР±С‰РµРЅРёСЏ "Р—Р°РіСЂСѓР·РєР°..."
+  container.innerHTML = '<div class="tab-loading">вЏі РРґС‘С‚ Р·Р°РіСЂСѓР·РєР°...</div>';
+
   fetch(url)
     .then(response => response.text())
     .then(html => {
-      document.getElementById(containerId).innerHTML = html;
+      container.classList.add('fade-out');
+      setTimeout(() => {
+        container.innerHTML = html;
+        document.getElementById(`${id}Timestamp`).textContent = `рџ•“ Р—Р°РіСЂСѓР¶РµРЅРѕ ${formatAge(Date.now())}`;
+        container.classList.remove('fade-out');
+        // tabCache[cacheKey] = html; // РЎРѕС…СЂР°РЅСЏРµРј С„СЂР°РіРјРµРЅС‚
+        addToCache(cacheKey, html);
+        updateRefreshButton(id);
+      }, 150);
     })
     .catch(error => {
-      console.error(`Error on loading TAB "${id}":`, error);
+      container.innerHTML = `<div class="tab-error">вќЊ Error: ${error.message}</div>`;
+      console.error(`Error on loadTabContent "${id}":`, error);
     });
+
+
 }
 /////////////////////////////////////////////////////////////////////////////////
-// Переходим с одного tab на другой и должны показываться соответствующие панели
-// Функция переключения между вкладками с выборкой его содержимого
+// РџРµСЂРµС…РѕРґРёРј СЃ РѕРґРЅРѕРіРѕ tab РЅР° РґСЂСѓРіРѕР№ Рё РґРѕР»Р¶РЅС‹ РїРѕРєР°Р·С‹РІР°С‚СЊСЃСЏ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ РїР°РЅРµР»Рё
+// Р¤СѓРЅРєС†РёСЏ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ РјРµР¶РґСѓ РІРєР»Р°РґРєР°РјРё СЃ РІС‹Р±РѕСЂРєРѕР№ РµРіРѕ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ
 function showTab(id) {
-  console.log("Show Tab:", id);
   currentTabId = id;
-  // Скрыть все панели
+  // РЎРєСЂС‹С‚СЊ РІСЃРµ РїР°РЅРµР»Рё
   document.querySelectorAll('.tab-panel').forEach(panel => {
     panel.classList.remove('active');
   });
 
-  // Показать нужную панель
+  // РџРѕРєР°Р·Р°С‚СЊ РЅСѓР¶РЅСѓСЋ РїР°РЅРµР»СЊ
   const targetPanel = document.getElementById(id);
   if (targetPanel) {
     targetPanel.classList.add('active');
   }
 
-  // Убрать активность со всех кнопок
+  // РЈР±СЂР°С‚СЊ Р°РєС‚РёРІРЅРѕСЃС‚СЊ СЃРѕ РІСЃРµС… РєРЅРѕРїРѕРє
   document.querySelectorAll('.tab-buttons .tab').forEach(btn => {
     btn.classList.remove('active');
   });
 
-  // Активировать соответствующую кнопку
+  // РђРєС‚РёРІРёСЂРѕРІР°С‚СЊ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰СѓСЋ РєРЅРѕРїРєСѓ
   const tabButtons = document.querySelectorAll('.tab-buttons .tab');
   tabButtons.forEach(btn => {
     if (btn.getAttribute('onclick')?.includes(id)) {
       btn.classList.add('active');
     }
   });
-
   loadTabContent(currentTabId);
 }
 
 // End ShowTab
 //////////////////////////////////////////////////////////////////////////////////
-// Переключаем область видимости на кнопке "Добавить" в области TAB
+// РџРµСЂРµРєР»СЋС‡Р°РµРј РѕР±Р»Р°СЃС‚СЊ РІРёРґРёРјРѕСЃС‚Рё РЅР° РєРЅРѕРїРєРµ "Р”РѕР±Р°РІРёС‚СЊ" РІ РѕР±Р»Р°СЃС‚Рё TAB
 function toggleForm(formName,formType) {
   const container = document.getElementById(`${formName}Container`);
   const form = document.getElementById(formName);
 
-  console.log("toggleForm triggered:", formName, formType);
   if (form) {
-    // Если форма уже загружена — удалим
+    // Р•СЃР»Рё С„РѕСЂРјР° СѓР¶Рµ Р·Р°РіСЂСѓР¶РµРЅР° вЂ” СѓРґР°Р»РёРј
     container.innerHTML = '';
   } else {
-    // Загружаем HTML по fetch
+    // Р—Р°РіСЂСѓР¶Р°РµРј HTML РїРѕ fetch
     fetch(`/form_fragment?form=${formType}&order_num=${getOrderNum()}`)
       .then(response => response.text())
       .then(html => {
         container.innerHTML = html;
-        syncOrderNumToForms(); // вставить значение в форму
+        syncOrderNumToForms(); // РІСЃС‚Р°РІРёС‚СЊ Р·РЅР°С‡РµРЅРёРµ РІ С„РѕСЂРјСѓ
       })
       .catch(error => console.error('Error load fragment form: ${formType}:', error));
   }
 }
 
-// При первоначальной загрузке страницы должна получить первый order_num
+// РџСЂРё РїРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅРѕР№ Р·Р°РіСЂСѓР·РєРµ СЃС‚СЂР°РЅРёС†С‹ РґРѕР»Р¶РЅР° РїРѕР»СѓС‡РёС‚СЊ РїРµСЂРІС‹Р№ order_num
 window.addEventListener('DOMContentLoaded', () => {
   const firstRow = document.querySelector('table tbody tr[data-order]');
   if (firstRow) {
@@ -149,7 +255,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (tab) {
     showTab(tab);
   } else {
-    showTab('pretrial'); // по умолчанию
+    showTab('pretrial'); // РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
   }
 });
 

@@ -115,37 +115,47 @@
             <div id="pretrial" class="tab-panel">
                 <!--<button class="add-button" onclick="toggleForm('pretrialForm')">{{ res_value('BUTTON_ADD') }}</button>-->
                 <button onclick="toggleForm('pretrialForm', 'pretrial')">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button id="pretrialRefreshButton" onclick="refreshTab('pretrial')">🔄 Обновить</button>
 
                 <div id="pretrialFormContainer"></div>
                 <div id="pretrialContent"><!-- Here will be fragment _pretrial_items --></div>
+                <div id="pretrialTimestamp" class="tab-timestamp"></div>
             </div>
 
             <div id="law" class="tab-panel">
                 <button onclick="toggleForm('lawForm', 'law')">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button id="lawRefreshButton" onclick="refreshTab('law')">🔄 Обновить</button>
 
                 <div id="lawFormContainer"><!-- Here will be FORM _law_items --></div>
                 <div id="lawContent"><!-- Here will be fragment _law_items --></div>
+                <div id="lawTimestamp" class="tab-timestamp"></div>
             </div>
 
             <div id="court" class="tab-panel">
                 <button class="add-button" onclick="toggleForm('courtForm', 'court')">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button id="courtRefreshButton" onclick="refreshTab('court')">🔄 Обновить</button>
 
                 <div id="courtFormContainer"><!-- Here will be FORM _court_items --></div>
                 <div id="courtContent"><!-- Here will be fragment _court_items --></div>
+                <div id="courtTimestamp" class="tab-timestamp"></div>
             </div>
 
             <div id="appeal" class="tab-panel">
                 <button class="add-button" onclick="toggleForm('appealForm', 'appeal')">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button id="appealRefreshButton" onclick="refreshTab('appeal')">🔄 Обновить</button>
 
                 <div id="appealFormContainer"><!-- Here will be FORM _appeal_items --></div>
                 <div id="appealContent"><!-- Here will be fragment _appeal_items --></div>
+                <div id="appealTimestamp" class="tab-timestamp"></div>
             </div>
 
             <div id="execution" class="tab-panel">
                 <button class="add-button" onclick="toggleForm('executionForm','execution')">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button id="executionRefreshButton" onclick="refreshTab('execution')">🔄 Обновить</button>
 
                 <div id="executionFormContainer"><!-- Here will be FORM _execution_items --></div>
                 <div id="executionContent"><!-- Here will be fragment _execution_items --></div>
+                <div id="executionTimestamp" class="tab-timestamp"></div>
             </div>
 
 
