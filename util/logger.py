@@ -5,10 +5,10 @@ from gfss_parameter import app_name, debug
 
 
 def init_logger():
-    logger = logging.getLogger('AKTUAR-GFSS')
+    logger = logging.getLogger('COURT-GFSS')
     # logging.getLogger('PDD').addHandler(logging.StreamHandler(sys.stdout))
     # Console
-    logging.getLogger('AKTUAR-GFSS').addHandler(logging.StreamHandler())
+    logging.getLogger('COURT-GFSS').addHandler(logging.StreamHandler())
     if debug:
         logger.setLevel(logging.DEBUG)
     else:
@@ -20,7 +20,7 @@ def init_logger():
     fh.setFormatter(formatter)
 
     logger.addHandler(fh)
-    logger.info('Протокол для расчета провизии стартован...')
+    logger.info('Протокол для программы юридического учета переплат стартован...')
     return logger
 
 

@@ -52,13 +52,13 @@ def logout():
     resp = requests.post(url=f'{sso_server}/close', json=req_json)
 
     if resp.status_code != 200:
-        log.info(f'----------------\n\tОшибка {resp.status_code} соединения {username} с сервером SSO\n----------------')
+        log.info(f'----------------\n\tLOGOUT\n\tОшибка {resp.status_code} соединения {username} с сервером SSO\n----------------')
         return redirect(url_for('view_root'))
 
     resp_json = resp.json()
 
     if 'status' in resp_json and resp_json['status'] !=200:
-        log.info(f'----------------\n\tОшибка закрытия сессии. Статус: {resp_json['status']}/{ip_addr()}\n----------------')
+        log.info(f'----------------\n\tLOGOUT\n\tОшибка закрытия сессии. Статус: {resp_json['status']}/{ip_addr()}\n----------------')
 
     return redirect(url_for('view_root'))
 
@@ -81,16 +81,16 @@ def login_page():
         req_json = {'ip_addr': f'{ip_addr()}'}
         resp = requests.post(url=f'{sso_server}/check', json=req_json)
 
-        log.debug(f'LOGIN CHECK. \n\taddr: {sso_server}/check\n\tresp: {resp}')
+        log.info(f'LOGIN. GET. CHECK. \n\taddr: {sso_server}/check\n\tREQ_JSON: {req_json}\n\tRESP: {resp}')
         if resp.status_code == 200:
             resp_json=resp.json()
-            log.debug(f'LOGIN GET. resp_json: {resp_json}')
+            log.debug(f'LOGIN. GET. RESP_JSON: {resp_json}')
             if 'status' in resp_json and resp_json['status'] == 200:
                 json_user = resp_json['user']
                 log.debug(f'LOGIN GET. json_user: {json_user}')
                 session['username'] = json_user['login_name']
             else:
-                log.info(f'----------------\n\tUSER {ip_addr()} not Registred\n----------------')
+                log.info(f'----------------\n\tLOGIN_PAGE. GET.\n\tUSER not Registred\n\tIP_ADDR: {ip_addr()}\n----------------')
                 return render_template('login.html')
 
     if request.method == "POST":
@@ -98,17 +98,17 @@ def login_page():
         session['password'] = request.form.get('password')
 
         req_json = {'login_name': session['username'], 'password': session['password'], 'ip_addr': ip_addr() }
-        log.debug(f'LOGIN POST. REQUEST JSON: {req_json}')
+        log.debug(f'LOGIN_PAGE. POST. REQUEST JSON: {req_json}')
 
         resp = requests.post(url=f'{sso_server}/login', json=req_json)
         if resp.status_code != 200:
-            log.info(f'----------------\n\tОшибка {resp.status_code} соединения с сервером SSO\n----------------')
+            log.info(f'----------------\n\tLOGIN_PAGE. Ошибка {resp.status_code} соединения с сервером SSO\n----------------')
             return render_template('login.html')
 
         resp_json=resp.json()
         log.debug(f'LOGIN POST. resp_json: {resp_json}/{type(resp_json)}')
         if resp_json['status'] !=200:
-            log.info(f'----------------\n\tUSER {session['username']}/{session['password']} not Registred\n----------------')
+            log.info(f'----------------\n\tLOGIN_PAGE. POST.\n\tUSER {session['username']}/{session['password']} not Registred\n----------------')
             return render_template('login.html', info='Неверна Фамилия (или ИИН) или пароль в Windows')
 
         json_user = resp_json['user']

@@ -2,7 +2,7 @@ from os import environ
 
 debug = False
 public_name = "Ведение судебных дел"
-app_name = "GFSSCourt"
+app_name = "GFSS-Court"
 http_ip_context='HTTP_X_FORWARDED_FOR'
 SSO_LOGIN = True
 #http_ip_context='HTTP_X_REAL_IP'
