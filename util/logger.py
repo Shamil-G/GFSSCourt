@@ -14,7 +14,7 @@ def init_logger():
     else:
         logger.setLevel(logging.INFO)
         
-    fh = logging.FileHandler(f"{LOG_PATH}/{app_name.lower()}.log", encoding="UTF-8")
+    fh = logging.FileHandler(f"{LOG_PATH}/court.log", encoding="UTF-8")
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
