@@ -241,6 +241,25 @@ function toggleForm(formName,formType) {
   }
 }
 
+function initHelpForMarkedCells() {
+  document.querySelectorAll('td.has-helper[data-help]').forEach(td => {
+    if (td.querySelector('.help-icon')) return; // защита от повторного добавления
+
+    const icon = document.createElement('span');
+    icon.className = 'help-icon';
+    icon.textContent = 'ℹ️';
+
+    icon.addEventListener('click', () => {
+      const topic = td.dataset.help;
+      fetch(`/help_fragment?topic=${topic}`)
+        .then(res => res.text())
+        .then(html => showPopover(icon, html));
+    });
+
+    td.appendChild(icon);
+  });
+}
+
 // При первоначальной загрузке страницы должна получить первый order_num
 window.addEventListener('DOMContentLoaded', () => {
   const firstRow = document.querySelector('table tbody tr[data-order]');
@@ -257,5 +276,9 @@ window.addEventListener('DOMContentLoaded', () => {
   } else {
     showTab('pretrial'); // по умолчанию
   }
+  // Привязываем HELPER к помеченным 
+  // ячейкам таблиц
+  initHelpForMarkedCells();
+
 });
 

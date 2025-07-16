@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-   {{ res_value('LIST_OVERPAYMENTS') }}
+{{ res_value('LIST_OVERPAYMENTS') }}
 {% endblock %}
 
 {% block main_title %}
@@ -23,74 +23,74 @@
 <div class="container">
     <!-- Верхняя область: список документов -->
     <div class="documents">
-            <table>
-                <colgroup><col><col><col><col><col><col><col><col><col><col><col></colgroup>
-                <thead>
-                    <tr>
-                        <th>{{ res_value('ORDER_NUM') }}</th>
-                        <th>{{ res_value('FILIAL_NAME') }}</th>
-                        <th>{{ res_value('FIO_OVERPAY') }}</th>
-                        <th>{{ res_value('IIN_OVERPAY') }}</th>
-                        <th>{{ res_value('RFPM_ID') }}</th>
-                        <th>{{ res_value('ESTIMATED_DAMAGE_AMOUNT') }}</th>
-                        <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
-                        <th>{{ res_value('COURT_DAMAGE_AMOUNT') }}</th>
-                        <th>{{ res_value('STATUS_OVERPAY') }}</th>
-                        <th>{{ res_value('POINT_UK') }}</th>
-                        <th>{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
-                        <th>{{ res_value('LAST_SOLUTION') }}</th>
-                    </tr>
-                </thead>
-                <tfoot></tfoot>
-                <tbody>
-                    <tr>
-                        <td>
-                            <a class="button button_add_op" href="/add_op">+</a>
-                        </td>
-                    </tr>
-                    {% for el in list_op %}
-                    <tr onclick="filterByOrder('{{ el.order_num }}')" data-order="{{ el.order_num }}">
-                        <td>
-                            {{ el.order_num }}
-                        </td>
-                        <td style="text-align: left">
-                            {{ el.region }}
-                        </td>
-                        <td>
-                            {{ el.fio }}
-                        </td>
-                        <td>
-                            {{ el.iin }}
-                        </td>
-                        <td style="text-align: left">
-                            {{ el.rfpm_id }}
-                        </td>
-                        <td>
-                            {{ el.estimated_amount }}
-                        </td>
-                        <td>
-                            {{ el.compensated_amount }}
-                        </td>
-                        <td>
-                            {{ el.court_amount }}
-                        </td>
-                        <td>
-                            {{ el.last_status }}
-                        </td>
-                        <td>
-                            {{ el.point_uk }}
-                        </td>
-                        <td style="text-align: left">
-                            {{ el.last_source_solution }}
-                        </td>
-                        <td style="text-align: left">
-                            {{ el.last_solution }}
-                        </td>
-
-                    </tr>
-                    {% endfor %}
+        <table>
+            <colgroup><col><col><col><col><col><col><col><col><col><col><col></colgroup>
+            <thead>
+                <tr>
+                    <th>{{ res_value('ORDER_NUM') }}</th>
+                    <th>{{ res_value('FILIAL_NAME') }}</th>
+                    <th>{{ res_value('FIO_OVERPAY') }}</th>
+                    <th>{{ res_value('IIN_OVERPAY') }}</th>
+                    <th>{{ res_value('RFPM_ID') }}</th>
+                    <th>{{ res_value('ESTIMATED_DAMAGE_AMOUNT') }}</th>
+                    <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
+                    <th>{{ res_value('COURT_DAMAGE_AMOUNT') }}</th>
+                    <th>{{ res_value('STATUS_OVERPAY') }}</th>
+                    <th>{{ res_value('POINT_UK') }}</th>
+                    <th>{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
+                    <th>{{ res_value('LAST_SOLUTION') }}</th>
+                </tr>
+            </thead>
+            <tfoot></tfoot>
             <tbody>
-            </table>
+                <tr>
+                    <td>
+                        <a class="button button_add_op" href="/add_op">+</a>
+                    </td>
+                </tr>
+                {% for el in list_op %}
+                <tr onclick="filterByOrder('{{ el.order_num }}')" data-order="{{ el.order_num }}">
+                    <td data-help="overpayment_id" class="has-helper">
+                        {{ el.order_num }}
+                    </td>
+                    <td data-help="region" class="has-helper" style="text-align: left">
+                        {{ el.region }}
+                    </td>
+                    <td style="text-align: left">
+                        {{ el.fio }}
+                    </td>
+                    <td>
+                        {{ el.iin }}
+                    </td>
+                    <td data-help="rfpm_id" class="has-helper" style="text-align: left">
+                        {{ el.rfpm_id }}
+                    </td>
+                    <td  style="text-align: left">
+                        {{ el.estimated_amount }}
+                    </td>
+                    <td  style="text-align: right">
+                        {{ el.compensated_amount }}
+                    </td>
+                    <td style="text-align: right">
+                        {{ el.court_amount }}
+                    </td>
+                    <td data-help="last_status" class="has-helper" style="text-align: left">
+                        {{ el.last_status }}
+                    </td>
+                    <td>
+                        {{ el.point_uk }}
+                    </td>
+                    <td data-help="last_source_solution" class="has-helper" style="text-align: left">
+                        {{ el.last_source_solution }}
+                    </td>
+                    <td data-help="last_solution" class="has-helper" style="text-align: left">
+                        {{ el.last_solution }}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            <tbody>
+        </table>
 
     </div>
     <!-- Нижняя область: вкладки -->
@@ -163,4 +163,5 @@
     </div>
 </div>
 <script src="static/js/list_op.js"></script>
+<script src="static/js/helper.js"></script>
 {% endblock %}

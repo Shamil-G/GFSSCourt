@@ -2,7 +2,6 @@
 .container { 
     margin: auto;
     padding: 20px;
-    font-family: sans-serif;
 
     display: flex;
     flex-direction: column;
@@ -88,4 +87,48 @@ li {
 .fade-out {
     opacity: 0.3;
     transition: opacity 150ms ease-in;
+}
+/*.help-cell {
+    position: relative;
+}*/
+.has-helper .help-icon {
+    visibility: hidden;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 6px;
+    color: #369;
+}
+
+.has-helper:hover .help-icon {
+    visibility: visible;
+}
+
+.popover {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px 12px;
+    max-width: 320px;
+    font-size: 13px;
+    color: #333;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    border-radius: 6px;
+    z-index: 1000;
+}
+
+.popover-close {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+}
+
+.popover-close:hover {
+    color: #c00;
+}
+
+.popover-content {
+    padding-top: 6px;
 }
