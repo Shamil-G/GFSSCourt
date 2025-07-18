@@ -240,12 +240,14 @@ def view_appeal_fragment():
 @login_required
 def view_execution_add():
     order_num = request.form.get('order_num')
-    transfer_date = request.form.get('trasfer_date','')
+    transfer_date = request.form.get('transfer_date','')
     start_date = request.form.get('start_date','')
     phone = request.form.get('phone','')
     court_executor = request.form.get('court_executor','')
 
-    log.info(f'----->\n\tADD EXECUTION\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
+    log.info(f'----->\n\tADD EXECUTION\n\tFORM: {request.form}')
+
+    log.info(f'----->\n\tADD EXECUTION\n\tORDER_NUM: {order_num}\n\tTRANSFER_DATE: {transfer_date}\n\tSTART_DATE: {start_date}\n\tPHONE: {phone}\n\tCOURT_EXECUTOR: {court_executor}\n\tUSER: {g.user.full_name}')
     if order_num and g.user.full_name:
         add_execution(order_num, transfer_date, start_date, phone, court_executor, g.user.full_name)      
     # Сохраняем в БД или обрабатываем

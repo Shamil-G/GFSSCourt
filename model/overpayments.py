@@ -293,7 +293,7 @@ def add_execution(op_id, transfer_date, start_date, phone, court_executor, emplo
         with connection.cursor() as cursor:
             try:
                 cursor.execute('begin op.add_execution(:op_id, :transfer_date, :start_date, :phone, :court_executor, :employee); end;', 
-                               op_id=op_id, 
+                               op_id=int(op_id), 
                                transfer_date=transfer_date, 
                                start_date=start_date, 
                                phone=phone, 
