@@ -1,14 +1,12 @@
-{% if pretrial_items %}
-<table style="width: 100%; margin-top:4px">
+{% if execution_items %}
+<table style="width: 840px; margin-top:4px">
     <colgroup>
-        <col style="width: 160px">
-        <col style="width: 170px">
-        <col style="width: 160px">
+        <col style="width: 176px">
+        <col style="width: 176px">
     </colgroup>
     <thead>
         <tr>
             <th>{{ res_value('PRETRIAL_DATE') }}</th>
-            <th>{{ res_value('UNTIL_DAY') }}</th>
             <th>{{ res_value('MATURITY_DATE') }}</th>
             <th>{{ res_value('EMPLOYEE') }}</th>
         </tr>
@@ -18,7 +16,6 @@
         {% for item in pretrial_items %}
         <tr>
             <td>{{ item.pretrial_date }}</td>
-            <td>{{ item.until_day }}</td>
             <td>{{ item.maturity_date }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
         </tr>
@@ -26,5 +23,5 @@
 </tbody>
 </table>
 {% else %}
-<p>{{ res_value('NONE_PRETRIAL_ITEMS') }}</p>
+<p>{{ res_value('NONE_REFUNDING_ITEMS') }}</p>
 {% endif %}

@@ -1,4 +1,6 @@
-﻿let currentTabId = null;
+﻿import { initFragment, showPopover, submitFormViaFetch } from './uiEngine.js';
+
+let currentTabId = null;
 const tabCache = {};
 const tabCacheOrder = [];
 
@@ -37,6 +39,87 @@ function updateRefreshButton(id){
   }
 }
 //////////////////////////////////////////////////////////////////////////////
+function showTableLoader(tabId, start) {
+  const contentZone = document.getElementById(`${tabId}Content`);
+  if (!contentZone) return;
+
+  const tfoot = contentZone.querySelector('tfoot');
+  if (tfoot) {
+    console.log("showTableLoader " + start)
+    if(start==1){
+        console.log("showTableLoader Пишем " + start)
+        tfoot.innerHTML = `
+          <tr>
+            <td colspan="100%" style="text-align:center; padding:8px">
+              <span class="loader">Загрузка...</span>
+            </td>
+          </tr>
+        `;
+    } 
+    else {
+        console.log("showTableLoader Чистим " + start)
+        tfoot.innerHTML = '';
+    } 
+  }
+}
+//////////////////////////////////////////////////////////////////////////////
+// Только при ручном обновлении через кнопку Обновить
+function refreshTabDirect(tabId) {
+  const orderNum = getOrderNum();
+  if (!orderNum) return;
+
+  console.log("refershTabDirect. orderNum: "+orderNum)
+  const contentZone = document.getElementById(`${tabId}Content`);
+  const timestampZone = document.getElementById(`${tabId}Timestamp`);
+  const cacheKey = `${tabId}_${orderNum}`;
+
+  showTableLoader(tabId,1);
+
+  fetch(`/${tabId}_fragment?order_num=${orderNum}`)
+    .then(res => res.text())
+    .then(html => {
+      const fragment = document.createRange().createContextualFragment(html);
+      
+      const hasTableRows = fragment.querySelectorAll('table tbody tr').length > 0;
+
+      if (hasTableRows) {
+        const cacheKey = `${tabId}_${orderNum}`;
+        const cached = tabCache[cacheKey];
+
+        if(!cached || html != cached.html){
+            delete tabCache[cacheKey];
+            addToCache(cacheKey, html);
+            console.info('ℹ️ Обновление кэша с ключом '+cacheKey);
+
+            contentZone.innerHTML = html;
+            timestampZone.textContent = `Обновлено: ${new Date().toLocaleTimeString()}`;
+            updateRefreshButton(tabId);
+        }
+        else{
+            console.info('ℹ️ Обновлений нет! '+cacheKey);
+        }
+      }
+    })
+    .catch(err => {
+      console.error(`Ошибка загрузки вкладки ${tabId}:`, err);
+    });
+    
+  showTableLoader(tabId,0);
+}
+///////////////////////////////////////////////////////////////////////////
+// Кнопка Refresh
+function refreshTab(id) {
+  const orderNum = getOrderNum();
+  if (!orderNum) return;
+
+  const cacheKey = `${id}_${orderNum}`;
+
+  delete tabCache[cacheKey];
+
+  loadTabContent(id); // загрузим заново
+  updateRefreshButton(id);
+}
+//////////////////////////////////////////////////////////////////////////////
 function formatAge(timestamp) {
   const now = Date.now();
   const delta = now - timestamp;
@@ -71,18 +154,6 @@ function addToCache(key, html) {
   tabCacheOrder.push(key);
 }
 ///////////////////////////////////////////////////////////////////////////
-// Кнопка Refresh
-function refreshTab(id) {
-  const orderNum = getOrderNum();
-  if (!orderNum) return;
-
-  const cacheKey = `${id}_${orderNum}`;
-
-  delete tabCache[cacheKey];
-
-  loadTabContent(id); // загрузим заново
-}
-///////////////////////////////////////////////////////////////////////////
 // Главная таблица переплат в LIST_OVERPAYMENTS.HTML
 // Когда щелкаем мышкой по записям TR надо менять фильтр orderNum для TABS
 function filterByOrder(orderNum) {
@@ -113,11 +184,14 @@ function syncOrderNumToForms() {
     input.value = value;
   });
 }
+
 ////////////////////////////////////////////////////////////////////////////////////
 // По выбранному TAB загружаем его содержимое
 function loadTabContent(id) {
   const orderNum = getOrderNum();
   if (!orderNum) return;
+
+  console.log("loadTabContent. order_num: "+orderNum)
 
   let url = '';
   let containerId = '';
@@ -127,13 +201,21 @@ function loadTabContent(id) {
       url = `/pretrial_fragment?order_num=${orderNum}`;
       containerId = 'pretrialContent';
       break;
+    case 'scammer':
+      url = `/scammer_fragment?order_num=${orderNum}`;
+      containerId = 'scammerContent';
+      break;
     case 'law':
       url = `/law_fragment?order_num=${orderNum}`;
       containerId = 'lawContent';
       break;
-    case 'court':
-      url = `/court_fragment?order_num=${orderNum}`;
-      containerId = 'courtContent';
+    case 'court_crime':
+      url = `/court_crime_fragment?order_num=${orderNum}`;
+      containerId = 'court_crimeContent';
+      break;
+    case 'court_civ':
+      url = `/court_civ_fragment?order_num=${orderNum}`;
+      containerId = 'court_civContent';
       break;
     case 'appeal':
       url = `/appeal_fragment?order_num=${orderNum}`;
@@ -143,8 +225,13 @@ function loadTabContent(id) {
       url = `/execution_fragment?order_num=${orderNum}`;
       containerId = 'executionContent';
       break;
+    case 'refunding':
+      url = `/refunding_fragment?order_num=${orderNum}`;
+      containerId = 'executionContent';
+      break;
     default:
-      console.warn(` Unknown TABS: ${id}`);
+      url = `/pretrial_fragment?order_num=${orderNum}`;
+      containerId = 'pretrialContent';
       return;
   }
 
@@ -155,6 +242,7 @@ function loadTabContent(id) {
     return;
   }
 
+
   // ✅ Если есть в кэше — сразу вставляем
   if (tabCache[cacheKey]) {
     const cached = tabCache[cacheKey];
@@ -162,6 +250,7 @@ function loadTabContent(id) {
     updateRefreshButton(id);
 
     document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
+
     return;
   }
 
@@ -174,6 +263,10 @@ function loadTabContent(id) {
       container.classList.add('fade-out');
       setTimeout(() => {
         container.innerHTML = html;
+
+        console.log("loadTabContent. ID "+id)
+        initFragment(container, id); // универсальная инициализация
+
         document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(Date.now())}`;
         container.classList.remove('fade-out');
         // tabCache[cacheKey] = html; // Сохраняем фрагмент
@@ -186,18 +279,22 @@ function loadTabContent(id) {
       console.error(`Error on loadTabContent "${id}":`, error);
     });
 
-
 }
 /////////////////////////////////////////////////////////////////////////////////
 // Переходим с одного tab на другой и должны показываться соответствующие панели
 // Функция переключения между вкладками с выборкой его содержимого
 function showTab(id) {
   currentTabId = id;
+
+  console.log("showTab. ID: " + id);
+  const sharedTab = document.getElementById('sharedTabId');
+  if (sharedTab) sharedTab.value = id;
+
   // Скрыть все панели
   document.querySelectorAll('.tab-panel').forEach(panel => {
     panel.classList.remove('active');
   });
-
+  console.log('showTab '+id)
   // Показать нужную панель
   const targetPanel = document.getElementById(id);
   if (targetPanel) {
@@ -235,12 +332,26 @@ function toggleForm(formName,formType) {
       .then(response => response.text())
       .then(html => {
         container.innerHTML = html;
+        console.log("toggleForm "+formName, "FormType "+formType);
+
+        // привязываем к Форме вызов функции submitFormViaFetch(formName, formType)
+        // при событии submit
+        const form = document.getElementById(formName);
+        if (form) {
+          form.addEventListener('submit', event => {
+            event.preventDefault(); // ❗ Не даём браузеру перезагрузить страницу
+            submitFormViaFetch(formName, formType, getOrderNum()); // 🔄 Отправляем асинхронно
+          });
+        }
+        
+        const formZone = container; // или document.getElementById(formName)
+        initFragment(formZone, formType);  // ⬅️ логика конкретной вкладки
         syncOrderNumToForms(); // вставить значение в форму
       })
       .catch(error => console.error('Error load fragment form: ${formType}:', error));
   }
 }
-
+////////////////////////////////////////////////////////////////////////////////////
 function initHelpForMarkedCells() {
   document.querySelectorAll('td.has-helper[data-help]').forEach(td => {
     if (td.querySelector('.help-icon')) return; // защита от повторного добавления
@@ -259,26 +370,63 @@ function initHelpForMarkedCells() {
     td.appendChild(icon);
   });
 }
-
+/////////////////////////////////////////////////////////////////////////////////////
 // При первоначальной загрузке страницы должна получить первый order_num
 window.addEventListener('DOMContentLoaded', () => {
   const firstRow = document.querySelector('table tbody tr[data-order]');
   if (firstRow) {
     const orderNum = firstRow.dataset.order;
-    console.log("First Load Page. orderNum: "+orderNum)
+    console.log("First Load Page. orderNum: " + orderNum);
     filterByOrder(orderNum);
   }
 
+  document.querySelectorAll('.add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const formName = btn.dataset.form;
+      const formType = btn.dataset.type;
+      API.toggleForm(formName, formType);
+    });
+  });
+
+  document.querySelectorAll('.clickable-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const orderNum = row.dataset.order;
+      API.filterByOrder(orderNum);
+    });
+  });
+
+  const sharedTab = document.getElementById('sharedTabId');
   const urlParams = new URLSearchParams(window.location.search);
-  const tab = urlParams.get('tab');
-  if (tab) {
-    showTab(tab);
-  } else {
-    showTab('pretrial'); // по умолчанию
-  }
-  // Привязываем HELPER к помеченным 
-  // ячейкам таблиц
+  const tabFromUrl = urlParams.get('tab');
+  const tabFromField = sharedTab?.value;
+  const activeTab = tabFromUrl || tabFromField || 'pretrial';
+
+  showTab(activeTab);
+
   initHelpForMarkedCells();
 
+  // 👇 Делегированная обработка кнопок "Обновить"
+  document.querySelector('.tabs').addEventListener('click', e => {
+    const btn = e.target;
+    if (btn.classList.contains('refresh-btn') && btn.dataset.tab) {
+      const tabId = btn.dataset.tab;
+      API.refreshTabDirect(tabId);
+    }
+  });
 });
 
+const globalAPI = {
+  filterByOrder,
+  toggleForm,
+  refreshTab,
+  refreshTabDirect,
+  showTab,
+  loadTabContent,
+  syncOrderNumToForms,
+  formatAge,
+  updateRefreshButton,
+  // добавляй по мере необходимости
+  submitFormViaFetch
+};
+
+window.API = globalAPI;

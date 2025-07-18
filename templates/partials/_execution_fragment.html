@@ -1,4 +1,4 @@
-{% if court_items %}
+{% if execution_items %}
 <table style="width: 100%; margin-top: 4px">
     <colgroup>
         <col style="width: 175px">
@@ -6,10 +6,10 @@
     </colgroup>
     <thead>
         <tr>
-            <th>{{ res_value('SUBMISSION_DATE') }}</th>
-            <th>{{ res_value('DECISION_DATE') }}</th>
-            <th>{{ res_value('LAW_DECISION') }}</th>
-            <th>{{ res_value('ORG_NAME') }}</th>
+            <th>{{ res_value('TRANSFER_DATE') }}</th>
+            <th>{{ res_value('START_DATE') }}</th>
+            <th>{{ res_value('PHONE') }}</th>
+            <th>{{ res_value('COURT_EXECUTOR') }}</th>
             <th>{{ res_value('EMPLOYEE') }}</th>
         </tr>
     </thead>
@@ -17,15 +17,15 @@
     <tbody>
         {% for item in court_items %}
         <tr>
-            <td>{{ item.submission_date }}</td>
-            <td>{{ item.decision_date }}</td>
-            <td style="text-align: left">{{ item.decision }}</td>
-            <td style="text-align: left">{{ item.orgname }}</td>
+            <td>{{ item.transfer_date }}</td>
+            <td>{{ item.start_date }}</td>
+            <td style="text-align: left">{{ item.phone }}</td>
+            <td style="text-align: left">{{ item.court_executor }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
         <tr>
         {% endfor %}
     </tbody>
 </table>
 {% else %}
-<p>{{ res_value('NONE_COURT_ITEMS') }}</p>
+<p>{{ res_value('NONE_EXECUTION_ITEMS') }}</p>
 {% endif %}

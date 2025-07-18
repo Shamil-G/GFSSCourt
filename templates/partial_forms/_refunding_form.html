@@ -1,5 +1,5 @@
-﻿<form style="width: 450px; margin-top: 15px;" class="form_op" id="pretrialForm" method="POST" action="/add_pretrial">
-    <input type="hidden" name="order_num" id="pretrialOrderNum">
+﻿<form style="width: 450px" class="form_op" id="refundingForm" margin-top: 15px;" method="POST" action="/add_refundingl">
+    <input type="hidden" name="order_num" id="refundingOrderNum">
 
     <table style="width: 420px; margin:4px 0px 4px 0px; box-shadow: none">
         <colgroup>
@@ -20,7 +20,7 @@
                     {{ res_value('UNTIL_DAY') }}
                 </td>
                 <td style="border: none; text-align: left">
-                    <input class="input_d" style="font-size: 18px; text-align: left; width: 60px" type="number" max="31" name="until_day">
+                    <input class="input_d" style="font-size: 18px; text-align: left" type="number" name="until_day" min="1" max="31">
                 </td>
             </tr>
             <tr class="disabled-row">

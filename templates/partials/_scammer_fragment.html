@@ -1,0 +1,28 @@
+{% if scammer_items %}
+<table style="width: 100%; margin-top:4px">
+    <colgroup>
+        <col style="width: 160px">
+    </colgroup>
+    <thead>
+        <tr>
+            <th>{{ res_value('SCAMMER_IIN') }}</th>
+            <th>{{ res_value('SCAMMER_FIO') }}</th>
+            <th>{{ res_value('SCAMMER_ORG_NAME') }}</th>
+            <th>{{ res_value('EMPLOYEE') }}</th>
+        </tr>
+    </thead>
+    <tfoot></tfoot>
+    <tbody>
+        {% for item in scammer_items %}
+        <tr>
+            <td>{{ item.iin }}</td>
+            <td style="text-align: left">{{ item.scammer_fio}}</td>
+            <td style="text-align: left">{{ item.scammer_org_name}}</td>
+            <td style="text-align: left">{{ item.employee}}</td>
+        </tr>
+        {% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>{{ res_value('NONE_SCAMMER_ITEMS') }}</p>
+{% endif %}

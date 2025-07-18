@@ -23,3 +23,7 @@
 .recommend {
     color: #d86;
 }
+input.input_d:disabled {
+    background-color: #f3f3f3;
+    opacity: 0.7;
+}

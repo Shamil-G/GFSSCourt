@@ -58,12 +58,6 @@ select {
     display: block;
 }
 
-input[type="text"] {
-    /*width: 100%;*/
-    padding: 8px;
-    margin-bottom: 10px;
-}
-
 ul {
     list-style: none;
     padding: 0;
@@ -88,10 +82,7 @@ li {
     opacity: 0.3;
     transition: opacity 150ms ease-in;
 }
-/*.help-cell {
-    position: relative;
-}*/
-.has-helper .help-icon {
+.help-icon {
     visibility: hidden;
     cursor: pointer;
     font-size: 14px;
@@ -99,7 +90,7 @@ li {
     color: #369;
 }
 
-.has-helper:hover .help-icon {
+td.has-helper:hover .help-icon {
     visibility: visible;
 }
 

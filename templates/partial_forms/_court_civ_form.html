@@ -1,5 +1,5 @@
-﻿<form class="form_op" id="courtForm" style=margin-top: 15px;" method="POST" action="/add_court">
-    <input type="hidden" name="order_num" id="courtOrderNum">
+﻿<form class="form_op" id="court_civForm" style=margin-top: 15px;" method="POST" action="/add_court_civ">
+    <!--<input type="hidden" name="order_num" id="court_civOrderNum">-->
 
     <table style="width: 960px; margin:4px 0px 4px 0px; box-shadow: none">
         <colgroup>
@@ -18,12 +18,12 @@
 
             <tr class="disabled-row">
                 <td style="border: none; text-align: left">{{ res_value('LAW_DECISION') }}:</td>
-                <td style="border: none; text-align: left"><input style="font-size: 18px; width: 840px;" type="text" name="orgname" required></td>
+                <td style="border: none; text-align: left"><input style="width: 75%" class="input_s_form" type="text" name="orgname" required></td>
             </tr>
 
             <tr class="disabled-row">
                 <td style="border: none; text-align: left">{{ res_value('ORG_NAME') }}:</td>
-                <td style="border: none; text-align: left"><input style="font-size: 18px; width: 840px;" type="text" name="orgname" required></td>
+                <td style="border: none; text-align: left"><input style="width: 95%" class="input_s_form" type="text" name="orgname" required></td>
             </tr>
 
         </tbody>
