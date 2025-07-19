@@ -1,4 +1,4 @@
-﻿import { initFragment, showPopover, submitFormViaFetch } from './uiEngine.js';
+﻿import { initFragment, showPopover, initHelpForMarkedCells, submitFormViaFetch } from './uiEngine.js';
 
 let currentTabId = null;
 const tabCache = {};
@@ -167,8 +167,9 @@ function filterByOrder(orderNum) {
   const shared = document.getElementById('sharedOrderNum');
   if (shared) shared.value = orderNum;
 
-  // Синхронизировать ORDER_NUM во все формы
-  syncOrderNumToForms();
+    // Синхронизировать ORDER_NUM во все формы
+    // Сейчас это делает submitFormViaFetch"
+    // syncOrderNumToForms();
 
   loadTabContent(currentTabId);
 }
@@ -345,30 +346,13 @@ function toggleForm(formName,formType) {
         }
         
         const formZone = container; // или document.getElementById(formName)
-        initFragment(formZone, formType);  // ⬅️ логика конкретной вкладки
-        syncOrderNumToForms(); // вставить значение в форму
+          initFragment(formZone, formType);  // ⬅️ логика конкретной вкладки
+          // Синхронизировать ORDER_NUM во все формы
+          // Сейчас это делает submitFormViaFetch"
+          // syncOrderNumToForms(); // вставить значение в форму
       })
       .catch(error => console.error('Error load fragment form: ${formType}:', error));
   }
-}
-////////////////////////////////////////////////////////////////////////////////////
-function initHelpForMarkedCells() {
-  document.querySelectorAll('td.has-helper[data-help]').forEach(td => {
-    if (td.querySelector('.help-icon')) return; // защита от повторного добавления
-
-    const icon = document.createElement('span');
-    icon.className = 'help-icon';
-    icon.textContent = 'ℹ️';
-
-    icon.addEventListener('click', () => {
-      const topic = td.dataset.help;
-      fetch(`/help_fragment?topic=${topic}`)
-        .then(res => res.text())
-        .then(html => showPopover(icon, html));
-    });
-
-    td.appendChild(icon);
-  });
 }
 /////////////////////////////////////////////////////////////////////////////////////
 // При первоначальной загрузке страницы должна получить первый order_num

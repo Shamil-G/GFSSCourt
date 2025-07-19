@@ -59,7 +59,8 @@ function initAppealLogic(zone) {
     console.log("initAppealLogic")
 }
 function initExecutionLogic(zone) {
-    console.log("initExecutionLogic")
+    console.log("initExecutionLogic");
+    initHelpForMarkedCells();
 }
 function initRefundingLogic(zone) {
     console.log("initRefundingLogic")
@@ -87,6 +88,26 @@ export function addHelperIcon(td) {
   });
 
   td.appendChild(icon);
+}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+export function initHelpForMarkedCells() {
+    document.querySelectorAll('td.has-helper[data-help]').forEach(td => {
+        if (td.querySelector('.help-icon')) return; // защита от повторного добавления
+
+        const icon = document.createElement('span');
+        icon.className = 'help-icon';
+        icon.textContent = 'ℹ️';
+
+        icon.addEventListener('click', () => {
+            const topic = td.dataset.help;
+            fetch(`/help_fragment?topic=${topic}`)
+                .then(res => res.text())
+                .then(html => showPopover(icon, html));
+        });
+
+        td.appendChild(icon);
+    });
 }
 ////////////////////////////////////////////////
 export function showPopover(target, html) {

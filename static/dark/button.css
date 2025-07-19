@@ -1,6 +1,6 @@
 button, .button, .button_red {
     color: #aaa;
-    background-color: #333;
+    background-color: #333C;
     border: 1px solid rgba(180, 180, 180, 0.3);
     transition: color .2s ease-in-out,background-color .2s ease-in-out, border-color .2s ease-in-out, box-shadow .2s ease-in-out;
 }

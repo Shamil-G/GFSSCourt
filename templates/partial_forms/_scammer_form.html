@@ -1,7 +1,4 @@
 ﻿<form style="width: 90%; margin-top: 15px;" class="form_op" id="scammerForm" method="POST" action="/add_scammer">
-    <input type="hidden" name="order_num" id="scammerOrderNum">
-    <input type="hidden" name="active_tab" value="scammer">
-
     <table style="width: 90%; margin:4px 0px 4px 0px; box-shadow: none">
         <colgroup>
             <col style="width: 220px">
@@ -12,7 +9,7 @@
                     {{ res_value('SCAMMER_IIN') }}
                 </td>
                 <td style="border: none; text-align: left">
-                    <input class="input_s" style="font-size: 18px; width: 140px;" type="text" name="iin" required>
+                    <input class="input_s" style="font-size: 18px; width: 140px;" type="text" name="iin" maxlength="12" required>
                 </td>
             </tr>
             <tr class="disabled-row">

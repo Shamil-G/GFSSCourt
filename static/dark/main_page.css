@@ -6,7 +6,7 @@
 /* јктивна€ вкладка Ч "вдавленна€" */
 .tab.active {
 /*    background: #0f03;*/
-    background: #555;
+    background: #5557;
     color: #ddd;
     border-bottom: 1px solid #fff; /* сливаетс€ с панелью */
     font-weight: 600;
@@ -16,5 +16,5 @@
     color: antiquewhite;
 }
 .tab-content {
-    background: #555;
+    background: #5557;
 }

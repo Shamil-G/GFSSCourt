@@ -1,8 +1,9 @@
 {% if execution_items %}
 <table style="width: 100%; margin-top: 4px">
     <colgroup>
-        <col style="width: 175px">
-        <col style="width: 155px">
+        <col style="width: 170px">
+        <col style="width: 170px">
+        <col style="width: 236px">
     </colgroup>
     <thead>
         <tr>
@@ -17,9 +18,9 @@
     <tbody>
         {% for item in execution_items %}
         <tr>
-            <td>{{ item.transfer_date }}</td>
-            <td>{{ item.start_date }}</td>
-            <td style="text-align: left">{{ item.phone }}</td>
+            <td data-help="transfer_date" class="has-helper">{{ item.transfer_date }}</td>
+            <td data-help="start_date" class="has-helper">{{ item.start_date }}</td>
+            <td>{{ item.phone }}</td>
             <td style="text-align: left">{{ item.court_executor }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
         <tr>

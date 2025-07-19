@@ -24,7 +24,7 @@
     <!-- Верхняя область: список документов -->
     <div class="documents">
         <table>
-            <colgroup><col><col><col><col><col><col><col><col><col><col><col></colgroup>
+            <colgroup><col style="width: 120px;"><col><col><col><col><col><col><col><col><col><col></colgroup>
             <thead>
                 <tr>
                     <th>{{ res_value('ORDER_NUM') }}</th>
@@ -49,9 +49,13 @@
                 </tr>
                 {% for el in list_op %}
                 <tr data-order="{{ el.order_num }}" class="clickable-row">
+                    <!--<td>
+                        <a>{{ el.order_num }}</a>
+                    </td>-->
                     <td data-help="overpayment_id" class="has-helper">
-                        {{ el.order_num }}
+                        <a>{{ el.order_num }}</a>
                     </td>
+
                     <td data-help="region" class="has-helper" style="text-align: left">
                         {{ el.region }}
                     </td>
@@ -64,10 +68,10 @@
                     <td data-help="rfpm_id" class="has-helper" style="text-align: left">
                         {{ el.rfpm_id }}
                     </td>
-                    <td  style="text-align: left">
+                    <td style="text-align: left">
                         {{ el.estimated_amount }}
                     </td>
-                    <td  style="text-align: right">
+                    <td style="text-align: right">
                         {{ el.compensated_amount }}
                     </td>
                     <td style="text-align: right">
@@ -98,14 +102,15 @@
         <!-- Общее поле order_num для всех TABS -->
         <input type="hidden" name="active_tab" id="sharedTabId">
         <input type="hidden" name="order_num" id="sharedOrderNum">
-        <input type="hidden" name="order_num" form="pretrialForm">
-        <input type="hidden" name="order_num" form="scammerForm">
+
+        <!--<input type="hidden" name="order_num" form="pretrialForm">-->
+        <!--<input type="hidden" name="order_num" form="scammerForm">
         <input type="hidden" name="order_num" form="lawForm">
         <input type="hidden" name="order_num" form="court_civOrderNum">
         <input type="hidden" name="order_num" form="court_crimeOrderNum">
         <input type="hidden" name="order_num" form="appealOrderNum">
         <input type="hidden" name="order_num" form="executionOrderNum">
-        <input type="hidden" name="order_num" form="refundingOrderNum">
+        <input type="hidden" name="order_num" form="refundingOrderNum">-->
 
 
         <div class="tab-buttons">

@@ -66,8 +66,7 @@ TAB_REFUNDING=Погашения
 SCAMMER_IIN=ИИН мошенника
 SCAMMER_FIO=ИИН мошенника
 SCAMMER_ORG_NAME=Организация - мошенник
-EXECUTION_TRANSFER_DATE=Дата передачи в исполнительное производство
-EXECUTION_PHONE=Телефон Исполнителя
+EXECUTION_TRANSFER_DATE=Дата передачи
+EXECUTION_PHONE=Телефон суд. исполнителя
 EXECUTION_COURT_EXECUTOR=ФИО судебного Исполнителя
-EXECUTION_START_DATE=Дата возбуждения исполнительного производства
-
+EXECUTION_START_DATE=Дата исполнения

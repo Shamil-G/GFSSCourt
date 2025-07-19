@@ -34,4 +34,9 @@
 .cancel {
     padding: 0px 1px 1px 0px;
 }
-
+.help-icon {
+    visibility: hidden;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 2px;
+}
