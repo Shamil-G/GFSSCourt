@@ -7,8 +7,8 @@
     </colgroup>
     <thead>
         <tr>
-            <th>{{ res_value('TRANSFER_DATE') }}</th>
-            <th>{{ res_value('START_DATE') }}</th>
+            <th data-help="transfer_date" class="has-helper">{{ res_value('TRANSFER_DATE') }}</th>
+            <th data-help="start_date" class="has-helper">{{ res_value('START_DATE') }}</th>
             <th>{{ res_value('PHONE') }}</th>
             <th>{{ res_value('COURT_EXECUTOR') }}</th>
             <th>{{ res_value('EMPLOYEE') }}</th>
@@ -18,8 +18,8 @@
     <tbody>
         {% for item in execution_items %}
         <tr>
-            <td data-help="transfer_date" class="has-helper">{{ item.transfer_date }}</td>
-            <td data-help="start_date" class="has-helper">{{ item.start_date }}</td>
+            <td>{{ item.transfer_date }}</td>
+            <td>{{ item.start_date }}</td>
             <td>{{ item.phone }}</td>
             <td style="text-align: left">{{ item.court_executor }}</td>
             <td style="text-align: left">{{ item.employee }}</td>

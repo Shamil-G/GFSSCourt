@@ -7,23 +7,29 @@
     <thead>
         <tr>
             <th>{{ res_value('SUBMISSION_DATE') }}</th>
-            <th>{{ res_value('DECISION_DATE') }}</th>
-            <th>{{ res_value('LAW_DECISION') }}</th>
-            <th>{{ res_value('ORG_NAME') }}</th>
+            <th>{{ res_value('VERDICT_DATE') }}</th>
+            <th>{{ res_value('ESTIMATED_DAMAGE_AMOUNT') }}</th>
+            <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
+            <th data-help="solution_crime_part" class="has-helper">{{ res_value('SOLUTION_CRIME_PART') }}</th>
+            <th data-help="solution_civ_part" class="has-helper">{{ res_value('SOLUTION_CIV_PART') }}</th>
+            <th>{{ res_value('COURT_NAME') }}</th>
             <th>{{ res_value('EMPLOYEE') }}</th>
         </tr>
     </thead>
     <tfoot></tfoot>
     <tbody>
-        {% for item in court_items %}
+        {% for item in court_crime_items %}
         <tr>
             <td>{{ item.submission_date }}</td>
-            <td>{{ item.decision_date }}</td>
-            <td style="text-align: left">{{ item.decision }}</td>
-            <td style="text-align: left">{{ item.orgname }}</td>
+            <td>{{ item.verdict_date }}</td>
+            <td style="text-align: right">{{ item.estimated_damage_amount }}</td>
+            <td style="text-align: right">{{ item.compensated_amount }}</td>
+            <td>{{ item.solution_crime_part }}</td>
+            <td>{{ item.solution_civ_part }}</td>
+            <td style="text-align: left">{{ item.court_name }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
         <tr>
-        {% endfor %}
+            {% endfor %}
     </tbody>
 </table>
 {% else %}

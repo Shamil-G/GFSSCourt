@@ -27,18 +27,18 @@
             <colgroup><col style="width: 120px;"><col><col><col><col><col><col><col><col><col><col></colgroup>
             <thead>
                 <tr>
-                    <th>{{ res_value('ORDER_NUM') }}</th>
-                    <th>{{ res_value('FILIAL_NAME') }}</th>
+                    <th data-help="overpayment_id" class="has-helper">{{ res_value('ORDER_NUM') }}</th>
+                    <th data-help="region" class="has-helper">{{ res_value('FILIAL_NAME') }}</th>
                     <th>{{ res_value('FIO_OVERPAY') }}</th>
                     <th>{{ res_value('IIN_OVERPAY') }}</th>
-                    <th>{{ res_value('RFPM_ID') }}</th>
+                    <th data-help="rfpm_id" class="has-helper">{{ res_value('RFPM_ID') }}</th>
                     <th>{{ res_value('ESTIMATED_DAMAGE_AMOUNT') }}</th>
                     <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
                     <th>{{ res_value('COURT_DAMAGE_AMOUNT') }}</th>
-                    <th>{{ res_value('STATUS_OVERPAY') }}</th>
-                    <th>{{ res_value('POINT_UK') }}</th>
-                    <th>{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
-                    <th>{{ res_value('LAST_SOLUTION') }}</th>
+                    <th data-help="last_status" class="has-helper">{{ res_value('STATUS_OVERPAY') }}</th>
+                    <th data-help="force_date" class="has-helper">{{ res_value('FORCE_DATE') }}</th>
+                    <th data-help="last_source_solution" class="has-helper">{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
+                    <th data-help="last_solution" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,11 +52,11 @@
                     <!--<td>
                         <a>{{ el.order_num }}</a>
                     </td>-->
-                    <td data-help="overpayment_id" class="has-helper">
+                    <td>
                         <a>{{ el.order_num }}</a>
                     </td>
 
-                    <td data-help="region" class="has-helper" style="text-align: left">
+                    <td style="text-align: left">
                         {{ el.region }}
                     </td>
                     <td style="text-align: left">
@@ -65,10 +65,10 @@
                     <td>
                         {{ el.iin }}
                     </td>
-                    <td data-help="rfpm_id" class="has-helper" style="text-align: left">
+                    <td style="text-align: left">
                         {{ el.rfpm_id }}
                     </td>
-                    <td style="text-align: left">
+                    <td style="text-align: right">
                         {{ el.estimated_amount }}
                     </td>
                     <td style="text-align: right">
@@ -77,16 +77,16 @@
                     <td style="text-align: right">
                         {{ el.court_amount }}
                     </td>
-                    <td data-help="last_status" class="has-helper" style="text-align: left">
+                    <td style="text-align: left">
                         {{ el.last_status }}
                     </td>
                     <td>
-                        {{ el.point_uk }}
+                        {{ el.verdict_date }}
                     </td>
-                    <td data-help="last_source_solution" class="has-helper" style="text-align: left">
+                    <td style="text-align: left">
                         {{ el.last_source_solution }}
                     </td>
-                    <td data-help="last_solution" class="has-helper" style="text-align: left">
+                    <td style="text-align: left">
                         {{ el.last_solution }}
                     </td>
 

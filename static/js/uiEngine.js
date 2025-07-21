@@ -92,21 +92,22 @@ export function addHelperIcon(td) {
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 export function initHelpForMarkedCells() {
-    document.querySelectorAll('td.has-helper[data-help]').forEach(td => {
-        if (td.querySelector('.help-icon')) return; // защита от повторного добавления
+    document.querySelectorAll('th.has-helper[data-help], td.has-helper[data-help]').forEach(cell => {
+        if (cell.querySelector('.help-icon')) return; // защита от повторного добавления
 
         const icon = document.createElement('span');
         icon.className = 'help-icon';
         icon.textContent = 'ℹ️';
+        icon.title = 'Нажмите для справки';
 
         icon.addEventListener('click', () => {
-            const topic = td.dataset.help;
+            const topic = cell.dataset.help;
             fetch(`/help_fragment?topic=${topic}`)
                 .then(res => res.text())
                 .then(html => showPopover(icon, html));
         });
 
-        td.appendChild(icon);
+        cell.appendChild(icon);
     });
 }
 ////////////////////////////////////////////////

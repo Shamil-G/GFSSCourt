@@ -94,6 +94,7 @@ function refreshTabDirect(tabId) {
             contentZone.innerHTML = html;
             timestampZone.textContent = `Обновлено: ${new Date().toLocaleTimeString()}`;
             updateRefreshButton(tabId);
+            initHelpForMarkedCells(); 
         }
         else{
             console.info('ℹ️ Обновлений нет! '+cacheKey);
@@ -273,6 +274,7 @@ function loadTabContent(id) {
         // tabCache[cacheKey] = html; // Сохраняем фрагмент
         addToCache(cacheKey, html);
         updateRefreshButton(id);
+        initHelpForMarkedCells(); 
       }, 150);
     })
     .catch(error => {
@@ -332,7 +334,8 @@ function toggleForm(formName,formType) {
     fetch(`/form_fragment?form=${formType}&order_num=${getOrderNum()}`)
       .then(response => response.text())
       .then(html => {
-        container.innerHTML = html;
+          container.innerHTML = html;
+          initHelpForMarkedCells();
         console.log("toggleForm "+formName, "FormType "+formType);
 
         // привязываем к Форме вызов функции submitFormViaFetch(formName, formType)

@@ -148,21 +148,17 @@ def view_law_fragment():
 def view_court_crime_add():
     order_num = request.form.get('order_num')
     submission_date = request.form['submission_date']
+    verdict_date = request.form.get('verdict_date','')
+    compensated_amount = request.form.get('compensated_amount','')
+    solution_crime_part = request.form.get('solution_crime_part','')
+    solution_civ_part = request.form.get('solution_civ_part','')
+    court_name = request.form.get('court_name','')
 
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tsubmission_date: {submission_date}')
-
-    decision_date = request.form['decision_date']
-    decision = request.form['decision']
-
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tdecision: {decision}')
-
-    orgname = request.form['orgname']
-
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
+    log.info(f'----->\n\tADD CRIME COURT\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
     if order_num and g.user.full_name:
-        add_law(order_num, submission_date, decision_date, decision, orgname, g.user.full_name)      
+        add_crime_court(order_num, submission_date, verdict_date, compensated_amount, solution_crime_part, solution_civ_part, court_name, g.user.full_name)      
     # Сохраняем в БД или обрабатываем
-    return redirect(url_for('view_list_overpayments', order_num=order_num, tab='law'))
+    return redirect(url_for('view_list_overpayments', order_num=order_num, tab='court_crime'))
 
 
 @app.route('/court_crime_fragment')
@@ -179,21 +175,16 @@ def view_court_crime_fragment():
 def view_court_civ_add():
     order_num = request.form.get('order_num')
     submission_date = request.form['submission_date']
+    solution_date = request.form.get('solution_date','')
+    num_solution = request.form.get('num_solution','')
+    solution = request.form.get('solution','')
+    court_name = request.form.get('court_name','')
 
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tsubmission_date: {submission_date}')
-
-    decision_date = request.form['decision_date']
-    decision = request.form['decision']
-
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tdecision: {decision}')
-
-    orgname = request.form['orgname']
-
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
+    log.info(f'----->\n\tADD CIV COURT\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
     if order_num and g.user.full_name:
-        add_law(order_num, submission_date, decision_date, decision, orgname, g.user.full_name)      
+        add_civ_court(order_num, submission_date, solution_date, num_solution, solution, court_name, g.user.full_name)      
     # Сохраняем в БД или обрабатываем
-    return redirect(url_for('view_list_overpayments', order_num=order_num, tab='law'))
+    return redirect(url_for('view_list_overpayments', order_num=order_num, tab='court_civ'))
 
 
 @app.route('/court_civ_fragment')
@@ -209,22 +200,17 @@ def view_court_civ_fragment():
 @login_required
 def view_appeal_add():
     order_num = request.form.get('order_num')
-    submission_date = request.form['submission_date']
+    appeal_date = request.form.get('appeal_date')
+    appeal_solution = request.form.get('appeal_solution','')
+    cassation_appeal_solution = request.form.get('cassation_appeal_solution','')
+    court_name = request.form.get('court_name','')
 
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tsubmission_date: {submission_date}')
-
-    decision_date = request.form['decision_date']
-    decision = request.form['decision']
-
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tdecision: {decision}')
-
-    orgname = request.form['orgname']
-
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
+    log.info(f"----->\n\tADD APPEAL COURT\n\tORDER_NUM: {order_num}\n\tAPPEAL_SOLUTION: {appeal_solution}"
+             f"\n\tCASSATION_APPEAL_SOLUTION: {cassation_appeal_solution}\n\tCOURT_NAME: {court_name}\n\tUSER: {g.user.full_name}")
     if order_num and g.user.full_name:
-        add_law(order_num, submission_date, decision_date, decision, orgname, g.user.full_name)      
+        add_appeal(order_num, appeal_date, appeal_solution, cassation_appeal_solution, court_name, g.user.full_name)      
     # Сохраняем в БД или обрабатываем
-    return redirect(url_for('view_list_overpayments', order_num=order_num, tab='law'))
+    return redirect(url_for('view_list_overpayments', order_num=order_num, tab='appeal'))
 
 
 @app.route('/appeal_fragment')
