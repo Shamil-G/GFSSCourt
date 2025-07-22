@@ -74,3 +74,10 @@ button:hover {
     top: 0px;
     box-shadow: 4px 4px 6px grey;
 }
+.dropdown-button {
+    min-width: 240px; /* или 280px, если хочется больше воздуха */
+    padding: 6px 12px;
+    font-size: 16px;
+    display: inline-block;
+    text-align: center;
+}

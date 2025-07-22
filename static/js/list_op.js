@@ -1,4 +1,4 @@
-﻿import { initFragment, showPopover, initHelpForMarkedCells, submitFormViaFetch } from './uiEngine.js';
+﻿import { initFragment, showPopover, initHelpForMarkedCells, submitFormViaFetch, UIBinder } from './uiEngine.js';
 
 let currentTabId = null;
 const tabCache = {};
@@ -94,7 +94,7 @@ function refreshTabDirect(tabId) {
             contentZone.innerHTML = html;
             timestampZone.textContent = `Обновлено: ${new Date().toLocaleTimeString()}`;
             updateRefreshButton(tabId);
-            initHelpForMarkedCells(); 
+            UIBinder.init();
         }
         else{
             console.info('ℹ️ Обновлений нет! '+cacheKey);
@@ -274,7 +274,7 @@ function loadTabContent(id) {
         // tabCache[cacheKey] = html; // Сохраняем фрагмент
         addToCache(cacheKey, html);
         updateRefreshButton(id);
-        initHelpForMarkedCells(); 
+        UIBinder.init();
       }, 150);
     })
     .catch(error => {
@@ -335,8 +335,9 @@ function toggleForm(formName,formType) {
       .then(response => response.text())
       .then(html => {
           container.innerHTML = html;
-          initHelpForMarkedCells();
-        console.log("toggleForm "+formName, "FormType "+formType);
+          UIBinder.init();
+
+          console.log("toggleForm " + formName, "FormType " + formType);
 
         // привязываем к Форме вызов функции submitFormViaFetch(formName, formType)
         // при событии submit
@@ -390,16 +391,21 @@ window.addEventListener('DOMContentLoaded', () => {
 
   showTab(activeTab);
 
-  initHelpForMarkedCells();
+  UIBinder.init();
+
+  console.log('🔧 Now will be MenuBinder...');
 
   // 👇 Делегированная обработка кнопок "Обновить"
-  document.querySelector('.tabs').addEventListener('click', e => {
-    const btn = e.target;
-    if (btn.classList.contains('refresh-btn') && btn.dataset.tab) {
-      const tabId = btn.dataset.tab;
-      API.refreshTabDirect(tabId);
+    const tabsZone = document.querySelector('.tabs');
+    if (tabsZone) {
+        tabsZone.addEventListener('click', e => {
+            const btn = e.target;
+            if (btn.classList.contains('refresh-btn') && btn.dataset.tab) {
+                const tabId = btn.dataset.tab;
+                API.refreshTabDirect(tabId);
+            }
+        });
     }
-  });
 });
 
 const globalAPI = {

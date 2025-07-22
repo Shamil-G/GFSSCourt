@@ -12,7 +12,22 @@
 
             <tr class="disabled-row">
                 <td style="border: none; text-align: left; font-size: 18px;">{{ res_value('LAW_DECISION') }}:</td>
-                <td style="border: none; text-align: left"><input style="width: 98%" class="input_s_form" type="text" name="decision" required></td>
+
+                <td style="border: none; text-align: left">
+                    <div class="dropdown">
+                        <input type="hidden" name="input_s_form" id="menuValue">
+                        <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
+                        <div class="dropdown-content">
+                            <!-- data-value - отправляется через submit, data-lable - отображается -->
+                            <a data-value="{{res_value('SELECT_LAW_REGISTRING')}}" data-label="{{res_value('SELECT_LAW_REGISTRING')}}"><i class="fas fa-home"></i>{{res_value('SELECT_LAW_REGISTRING')}}</a>
+                            <a data-value="{{res_value('SELECT_LAW_RETURN')}}" data-label="{{res_value('SELECT_LAW_RETURN')}}"><i class="fas fa-info-circle"></i>{{res_value('SELECT_LAW_RETURN')}}</a>
+                            <a data-value="{{res_value('SELECT_LAW_BREAK')}}" data-label="{{res_value('SELECT_LAW_BREAK')}}"><i class="fas fa-info-circle"></i>{{res_value('SELECT_LAW_BREAK')}}</a>
+                            <a data-value="{{res_value('SELECT_LAW_SKIP')}}" data-label="{{res_value('SELECT_LAW_SKIP')}}"><i class="fas fa-home"></i>{{res_value('SELECT_LAW_SKIP')}}</a>
+                            <a data-value="{{res_value('SELECT_LAW_OPEN')}}" data-label="{{res_value('SELECT_LAW_OPEN')}}"><i class="fas fa-info-circle"></i>{{res_value('SELECT_LAW_OPEN')}}</a>
+                        </div>
+                    </div>
+                </td>
+
             </tr>
 
             <tr class="disabled-row">

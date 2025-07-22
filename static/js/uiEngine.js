@@ -1,4 +1,12 @@
-﻿function showTooltip(target, message) {
+﻿export const UIBinder = {
+    init(zone = document) {
+        MenuBinder.attachAll(zone);
+        initHelpForMarkedCells(zone);
+        // 🔧 можно подключить и другие биндеры
+    }
+};
+
+function showTooltip(target, message) {
   const tooltip = document.createElement('div');
   tooltip.className = 'input-tooltip';
   tooltip.textContent = message;
@@ -226,3 +234,29 @@ export function submitFormViaFetch(formName, formType, order_num) {
       }, 2000);
     });
 }
+const MenuBinder = {
+    attachAll(zone = document) {
+        zone.querySelectorAll('.dropdown').forEach(dropdown => {
+            const button = dropdown.querySelector('.dropdown-button');
+            const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+            const items = dropdown.querySelectorAll('.dropdown-content a');
+
+            if (!button || !hiddenInput || items.length === 0) return;
+
+            items.forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = item.dataset.value || item.textContent.trim();
+                    const label = item.dataset.label || value;
+
+                    hiddenInput.value = value;
+                    button.textContent = label;
+
+                    // кастомное событие для интеграции
+                    dropdown.dispatchEvent(new CustomEvent('menu-changed', {
+                        detail: { value }
+                    }));
+                });
+            });
+        });
+    }
+};

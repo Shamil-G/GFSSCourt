@@ -3,9 +3,9 @@
     color: white;
 }
 
-    .dropdown-button:hover {
-        background-color: #388e3c;
-    }
+.dropdown-button:hover {
+    background-color: #388e3c;
+}
 
 .dropdown-content {
     background-color: #ffffff;
