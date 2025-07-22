@@ -61,14 +61,14 @@ select {
 }
 .input_s {
     margin-left: 12px;
-    padding: 4px;
+    padding: 8px;
     font-size: 18px;
     align-items: center;
     border-radius: 5px;
     width: 260px;
 }
 .input_s_form {
-    padding: 4px;
+    padding: 8px;
     font-size: 18px;
 
     width: 100%;

@@ -25,7 +25,7 @@
             <tbody>
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none; width: 240px">{{res_value('IIN')}}</td>
-                    <td style="text-align: left; border:none;"><input style="margin-left: 0px; width: 280px" class="input_s" name="iin" pattern="[0-9]{12}" type="text" placeholder="{{res_value('IIN')}}" autocomplete="off"></td>
+                    <td style="text-align: left; border:none;"><input style="margin-left: 0px; width: 144px" class="input_s" name="iin" pattern="[0-9]{12}" type="text" maxlength="12" autocomplete="off"></td>
                 </tr>
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none;">{{res_value('RFPM_ID')}}</td>
@@ -51,8 +51,10 @@
                     <td style="text-align: left; border: none;"><input style="margin-left: 0px" class="input_s" type="number" min="0.00" name="estimate_damage_amount" autocomplete="off"></td>
                 </tr>
                 <tr class="disabled-row">
-                    <td style="text-align: left; border: none;">{{res_value('FILIAL_NAME')}}</td>
-                    <td style="text-align: left; border: none;"><input style="margin-left: 0px; width: 640px" class="input_s" type="text" name="region" placeholder="{{ g.user.dep_name }}" value="{{region}}" autocomplete="on"></td>
+                    <td style="text-align: left; border: none; margin-bottom: 16px">{{res_value('FILIAL_NAME')}}</td>
+                    <td style="text-align: left; border: none;">
+                        <input style="margin: 8px 16px 16px 0px; width: 640px" class="input_s" type="text" name="region" placeholder="{{ g.user.dep_name }}" value="{{region}}" autocomplete="on">
+                    </td>
                 </tr>
             </tbody>
         </table>
