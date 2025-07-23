@@ -1,8 +1,8 @@
 ﻿import { initFragment, submitFormViaFetch } from './uiEngine.js';
 import { UIBinder } from './uiBinder.js';
+import { TabConfig } from './tabConfig.js';
 
-
-let currentTabId = null;
+let activeTab = null;
 const tabCache = {};
 const tabCacheOrder = [];
 
@@ -95,7 +95,6 @@ function refreshTabDirect(tabId) {
 
             contentZone.innerHTML = html;
             timestampZone.textContent = `Обновлено: ${new Date().toLocaleTimeString()}`;
-            updateRefreshButton(tabId);
             UIBinder.init();
         }
         else{
@@ -107,6 +106,8 @@ function refreshTabDirect(tabId) {
       console.error(`Ошибка загрузки вкладки ${tabId}:`, err);
     });
     
+  // ✅ Обновить кнопку в любом случае:
+  updateRefreshButton(tabId);
   showTableLoader(tabId,0);
 }
 ///////////////////////////////////////////////////////////////////////////
@@ -159,7 +160,7 @@ function addToCache(key, html) {
 ///////////////////////////////////////////////////////////////////////////
 // Главная таблица переплат в LIST_OVERPAYMENTS.HTML
 // Когда щелкаем мышкой по записям TR надо менять фильтр orderNum для TABS
-function filterByOrder(orderNum) {
+function filterByOrder(orderNum, tabId) {
   // После клика мышкой - делаем подсветку выбранной строки
   const rows = document.querySelectorAll('table tbody tr[data-order]');
   rows.forEach(row => {
@@ -174,7 +175,8 @@ function filterByOrder(orderNum) {
     // Сейчас это делает submitFormViaFetch"
     // syncOrderNumToForms();
 
-  loadTabContent(currentTabId);
+  console.log("filterByOrder. currentTab: "+tabId)
+  loadTabContent(tabId || 'pretrial');
 }
 /////////////////////////////////////////////////////////////////////////////////////
 function syncOrderNumToForms() {
@@ -195,102 +197,58 @@ function loadTabContent(id) {
   const orderNum = getOrderNum();
   if (!orderNum) return;
 
-  console.log("loadTabContent. order_num: "+orderNum)
-
-  let url = '';
-  let containerId = '';
-
-  switch (id) {
-    case 'pretrial':
-      url = `/pretrial_fragment?order_num=${orderNum}`;
-      containerId = 'pretrialContent';
-      break;
-    case 'scammer':
-      url = `/scammer_fragment?order_num=${orderNum}`;
-      containerId = 'scammerContent';
-      break;
-    case 'law':
-      url = `/law_fragment?order_num=${orderNum}`;
-      containerId = 'lawContent';
-      break;
-    case 'court_crime':
-      url = `/court_crime_fragment?order_num=${orderNum}`;
-      containerId = 'court_crimeContent';
-      break;
-    case 'court_civ':
-      url = `/court_civ_fragment?order_num=${orderNum}`;
-      containerId = 'court_civContent';
-      break;
-    case 'appeal':
-      url = `/appeal_fragment?order_num=${orderNum}`;
-      containerId = 'appealContent';
-      break;
-    case 'execution':
-      url = `/execution_fragment?order_num=${orderNum}`;
-      containerId = 'executionContent';
-      break;
-    case 'refunding':
-      url = `/refunding_fragment?order_num=${orderNum}`;
-      containerId = 'executionContent';
-      break;
-    default:
-      url = `/pretrial_fragment?order_num=${orderNum}`;
-      containerId = 'pretrialContent';
-      return;
-  }
-
-  const cacheKey = `${id}_${orderNum}`;
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.error(`Container "${containerId}" not found`);
+  const config = TabConfig[id];
+  if (!config) {
+    console.warn(`⛔ Не найдена конфигурация вкладки "${id}"`);
     return;
   }
 
+  const url = typeof config.url === 'function' ? config.url(orderNum) : config.url;
+  const container = document.querySelector(config.zoneSelector);
+  if (!container) {
+    console.error(`❌ Зона "${config.zoneSelector}" не найдена`);
+    return;
+  }
 
-  // ✅ Если есть в кэше — сразу вставляем
+  const cacheKey = `${id}_${orderNum}`;
+
+  // ✅ Кэш
   if (tabCache[cacheKey]) {
     const cached = tabCache[cacheKey];
     container.innerHTML = cached.html;
     updateRefreshButton(id);
-
     document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
-
     return;
   }
 
-  // 🔹 Показ сообщения "Загрузка..."
+  // ⏳ Загрузка...
   container.innerHTML = '<div class="tab-loading">⏳ Идёт загрузка...</div>';
 
   fetch(url)
-    .then(response => response.text())
+    .then(res => res.text())
     .then(html => {
       container.classList.add('fade-out');
       setTimeout(() => {
         container.innerHTML = html;
-
-        console.log("loadTabContent. ID "+id)
-        initFragment(container, id); // универсальная инициализация
+        initFragment(container, id);
+        config.onInit?.(container);
 
         document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(Date.now())}`;
         container.classList.remove('fade-out');
-        // tabCache[cacheKey] = html; // Сохраняем фрагмент
         addToCache(cacheKey, html);
         updateRefreshButton(id);
-        UIBinder.init();
+        UIBinder.init(container);
       }, 150);
     })
-    .catch(error => {
-      container.innerHTML = `<div class="tab-error">❌ Error: ${error.message}</div>`;
-      console.error(`Error on loadTabContent "${id}":`, error);
+    .catch(err => {
+      container.innerHTML = `<div class="tab-error">❌ Ошибка: ${err.message}</div>`;
+      console.error(`Ошибка загрузки вкладки "${id}":`, err);
     });
-
 }
 /////////////////////////////////////////////////////////////////////////////////
 // Переходим с одного tab на другой и должны показываться соответствующие панели
 // Функция переключения между вкладками с выборкой его содержимого
 function showTab(id) {
-  currentTabId = id;
-
   console.log("showTab. ID: " + id);
   const sharedTab = document.getElementById('sharedTabId');
   if (sharedTab) sharedTab.value = id;
@@ -299,7 +257,6 @@ function showTab(id) {
   document.querySelectorAll('.tab-panel').forEach(panel => {
     panel.classList.remove('active');
   });
-  console.log('showTab '+id)
   // Показать нужную панель
   const targetPanel = document.getElementById(id);
   if (targetPanel) {
@@ -318,7 +275,8 @@ function showTab(id) {
       btn.classList.add('active');
     }
   });
-  loadTabContent(currentTabId);
+
+  loadTabContent(id);
 }
 
 // End ShowTab
@@ -352,10 +310,10 @@ function toggleForm(formName,formType) {
         }
         
         const formZone = container; // или document.getElementById(formName)
-          initFragment(formZone, formType);  // ⬅️ логика конкретной вкладки
-          // Синхронизировать ORDER_NUM во все формы
-          // Сейчас это делает submitFormViaFetch"
-          // syncOrderNumToForms(); // вставить значение в форму
+        initFragment(formZone, formType);  // ⬅️ логика конкретной вкладки
+        // Синхронизировать ORDER_NUM во все формы
+        // Сейчас это делает submitFormViaFetch"
+        // syncOrderNumToForms(); // вставить значение в форму
       })
       .catch(error => console.error('Error load fragment form: ${formType}:', error));
   }
@@ -364,12 +322,26 @@ function toggleForm(formName,formType) {
 // При первоначальной загрузке страницы должна получить первый order_num
 window.addEventListener('DOMContentLoaded', () => {
   const firstRow = document.querySelector('table tbody tr[data-order]');
+  let orderNum = null;
+
   if (firstRow) {
-    const orderNum = firstRow.dataset.order;
+    orderNum = firstRow.dataset.order;
     console.log("First Load Page. orderNum: " + orderNum);
-    filterByOrder(orderNum);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabFromUrl = urlParams.get('tab');
+    const sharedTab = document.getElementById('sharedTabId');
+    const tabFromField = sharedTab?.value;
+
+    activeTab = tabFromUrl || tabFromField || 'pretrial';
+
+    // 💡 Установим всё в правильной последовательности:
+    filterByOrder(orderNum, activeTab);
+    console.log("DOMContentLoaded. ActiveTab: "+activeTab)
+    showTab(activeTab);
   }
 
+  // 🔘 Кнопки форм
   document.querySelectorAll('.add-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const formName = btn.dataset.form;
@@ -378,36 +350,30 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 📦 Клики по строкам
   document.querySelectorAll('.clickable-row').forEach(row => {
     row.addEventListener('click', () => {
       const orderNum = row.dataset.order;
-      API.filterByOrder(orderNum);
+      API.filterByOrder(orderNum, activeTab); // возможно, без tabId — если уже сохранён currentTab
     });
   });
 
-  const sharedTab = document.getElementById('sharedTabId');
-  const urlParams = new URLSearchParams(window.location.search);
-  const tabFromUrl = urlParams.get('tab');
-  const tabFromField = sharedTab?.value;
-  const activeTab = tabFromUrl || tabFromField || 'pretrial';
+  // 🔁 Кнопки "Обновить"
+  const tabsZone = document.querySelector('.tabs');
+  if (tabsZone) {
+    tabsZone.addEventListener('click', e => {
+      const btn = e.target;
+      if (btn.classList.contains('refresh-btn') && btn.dataset.tab) {
+        const tabId = btn.dataset.tab;
+        API.refreshTabDirect(tabId);
+      }
+    });
+  }
 
-  showTab(activeTab);
-
+  // 🧩 Общая инициализация UI
   UIBinder.init();
-
-
-  // 👇 Делегированная обработка кнопок "Обновить"
-    const tabsZone = document.querySelector('.tabs');
-    if (tabsZone) {
-        tabsZone.addEventListener('click', e => {
-            const btn = e.target;
-            if (btn.classList.contains('refresh-btn') && btn.dataset.tab) {
-                const tabId = btn.dataset.tab;
-                API.refreshTabDirect(tabId);
-            }
-        });
-    }
 });
+
 
 const globalAPI = {
   filterByOrder,

@@ -127,4 +127,3 @@ export function submitFormViaFetch(formName, formType, order_num) {
       }, 2000);
     });
 }
-
