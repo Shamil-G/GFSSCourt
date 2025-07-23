@@ -1,4 +1,4 @@
-import { MenuBinder } from './MenuBinder.js';
+import { MenuBinder } from './menuBinder.js';
 import { HelperBinder } from './helperBinder.js';
 import { TooltipBinder } from './tooltipBinder.js';
 
