@@ -7,7 +7,7 @@ const tabCache = {};
 const tabCacheOrder = [];
 
 // Предлагаем обновить данные, если прошло 10 минут
-const REFRESH_RECOMMENDED_THRESHOLD = 10 * 60 * 1000; // 10 минут
+const REFRESH_RECOMMENDED_THRESHOLD = 1 * 60 * 1000; // 10 минут
 // Удаляем из кэша принудительно, если прошло 2 часа
 const CACHE_LIFETIME = 2 * 60 * 60 * 1000; // 2 часа в мс
 // В кэше храним 512 документов
@@ -28,6 +28,7 @@ function updateRefreshButton(id){
   const age = Date.now() - cached.timestamp;
 
   const refreshTarget = document.getElementById(`${id}RefreshButton`);
+
   if (!refreshTarget) return;
 
   if (age > REFRESH_RECOMMENDED_THRESHOLD) {
@@ -91,8 +92,6 @@ function refreshTabDirect(tabId) {
         if(!cached || html != cached.html){
             delete tabCache[cacheKey];
             addToCache(cacheKey, html);
-            console.info('ℹ️ Обновление кэша с ключом '+cacheKey);
-
             contentZone.innerHTML = html;
             timestampZone.textContent = `Обновлено: ${new Date().toLocaleTimeString()}`;
             UIBinder.init();
@@ -100,15 +99,17 @@ function refreshTabDirect(tabId) {
         else{
             console.info('ℹ️ Обновлений нет! '+cacheKey);
         }
+        tabCache[cacheKey].timestamp=Date.now();
+
+        // ✅ Обновить кнопку в любом случае:
+        updateRefreshButton(tabId);
+        showTableLoader(tabId,0);
       }
     })
     .catch(err => {
       console.error(`Ошибка загрузки вкладки ${tabId}:`, err);
     });
-    
-  // ✅ Обновить кнопку в любом случае:
-  updateRefreshButton(tabId);
-  showTableLoader(tabId,0);
+  
 }
 ///////////////////////////////////////////////////////////////////////////
 // Кнопка Refresh
