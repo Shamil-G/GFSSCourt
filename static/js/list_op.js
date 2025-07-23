@@ -7,7 +7,7 @@ const tabCache = {};
 const tabCacheOrder = [];
 
 // Предлагаем обновить данные, если прошло 10 минут
-const REFRESH_RECOMMENDED_THRESHOLD = 1 * 60 * 1000; // 10 минут
+const REFRESH_RECOMMENDED_THRESHOLD = 30 * 60 * 1000; // 10 минут
 // Удаляем из кэша принудительно, если прошло 2 часа
 const CACHE_LIFETIME = 2 * 60 * 60 * 1000; // 2 часа в мс
 // В кэше храним 512 документов
