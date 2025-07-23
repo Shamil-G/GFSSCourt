@@ -1,4 +1,6 @@
-﻿import { initFragment, showPopover, initHelpForMarkedCells, submitFormViaFetch, UIBinder } from './uiEngine.js';
+﻿import { initFragment, submitFormViaFetch } from './uiEngine.js';
+import { UIBinder } from './uiBinder.js';
+
 
 let currentTabId = null;
 const tabCache = {};
@@ -393,7 +395,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   UIBinder.init();
 
-  console.log('🔧 Now will be MenuBinder...');
 
   // 👇 Делегированная обработка кнопок "Обновить"
     const tabsZone = document.querySelector('.tabs');

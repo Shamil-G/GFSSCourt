@@ -84,7 +84,7 @@ select {
     cursor: pointer;
 }
 input.input_d {
-  background-color: #ffffff;
+  /*background-color: #ffffff;*/
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 6px 10px;

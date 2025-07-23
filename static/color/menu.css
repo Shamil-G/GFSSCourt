@@ -24,3 +24,7 @@
     /*color: blue;*/
     font-weight: 600;
 }
+.dropdown-content a.selected {
+    color: #0077cc;
+    background-color: #e6f2ff;
+}

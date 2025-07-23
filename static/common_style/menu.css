@@ -1,4 +1,4 @@
-.dropdown {
+﻿.dropdown {
     position: relative;
     display: inline-block;
 }
@@ -38,4 +38,13 @@
 .dropdown-content i {
     width: 20px;
     text-align: center;
+}
+.dropdown-content a.selected {
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+.dropdown-content a.selected::after {
+    content: " ✔";
+    color: green;
 }

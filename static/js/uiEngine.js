@@ -1,28 +1,5 @@
-﻿export const UIBinder = {
-    init(zone = document) {
-        MenuBinder.attachAll(zone);
-        initHelpForMarkedCells(zone);
-        // 🔧 можно подключить и другие биндеры
-    }
-};
+﻿import { showTooltipPopover } from './popoverEngine.js';
 
-function showTooltip(target, message) {
-  const tooltip = document.createElement('div');
-  tooltip.className = 'input-tooltip';
-  tooltip.textContent = message;
-
-  const rect = target.getBoundingClientRect();
-  tooltip.style.position = 'absolute';
-  tooltip.style.top = `${rect.bottom + window.scrollY + 8}px`;
-  tooltip.style.left = `${rect.left + window.scrollX}px`;
-
-  document.body.appendChild(tooltip);
-
-  // 🕓 Автоматическое удаление
-  setTimeout(() => {
-    tooltip.remove();
-  }, 3500);
-}
 ////////////////////////////////////////////////////////////////////
 function bindMutualExclusive(zone, nameA, nameB) {
   const inputA = zone.querySelector(`[name="${nameA}"]`);
@@ -33,13 +10,13 @@ function bindMutualExclusive(zone, nameA, nameB) {
   inputA.addEventListener('input', () => {
     inputB.disabled = !!inputA.value;
     if (inputA.value) inputB.value = '';
-    showTooltip(inputA, 'Поле <📆 Дата погашения> будет недоступно, пока указано значение дня');
+    showTooltipPopover(inputA, 'Поле <📆 Дата погашения> будет недоступно, пока указано значение дня');
   });
 
   inputB.addEventListener('input', () => {
     inputA.disabled = !!inputB.value;
     if (inputB.value) inputA.value = '';
-    showTooltip(inputB, 'Поле <Каждый месяц до> будет недоступно, пока указана дата <📆 Дата погашения>');
+    showTooltipPopover(inputB, 'Поле <Каждый месяц до> будет недоступно, пока указана дата <📆 Дата погашения>');
   });
 }
 ////////////////////////////////////////////////////////////////////
@@ -68,93 +45,9 @@ function initAppealLogic(zone) {
 }
 function initExecutionLogic(zone) {
     console.log("initExecutionLogic");
-    initHelpForMarkedCells();
 }
 function initRefundingLogic(zone) {
     console.log("initRefundingLogic")
-}
-/////////////////////////////////////////////////
-export function addHelperIcon(td) {
-  if (td.querySelector('.help-icon')) return;
-
-  const icon = document.createElement('span');
-  icon.className = 'help-icon';
-  icon.textContent = 'ℹ️';
-
-  icon.addEventListener('click', () => {
-    const topic = td.dataset.help;
-    fetch(`/help_fragment?topic=${topic}`)
-      .then(res => res.text())
-      .then(html => {
-        const cleaned = html.trim();
-        if (!cleaned) {
-          showPopover(icon, '<em>Нет информации по этой подсказке</em>');
-        } else {
-          showPopover(icon, html);
-        }
-    });
-  });
-
-  td.appendChild(icon);
-}
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-export function initHelpForMarkedCells() {
-    document.querySelectorAll('th.has-helper[data-help], td.has-helper[data-help]').forEach(cell => {
-        if (cell.querySelector('.help-icon')) return; // защита от повторного добавления
-
-        const icon = document.createElement('span');
-        icon.className = 'help-icon';
-        icon.textContent = 'ℹ️';
-        icon.title = 'Нажмите для справки';
-
-        icon.addEventListener('click', () => {
-            const topic = cell.dataset.help;
-            fetch(`/help_fragment?topic=${topic}`)
-                .then(res => res.text())
-                .then(html => showPopover(icon, html));
-        });
-
-        cell.appendChild(icon);
-    });
-}
-////////////////////////////////////////////////
-export function showPopover(target, html) {
-  const old = document.querySelector('.popover');
-  if (old) old.remove();
-
-  const pop = document.createElement('div');
-  pop.className = 'popover';
-
-  const close = document.createElement('span');
-  close.className = 'popover-close';
-  close.textContent = '×';
-  close.title = 'Закрыть';
-  close.onclick = () => {
-    pop.remove();
-    document.removeEventListener('click', outsideClick);
-  };
-  pop.appendChild(close);
-
-  const content = document.createElement('div');
-  content.className = 'popover-content';
-  content.innerHTML = html;
-  pop.appendChild(content);
-
-  document.body.appendChild(pop);
-
-  const rect = target.getBoundingClientRect();
-  pop.style.top = `${rect.bottom + window.scrollY + 6}px`;
-  pop.style.left = `${rect.left + window.scrollX}px`;
-
-  function outsideClick(e) {
-    if (!pop.contains(e.target) && e.target !== target) {
-      pop.remove();
-      document.removeEventListener('click', outsideClick);
-    }
-  }
-
-  setTimeout(() => document.addEventListener('click', outsideClick), 0);
 }
 // Добавляем хелперы для основной таблицы
 // Вызываем настройку логики для фрагментов форм, 
@@ -234,29 +127,4 @@ export function submitFormViaFetch(formName, formType, order_num) {
       }, 2000);
     });
 }
-const MenuBinder = {
-    attachAll(zone = document) {
-        zone.querySelectorAll('.dropdown').forEach(dropdown => {
-            const button = dropdown.querySelector('.dropdown-button');
-            const hiddenInput = dropdown.querySelector('input[type="hidden"]');
-            const items = dropdown.querySelectorAll('.dropdown-content a');
 
-            if (!button || !hiddenInput || items.length === 0) return;
-
-            items.forEach(item => {
-                item.addEventListener('click', () => {
-                    const value = item.dataset.value || item.textContent.trim();
-                    const label = item.dataset.label || value;
-
-                    hiddenInput.value = value;
-                    button.textContent = label;
-
-                    // кастомное событие для интеграции
-                    dropdown.dispatchEvent(new CustomEvent('menu-changed', {
-                        detail: { value }
-                    }));
-                });
-            });
-        });
-    }
-};
