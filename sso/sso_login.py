@@ -1,7 +1,7 @@
 from flask import session
 from util.ip_addr import ip_addr
 from util.logger import log
-from app_config import ldap_admins, permit_deps, permit_post
+from app_config import ldap_admins, admin_deps, permit_post
 
      
 class SSO_User:
@@ -22,9 +22,14 @@ class SSO_User:
             session['username'] = login_name
 
             if 'dep_name' not in src_user or 'post' not in src_user or \
-            ( src_user['dep_name'] not in permit_deps and src_user['post'] not in permit_post ):
+            ( src_user['dep_name'] not in admin_deps or src_user['post'] not in permit_post ):
                 log.info(f'----------------\n\tUSER {session['username']} not Registred\n----------------')
                 return None
+
+            if 'dep_name' in src_user and src_user['dep_name'] in admin_deps:
+                self.top_control=1
+            else:
+                self.top_control=0
 
             if 'post' in src_user:
                 self.post = src_user['post']

@@ -15,8 +15,8 @@ def view_list_overpayments():
     # pretrial_items = []
 
     order_num = request.form.get('order_num')
-
-    list_op = list_overpayments()
+    log.info(f"LIST_OVERPAYMENTS. USER: {g.user.full_name}\n\tTOP_CONTROL: {g.user.top_control}\n\tDEPNAME: {g.user.dep_name}")
+    list_op = list_overpayments(g.user.top_control, g.user.dep_name)
 
     log.info(f"LIST_OVERPAYMENTS\n\tORDER_NUM: {order_num}")
     return render_template("list_overpayments.html", list_op=list_op, selected_order=order_num)

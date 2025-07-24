@@ -1,32 +1,52 @@
 from    util.logger import log
-import  db_config as cfg
 from    db.connect import get_connection
-import  oracledb
-import  datetime
-import  os.path
 
 
-def list_overpayments():
-    stmt = """
-        select op.op_id,
-             op.region, 
-             p.lastname||' '||p.firstname||' '||p.middlename as fio,
-             op.iin,  
-             to_char(op.estimated_damage_amount,'999999990.99'),
-             to_char(coalesce(op.compensated_amount,0),'9999990.99'),
-             to_char(coalesce(op.court_damage_amount,0),'999999990.99'),
-             op.rfpm_id,
-             op.last_status,
-             to_char(op.verdict_date,'dd.mm.yyyy'),
-             op.last_source_solution,
-             op.last_solution,
-             op.employee
-        from overpayments op, loader.person p
-        where op.iin=p.iin(+)
-    """
+
+def list_overpayments(top_control, user_region):
+    if top_control:      
+        stmt = """
+                select op.op_id,
+                     op.region, 
+                     p.lastname||' '||p.firstname||' '||p.middlename as fio,
+                     op.iin,  
+                     to_char(op.estimated_damage_amount,'999999990.99'),
+                     to_char(coalesce(op.compensated_amount,0),'9999990.99'),
+                     to_char(coalesce(op.court_damage_amount,0),'999999990.99'),
+                     op.rfpm_id,
+                     op.last_status,
+                     to_char(op.verdict_date,'dd.mm.yyyy'),
+                     op.last_source_solution,
+                     op.last_solution,
+                     op.employee
+                from overpayments op, loader.person p
+                where op.iin=p.iin(+)
+            """
+    else:
+        stmt = """
+                select op.op_id,
+                     op.region, 
+                     p.lastname||' '||p.firstname||' '||p.middlename as fio,
+                     op.iin,  
+                     to_char(op.estimated_damage_amount,'999999990.99'),
+                     to_char(coalesce(op.compensated_amount,0),'9999990.99'),
+                     to_char(coalesce(op.court_damage_amount,0),'999999990.99'),
+                     op.rfpm_id,
+                     op.last_status,
+                     to_char(op.verdict_date,'dd.mm.yyyy'),
+                     op.last_source_solution,
+                     op.last_solution,
+                     op.employee
+                from overpayments op, loader.person p
+                where op.iin=p.iin(+)
+                and op.region=:region
+            """
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute(stmt)
+            if top_control:
+                cursor.execute(stmt)
+            else:
+                cursor.execute(stmt, region=user_region)
             
             result = []
             records = cursor.fetchall()
