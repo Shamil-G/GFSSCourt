@@ -313,7 +313,7 @@ def add_law(op_id, submission_date, decision_date, decision, orgname, employee):
         with connection.cursor() as cursor:
             try:
                 cursor.execute('begin op.add_law(:op_id, :submission_date, :decision_date, :decision, :orgname, :employee); end;', 
-                               op_id=op_id, submission_date=submission_date, 
+                               op_id=int(op_id), submission_date=submission_date, 
                                decision_date=decision_date, decision=decision, orgname=orgname, employee=employee)
             finally:
                 log.info(f'ADD_LAW\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tDECISION_DATE: {decision_date}\n\tDECISION: {decision}\n\tORGNAME: {orgname}\n\temployee: {employee}')

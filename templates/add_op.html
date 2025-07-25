@@ -52,10 +52,29 @@
                 <tr class="disabled-row">
                     <td style="text-align: left; border: none; margin-bottom: 16px">{{res_value('FILIAL_NAME')}}</td>
                     <td style="text-align: left; border: none;">
-                        <input style="margin: 8px 16px 16px 0px; width: 640px" class="input_s" type="text" name="region" placeholder="{{ g.user.dep_name }}" value="{{region}}" autocomplete="on">
+                        {% if top_control==1 %}
+                        <input style="margin: 8px 16px 16px 0px; width: 640px" class="input_s" type="text" name="region" autocomplete="on">
+                        {% else %}
+                        <input style="margin: 8px 16px 16px 0px; width: 640px" class="input_s" type="text" name="region" placeholder="{{ g.user.dep_name }}" value="{{region}}" autocomplete="on" disabled>
+                        {% endif %}
                     </td>
                 </tr>
             </tbody>
+            <tfoot>
+                <!--<tr>
+                    <td colspan="1">
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        <div class="flash-message">
+                            {% for msg in messages %}
+                            <div class="alert">{{ msg }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                    </td>
+                </tr>-->
+            </tfoot>
         </table>
         <button style="margin-top: 16px" type="submit">{{ res_value('BUTTON_SAVE') }}</button>
     </form>

@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, g
+from flask import render_template, request, redirect, url_for, g, jsonify
 from flask_login import login_required
 from main_app import app, log
 
@@ -33,8 +33,8 @@ def view_add_op():
         estimated_damage_amount = request.form['estimate_damage_amount']
         add_op(region, iin, rfpm_id, estimated_damage_amount, status)      
         return redirect(url_for('view_list_overpayments'))            
-    log.info(f"ADD OP")
-    return render_template("add_op.html", region=g.user.dep_name)
+    log.info(f"ADD OP. REGION: {g.user.dep_name}, TTOP_CONTROL: {g.user.top_control}")
+    return render_template("add_op.html", region=g.user.dep_name, top_control=g.user.top_control)
 
 
 @app.route('/form_fragment')
@@ -117,20 +117,25 @@ def view_scammer_add():
 @login_required
 def view_law_add():
     order_num = request.form.get('order_num')
-    submission_date = request.form['submission_date']
+    submission_date = request.form.get('submission_date','')
 
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tsubmission_date: {submission_date}')
-
-    decision_date = request.form.get('decision_date')
-    decision = request.form['decision']
-
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tdecision: {decision}')
-
-    orgname = request.form['orgname']
+    decision_date = request.form.get('decision_date','')
+    decision = request.form.get('decision','')
+    orgname = request.form.get('orgname','')
 
     log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
+    if submission_date=='' and decision_date=='':
+        log.info(f'----->\n\tADD LAW\n\tSUBMISSION_DATE and DECISION_DATE is NULL')
+        return jsonify({ "success": False, "messages": ["⚠️ Вы должны указать одно из двух полей:\n<Дата обращения> или <Дата решения>"] }), 200
+    if decision=='' and decision_date!='':
+        log.info(f'----->\n\tADD LAW\n\tDECISION and DECISION_DATE cant be NULL at once')
+        return jsonify({ "success": False, "messages": ["⚠️ При указании <Дата решения> должно быть указано <Решение>"] }), 200
+    if decision!='' and decision_date=='':
+        log.info(f'----->\n\tADD LAW\n\tDECISION and DECISION_DATE cant be NULL at once')
+        return jsonify({ "success": False, "messages": ["⚠️ При вынесении решения должна быть указана <Дата решения>"] }), 200
     if order_num and g.user.full_name:
         add_law(order_num, submission_date, decision_date, decision, orgname, g.user.full_name)      
+        return { "success": True }, 200
     # Сохраняем в БД или обрабатываем
     return redirect(url_for('view_list_overpayments', order_num=order_num, tab='law'))
 

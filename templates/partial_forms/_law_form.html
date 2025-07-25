@@ -3,11 +3,11 @@
         <tbody>
             <tr class="disabled-row">
                 <td style="border: none; width: 260px; text-align: left; font-size: 18px;">📅 {{ res_value('SUBMISSION_DATE') }}:</td>
-                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="submission_date" required></td>
+                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="submission_date"></td>
             </tr>
             <tr class="disabled-row">
                 <td style="border: none; text-align: left; font-size: 18px;">📆 {{ res_value('DECISION_DATE') }}:</td>
-                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="decision_date" required></td>
+                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="decision_date"></td>
             </tr>
 
             <tr class="disabled-row">
@@ -15,7 +15,7 @@
 
                 <td style="border: none; text-align: left">
                     <div class="dropdown">
-                        <input type="hidden" name="input_s_form" id="menuValue">
+                        <input type="hidden" name="decision" id="menuValue">
                         <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-lable - отображается -->
@@ -27,7 +27,6 @@
                         </div>
                     </div>
                 </td>
-
             </tr>
 
             <tr class="disabled-row">

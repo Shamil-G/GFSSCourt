@@ -20,6 +20,30 @@ function bindMutualExclusive(zone, nameA, nameB) {
   });
 }
 ////////////////////////////////////////////////////////////////////
+function requireAtLeastOne(fields, errorMessage) {
+    const hasValue = fields.some(name => document.querySelector(`input[name='${name}']`)?.value.trim());
+    if (!hasValue) {
+        alert(errorMessage);
+        return false;
+    }
+    return true;
+}
+////////////////////////////////////////////////////////////////////
+function waitForElementInZone(zone, selector, callback) {
+    const el = zone.querySelector(selector);
+    if (el) return callback(el);
+
+    const observer = new MutationObserver(() => {
+        const el = zone.querySelector(selector);
+        if (el) {
+            observer.disconnect();
+            callback(el);
+        }
+    });
+
+    observer.observe(zone, { childList: true, subtree: true });
+}
+////////////////////////////////////////////////////////////////////
 function initPretrialLogic(zone) {
   console.log("initPretrialLogic");
 
@@ -32,6 +56,23 @@ function initScammerLogic(zone) {
 
 function initLawLogic(zone) {
     console.log("initLawLogic")
+    document.getElementById("lawForm").addEventListener("submit", function (event) {
+        const submissionDate = document.querySelector("input[name='submission_date']").value.trim();
+        const decisionDate = document.querySelector("input[name='decision_date']").value.trim();
+
+        console.log("submissionDate " + submissionDate, "decisionDate " + decisionDate);
+    //    if (!submissionDate && !decisionDate) {
+    //        console.log("submissionDate and decisionDate is empty")
+    //        event.preventDefault();
+
+    //        ModalManager.show({
+    //            message: '⚠️ Укажите хотя бы одну дату.',
+    //            type: 'validation'
+    //        });
+    //        //showValidationWarning("⚠️ Укажите хотя бы одну дату: 'Дата подачи' или 'Дата решения'.");
+    //        console.log("submissionDate and decisionDate is empty")
+    //    }
+    });
 }
 
 function initCourtCrimeLogic(zone) {
@@ -61,7 +102,9 @@ export function initFragment(zone, tabId) {
       initScammerLogic(zone);
       break;
     case 'law':
-      initLawLogic(zone);
+          waitForElementInZone(zone, "#lawForm", () => { // промис на появление формы
+              initLawLogic(zone);
+          });
       break;
     case 'court_crime':
       initCourtCrimeLogic(zone);
@@ -103,27 +146,77 @@ export function submitFormViaFetch(formName, formType, order_num) {
   
   const endpoint = `/add_${formType}`;
 
-  fetch(endpoint, {
-    method: 'POST',
-    body: formData
-  })
-    .then(response => {
-      if (!response.ok) throw new Error('Network error');
-      return response.text(); // или .json()
+    fetch(endpoint, {
+        method: 'POST',
+        body: formData
     })
-    .then(() => {
-      submitBtn.textContent = '✅ Сохранено!';
-      API.refreshTab(formType);
-      API.toggleForm(formName, formType);
+    .then(async response => {
+        try {
+            const data = await response.json();
+            if (!data.success) {
+                const rawMessage = Array.isArray(data.messages)
+                    ? data.messages.join('\n')
+                    : data.message || 'Неизвестная ошибка';
+
+                const formattedText = rawMessage.replace(/\n/g, '<br>');
+                ModalManager.show({ message: formattedText, type: 'validation' });
+                submitBtn.textContent = '⚠️ Ошибка!';
+                return;
+            }
+
+            submitBtn.textContent = '✅ Сохранено!';
+            API.refreshTab(formType);
+            API.toggleForm(formName, formType);
+        } catch (jsonErr) {
+            console.warn("Не удалось распарсить JSON:", jsonErr);
+            ModalManager.show({
+                message: '⚠️ Некорректный ответ от сервера. Проверьте формат JSON.',
+                type: 'error'
+            });
+            submitBtn.textContent = '⚠️ Ошибка парсинга!';
+        }
     })
     .catch(() => {
-      submitBtn.textContent = '⚠️ Ошибка сети!';
+        //renderFlashedMessages('modal-container', ['Ошибка сети. Проверьте подключение.']);
+        ModalManager.show({ message: 'Поймали CATCH', type: 'validation' });
+        submitBtn.textContent = '⚠️ Ошибка сети!';
     })
     .finally(() => {
-      formSubmitting = false;
-      setTimeout(() => {
+        formSubmitting = false;
+        setTimeout(() => {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
-      }, 2000);
+        }, 2000);
     });
 }
+/////////////////////////////////////////////////////
+export const ModalManager = {
+    show({ message = '', html = '', type = 'info' }) {
+        this.hide(); // Очищаем предыдущую модалку
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+
+        const content = document.createElement('div');
+        content.className = 'modal-content';
+        content.classList.add(`type-${type}`);
+
+        // Вставляем контент
+        content.innerHTML = html || `
+      <div>${message}</div>
+      <button class="close-btn">Ок</button>
+    `;
+
+        overlay.appendChild(content);
+
+        // Закрытие по кнопке
+        content.querySelector(".close-btn")?.addEventListener("click", () => this.hide());
+
+        // Добавляем в глобальный слой
+        document.getElementById('global-modal-layer')?.appendChild(overlay);
+    },
+
+    hide() {
+        document.querySelectorAll('.modal-overlay')?.forEach(el => el.remove());
+    }
+};

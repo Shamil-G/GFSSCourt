@@ -11,6 +11,7 @@ class SSO_User:
         self.post=''
         self.dep_name=''
         self.roles=''
+        self.top_control=0
 
         if 'password' in session:
             self.password = session['password']
@@ -21,8 +22,10 @@ class SSO_User:
             self.username = login_name
             session['username'] = login_name
 
-            if 'dep_name' not in src_user or 'post' not in src_user or \
-            ( src_user['dep_name'] not in admin_deps or src_user['post'] not in permit_post ):
+            if 'dep_name' in src_user and src_user['dep_name'] in admin_deps:
+                self.top_control=1
+
+            if self.top_control==0 and ('post' not in src_user or src_user['post'] not in permit_post):
                 log.info(f'----------------\n\tUSER {session['username']} not Registred\n----------------')
                 return None
 
