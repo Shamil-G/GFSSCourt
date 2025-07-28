@@ -84,7 +84,7 @@ def view_pretrial_add():
     maturity_date = request.form.get('execution_date', '')
     log.debug(f'-------------->>>\n\tADD PRETRIAL. ORDER_NUM: {order_num}\n\tUNTIL_DAY: {until_day}\n\tMATURITY_date: {maturity_date}\n\tUSER: {g.user.full_name}')
     if date_pretrial=='' or (until_day=='' and maturity_date==''):
-        return { "success":  False, "message": "Не все поля заполнены:\n<Каждый месяц до> или <Дата погашения>?" }, 200
+        return { "success":  False, "message": "Не все поля заполнены:\n'Каждый месяц до' или 'Дата погашения'?" }, 200
     if order_num and g.user.full_name:
         add_pta(order_num, date_pretrial, until_day, maturity_date, g.user.full_name)      
         return { "success":  True }, 200
@@ -125,8 +125,9 @@ def view_scammer_add():
 def view_law_add():
     order_num = request.form.get('order_num')
     submission_date = request.form.get('submission_date','')
-
     decision_date = request.form.get('decision_date','')
+    effective_date = request.form.get('effective_date','')
+
     decision = request.form.get('decision','')
     orgname = request.form.get('orgname','')
 
@@ -138,10 +139,11 @@ def view_law_add():
             log.info(f'----->\n\tADD LAW\n\t{get_i18n_value('MUST_BE_ALL_FIELD')}')
             return jsonify({ "success": False, "messages": [ get_i18n_value('MUST_BE_ALL_FIELD') ] }), 200
     if order_num and g.user.full_name:
-        add_law(order_num, submission_date, decision_date, decision, orgname, g.user.full_name)      
+        add_law(order_num, submission_date, decision_date, effective_date, decision, orgname, g.user.full_name)      
         return { "success": True }, 200
     # Сохраняем в БД или обрабатываем
-    return { "success":  False, "message": "Не все поля заполнены\n<Решение ПО> или <Правоохранительный орган>?" }, 200
+    return { "success":  False, "message": "Не все поля заполнены\n'Решение ПО' или 'Правоохранительный орган'?" }, 200
+
 
 @app.route('/law_fragment')
 @login_required
@@ -158,6 +160,7 @@ def view_court_crime_add():
     order_num = request.form.get('order_num')
     submission_date = request.form['submission_date']
     verdict_date = request.form.get('verdict_date','')
+    effective_date = request.form.get('effective_date','')
     compensated_amount = request.form.get('compensated_amount','')
     solution_crime_part = request.form.get('solution_crime_part','')
     solution_civ_part = request.form.get('solution_civ_part','')
@@ -171,7 +174,8 @@ def view_court_crime_add():
             return jsonify({ "success": False, "messages": [ get_i18n_value('MUST_BE_ALL_FIELD') ] }), 200
 
     if order_num and g.user.full_name:
-        add_crime_court(order_num, submission_date, verdict_date, compensated_amount, solution_crime_part, solution_civ_part, court_name, g.user.full_name)      
+        add_crime_court(order_num, submission_date, verdict_date, effective_date, compensated_amount, 
+                        solution_crime_part, solution_civ_part, court_name, g.user.full_name)      
         return jsonify({ "success": True }), 200
     # Сохраняем в БД или обрабатываем
     return { "success":  False, "message": "ADD CRIME. ⚠️ Не все поля заполнены" }, 200
@@ -192,6 +196,7 @@ def view_court_civ_add():
     order_num = request.form.get('order_num')
     submission_date = request.form['submission_date']
     solution_date = request.form.get('solution_date','')
+    effective_date = request.form.get('effective_date','')
     num_solution = request.form.get('num_solution','')
     solution = request.form.get('solution','')
     court_name = request.form.get('court_name','')
@@ -208,7 +213,7 @@ def view_court_civ_add():
             log.info(f'----->\n\tADD LAW\n\t{get_i18n_value('MUST_BE_ALL_FIELD')}')
             return jsonify({ "success": False, "messages": [ get_i18n_value('MUST_BE_ALL_FIELD') ] }), 200
     if order_num and g.user.full_name:
-        add_civ_court(order_num, submission_date, solution_date, num_solution, solution, court_name, g.user.full_name)      
+        add_civ_court(order_num, submission_date, solution_date, effective_date, num_solution, solution, court_name, g.user.full_name)      
         return jsonify({ "success": True }), 200
     # Сохраняем в БД или обрабатываем
     return { "success":  False, "message": "ADD CIV. ⚠️ Не все поля заполнены" }, 200
@@ -228,6 +233,7 @@ def view_court_civ_fragment():
 def view_appeal_add():
     order_num = request.form.get('order_num')
     appeal_date = request.form.get('appeal_date')
+    effective_date = request.form.get('effective_date','')
     appeal_solution = request.form.get('appeal_solution','')
     cassation_appeal_solution = request.form.get('cassation_appeal_solution','')
     court_name = request.form.get('court_name','')
@@ -235,7 +241,7 @@ def view_appeal_add():
     log.debug(f"----->\n\tADD APPEAL COURT\n\tORDER_NUM: {order_num}\n\tAPPEAL_SOLUTION: {appeal_solution}"
              f"\n\tCASSATION_APPEAL_SOLUTION: {cassation_appeal_solution}\n\tCOURT_NAME: {court_name}\n\tUSER: {g.user.full_name}")
     if order_num and g.user.full_name:
-        add_appeal(order_num, appeal_date, appeal_solution, cassation_appeal_solution, court_name, g.user.full_name)
+        add_appeal(order_num, appeal_date, effective_date, appeal_solution, cassation_appeal_solution, court_name, g.user.full_name)
         return jsonify({ "success": True }), 200
     # Сохраняем в БД или обрабатываем
     return jsonify({ "success": False, "message": "Поле ORDER_NUM is empty?" }), 200
@@ -264,13 +270,6 @@ def view_execution_add():
     if transfer_date=='' and start_date=='':
         log.info(f'----->\n\tADD LAW\n\tTRANSFER_DATE and START_DATE is NULL')
         return jsonify({ "success": False, "messages": ["⚠️ Вы должны указать одно из двух полей:\n<Дата передачи> или <Дата исполнения>"] }), 200
-    if phone!='' and start_date=='':
-        log.info(f'----->\n\tADD LAW\n\tPHONE and START_DATE cant be NULL at once')
-        return jsonify({ "success": False, "messages": ["⚠️ Должна быть указана <Дата исполнения>"] }), 200
-    if start_date!='':
-        if phone=='' or court_executor=='' or transfer_date=='':
-            log.info(f'----->\n\tADD LAW\n\t{get_i18n_value('MUST_BE_ALL_FIELD')}')
-            return jsonify({ "success": False, "messages": [ get_i18n_value('MUST_BE_ALL_FIELD') ] }), 200
 
     log.debug(f'----->\n\tADD EXECUTION\n\tORDER_NUM: {order_num}\n\tTRANSFER_DATE: {transfer_date}\n\tSTART_DATE: {start_date}\n\tPHONE: {phone}\n\tCOURT_EXECUTOR: {court_executor}\n\tUSER: {g.user.full_name}')
     if order_num and g.user.full_name:
@@ -285,7 +284,7 @@ def view_execution_add():
 def view_execution_fragment():
     order_num = request.args.get('order_num')
     execution_items = get_execution_items(order_num) if order_num else []
-    log.debug(f"EXECUTION_FRAGMENT\n\tORDER_NUM: {order_num}\n\tEXECUTION_ITEMS: {execution_items}")
+    log.info(f"EXECUTION_FRAGMENT\n\tORDER_NUM: {order_num}\n\tEXECUTION_ITEMS: {execution_items}")
     return render_template("partials/_execution_fragment.html", execution_items=execution_items, selected_order=order_num)
 
 

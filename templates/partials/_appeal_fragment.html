@@ -7,7 +7,7 @@
         <tr>
             <th>{{ res_value('APPEAL_DATE') }}</th>
             <th>{{ res_value('APPEAL_SOLUTION') }}</th>
-            <th>{{ res_value('CASSATION_APPEAL_SOLUTION') }}</th>
+            <th>{{ res_value('APPEAL_CASSATION_SOLUTION') }}</th>
             <th>{{ res_value('COURT_NAME') }}</th>
             <th>{{ res_value('EMPLOYEE') }}</th>
         </tr>
@@ -21,7 +21,7 @@
             <td>{{ item.cassation_appeal_solution }}</td>
             <td style="text-align: left">{{ item.court_name }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
-<tr>
+        <tr>
         {% endfor %}
     </tbody>
 </table>

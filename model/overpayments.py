@@ -12,10 +12,10 @@ def list_overpayments(top_control, user_region):
                      op.iin,  
                      to_char(op.estimated_damage_amount,'999999990.99'),
                      to_char(coalesce(op.compensated_amount,0),'9999990.99'),
-                     to_char(coalesce(op.court_damage_amount,0),'999999990.99'),
                      op.rfpm_id,
                      op.last_status,
                      to_char(op.verdict_date,'dd.mm.yyyy'),
+                     to_char(op.effective_date,'dd.mm.yyyy'),
                      op.last_source_solution,
                      op.last_solution,
                      op.employee
@@ -30,10 +30,10 @@ def list_overpayments(top_control, user_region):
                      op.iin,  
                      to_char(op.estimated_damage_amount,'999999990.99'),
                      to_char(coalesce(op.compensated_amount,0),'9999990.99'),
-                     to_char(coalesce(op.court_damage_amount,0),'999999990.99'),
                      op.rfpm_id,
                      op.last_status,
                      to_char(op.verdict_date,'dd.mm.yyyy'),
+                     to_char(op.effective_date,'dd.mm.yyyy'),
                      op.last_source_solution,
                      op.last_solution,
                      op.employee
@@ -52,7 +52,8 @@ def list_overpayments(top_control, user_region):
             records = cursor.fetchall()
             for rec in records:
                 res = {'order_num': rec[0], 'region': rec[1], 'fio': rec[2], 'iin': rec[3], 'estimated_amount': rec[4], 'compensated_amount': rec[5],
-                       'court_amount': rec[6], 'rfpm_id': rec[7], 'last_status': rec[8], 'verdict_date': rec[9] or '', 
+                       'rfpm_id': rec[6], 'last_status': rec[7], 
+                       'verdict_date': rec[8] or '', 'effective_date': rec[9] or '', 
                        'last_source_solution': rec[10] or '-//-', 
                        'last_solution': rec[11] or '-//-',
                        'employee': rec[12]}
@@ -113,6 +114,7 @@ def get_law_items(order_num):
         select op_id, 
                to_char(submission_date,'dd.mm.yyyy HH24'), 
                to_char(decision_date,'dd.mm.yyyy HH24'), 
+               to_char(effective_date,'dd.mm.yyyy HH24'), 
                decision,
                org_name,
                employee
@@ -129,7 +131,8 @@ def get_law_items(order_num):
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'op_id': rec[0], 'submission_date': rec[1], 'decision_date': rec[2], 'decision': rec[3], 'orgname': rec[4], 'employee': rec[5] }
+                res = { 'op_id': rec[0], 'submission_date': rec[1], 'decision_date': rec[2], 'effective_date': rec[3], 
+                        'decision': rec[3], 'orgname': rec[4], 'employee': rec[5] }
                 result.append(res)
             log.debug(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
             return result
@@ -140,6 +143,7 @@ def get_court_crime_items(order_num):
         select op_id, 
                to_char(submission_date,'dd.mm.yyyy HH24') as submission_date, 
                to_char(verdict_date,'dd.mm.yyyy HH24') as verdict_date, 
+               to_char(effective_date,'dd.mm.yyyy HH24') as effective_date, 
                estimated_damage_amount,
                compensated_amount,
                solution_crime_part,
@@ -160,9 +164,9 @@ def get_court_crime_items(order_num):
             records = cursor.fetchall()
             for rec in records:
                 res = {'op_id': rec[0], 'submission_date': rec[1], 
-                       'verdict_date': rec[2], 'estimated_damage_amount': rec[3], 'compensated_amount': rec[4], 
-                       'solution_crime_part': rec[5], "solution_civ_part": rec[6], 'court_name': rec[7],
-                       'employee': rec[8] }
+                       'verdict_date': rec[2], 'effective_date': rec[3], 'estimated_damage_amount': rec[4], 
+                       'compensated_amount': rec[5], 'solution_crime_part': rec[6], "solution_civ_part": rec[7], 
+                       'court_name': rec[8], 'employee': rec[9] }
                 result.append(res)
             log.debug(f'------ GET CRIME COURT ITEMS. RESULT:\n\t{result}')
             return result
@@ -173,6 +177,7 @@ def get_court_civ_items(order_num):
         select op_id, 
                to_char(submission_date,'dd.mm.yyyy HH24') as submission_date, 
                to_char(solution_date,'dd.mm.yyyy HH24') as solution_date, 
+               to_char(effective_date,'dd.mm.yyyy HH24') as effecive_date, 
                num_solution,
                solution,
                court_name,
@@ -190,7 +195,8 @@ def get_court_civ_items(order_num):
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'op_id': rec[0], 'submission_date': rec[1], 'solution_date': rec[2], 'num_solution': rec[3], 'solution': rec[4], 'court_name': rec[5], 'employee': rec[6] }
+                res = {'op_id': rec[0], 'submission_date': rec[1], 'solution_date': rec[2], 'solution_date': rec[3], 
+                       'num_solution': rec[4], 'solution': rec[5], 'court_name': rec[6], 'employee': rec[7] }
                 result.append(res)
             log.debug(f'------ GET CIV COURT ITEMS. RESULT:\n\t{result}')
             return result
@@ -200,6 +206,7 @@ def get_appeal_items(order_num):
     stmt = """
         select op_id,
                to_char(appeal_date,'dd.mm.yyyy HH24') as appeal_date,
+               to_char(effective_date,'dd.mm.yyyy HH24') as efectivel_date,
                appeal_solution, 
                cassation_appeal_solution, 
                court_name,
@@ -217,7 +224,7 @@ def get_appeal_items(order_num):
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'op_id': rec[0], 'appeal_date': rec[1], 'appeal_solution': rec[2], 'cassation_appeal_solution': rec[3], 'court_name': rec[4], 'employee': rec[5] }
+                res = {'op_id': rec[0], 'appeal_date': rec[1], 'effective_date': rec[2] or '', 'appeal_solution': rec[3], 'cassation_appeal_solution': rec[4] or '-//-', 'court_name': rec[5], 'employee': rec[6] }
                 result.append(res)
             log.debug(f'------ GET APPEAL COURT ITEMS. RESULT:\n\t{result}')
             return result
@@ -244,7 +251,7 @@ def get_execution_items(order_num):
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'op_id': rec[0], 'transfer_date': rec[1], 'start_date': rec[2], 'phone': rec[3], 'court_executor': rec[4], 'employee': rec[5], }
+                res = {'op_id': rec[0], 'transfer_date': rec[1], 'start_date': rec[2], 'phone': rec[3], 'court_executor': rec[4], 'employee': rec[5] }
                 result.append(res)
             log.debug(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
             return result
@@ -308,47 +315,49 @@ def add_scammer(op_id, iin, scammer_org_name, employee):
                 log.info(f'ADD_SCAMMER\n\tOP_ID: {op_id}\n\tIIN: {iin}\n\tSCAMMER_ORG_NAME: {scammer_org_name}\n\temployee: {employee}')
 
 
-def add_law(op_id, submission_date, decision_date, decision, orgname, employee):
+def add_law(op_id, submission_date, decision_date, effective_date, decision, orgname, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            log.info(f'ADD_LAW\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tDECISION_DATE: {decision_date}\n\tDECISION: {decision}\n\tORGNAME: {orgname}\n\temployee: {employee}')
             try:
                 cursor.execute('begin op.add_law(:op_id, :submission_date, :decision_date, :decision, :orgname, :employee); end;', 
-                               op_id=int(op_id), submission_date=submission_date, 
-                               decision_date=decision_date, decision=decision, orgname=orgname, employee=employee)
+                               op_id=int(op_id), submission_date=submission_date, decision_date=decision_date, 
+                               effective_date=effective_date, decision=decision, orgname=orgname, employee=employee)
             finally:
                 log.info(f'ADD_LAW\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tDECISION_DATE: {decision_date}\n\tDECISION: {decision}\n\tORGNAME: {orgname}\n\temployee: {employee}')
 
 
-def add_crime_court(op_id, submission_date, verdict_date, compensated_amount, solution_crime_part, solution_civ_part, court_name, employee):
+def add_crime_court(op_id, submission_date, verdict_date, effective_date, compensated_amount, solution_crime_part, solution_civ_part, court_name, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
                 cursor.execute('begin op.add_crime_court(:op_id, :submission_date, :verdict_date, :compensated_amount, :solution_crime_part, :solution_civ_part, :court_name, :employee); end;', 
                                op_id=op_id, submission_date=submission_date, 
-                               verdict_date=verdict_date, compensated_amount=compensated_amount, solution_crime_part=solution_crime_part,
-                               solution_civ_part=solution_civ_part, court_name=court_name, employee=employee)
+                               verdict_date=verdict_date, effective_date=effective_date, compensated_amount=compensated_amount, 
+                               solution_crime_part=solution_crime_part,solution_civ_part=solution_civ_part, court_name=court_name, employee=employee)
             finally:
                 log.info(f'ADD_CRIME_COURT\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tVERDICT_DATE: {verdict_date}\n\tSOLUTION_CRIME: {solution_crime_part}\n\tCOURT_NAME: {court_name}\n\temployee: {employee}')
 
 
-def add_civ_court(op_id, submission_date, solution_date, num_solution, solution, court_name, employee):
+def add_civ_court(op_id, submission_date, solution_date, effective_date, num_solution, solution, court_name, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
                 cursor.execute('begin op.add_civ_court(:op_id, :submission_date, :solution_date, :num_solution, :solution, :court_name, :employee); end;', 
                                op_id=op_id, submission_date=submission_date, 
-                               solution_date=solution_date, num_solution=num_solution, solution=solution,
-                               court_name=court_name, employee=employee)
+                               solution_date=solution_date, effective_date=effective_date, 
+                               num_solution=num_solution, solution=solution, court_name=court_name, employee=employee)
             finally:
                 log.info(f'ADD_CIV_COURT\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tSOLUTION_DATE: {solution_date}\n\tNUM_SOLUTION: {num_solution}\n\tSOLUTION: {solution}\n\tCOURT_NAME: {court_name}\n\temployee: {employee}')
 
 
-def add_appeal(op_id, appeal_date, appeal_solution, cassation_appeal_solution, court_name, employee):
+def add_appeal(op_id, appeal_date, effective_date, appeal_solution, cassation_appeal_solution, court_name, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
                 cursor.execute('begin op.add_appeal(:op_id, :appeal_date, :appeal_solution, :cassation_appeal_solution, :court_name, :employee); end;', 
-                               op_id=op_id, appeal_date=appeal_date, appeal_solution=appeal_solution, cassation_appeal_solution=cassation_appeal_solution, 
+                               op_id=op_id, appeal_date=appeal_date, effective_date=effective_date, 
+                               appeal_solution=appeal_solution, cassation_appeal_solution=cassation_appeal_solution, 
                                court_name=court_name, employee=employee)
             finally:
                 log.info(f'ADD_LAW\n\tOP_ID: {op_id}\n\tAPPEAL_DATE: {appeal_date}\n\tAPPEAL_SOLUTION: {appeal_solution}\n\tCASSATION_APPEAL: {cassation_appeal_solution}\n\temployee: {employee}')

@@ -21,6 +21,7 @@ create or replace package op is
  procedure add_law( i_op_id in number, 
                     i_submission_date in varchar2, 
                     i_decision_date in varchar2, 
+                    i_effective_date in varchar2,
                     i_decision in varchar2,
                     i_orgname in varchar2,
                     i_employee in varchar2);
@@ -28,6 +29,7 @@ create or replace package op is
  procedure add_crime_court( i_op_id in number, 
                     i_submission_date in varchar2, 
                     i_verdict_date in varchar2, 
+                    i_effective_date in varchar2,
                     i_compensated_amount in varchar2,
                     i_solution_crime_part in varchar2,
                     i_solution_civ_part in varchar2,
@@ -37,6 +39,7 @@ create or replace package op is
  procedure add_civ_court( i_op_id in number, 
                     i_submission_date in varchar2, 
                     i_solution_date in varchar2, 
+                    i_effective_date in varchar2,
                     i_num_solution in varchar2,
                     i_solution in varchar2,
                     i_court_name in varchar2,
@@ -44,6 +47,7 @@ create or replace package op is
                     
  procedure add_appeal( i_op_id in number, 
                     i_appeal_date in varchar2, 
+                    i_effective_date in varchar2,
                     i_appeal_solution in varchar2, 
                     i_cassation_appeal_solution in varchar2, 
                     i_court_name in varchar2, 
@@ -121,10 +125,10 @@ create or replace package body op is
 
    v_exist := exist_person(i_iin);
    if v_exist = 1 then
-     insert into overpayments (estimated_damage_amount, compensated_amount, court_damage_amount, iin, 
-                 rfpm_id, last_status, region, verdict_date, last_source_solution, last_solution)
-     values    ( i_estimated_damage_amount, 0, 0, 
-               i_iin, i_rfpm_id, i_last_status, i_region, '', '', '');
+     insert into overpayments (estimated_damage_amount, compensated_amount, iin, 
+                 rfpm_id, last_status, region, verdict_date, effective_date, last_source_solution, last_solution)
+     values    ( i_estimated_damage_amount, 0,  
+               i_iin, i_rfpm_id, i_last_status, i_region, '', '', '', '');
      commit;
      return;
    end if;
@@ -139,14 +143,21 @@ create or replace package body op is
                     i_employee in varchar2)
  is
  begin
-
    insert into pt_agreements (op_id, date_pretrial, until_day, maturity_date, employee)
    values    (i_op_id, to_date(i_date_pretrial,'YYYY-MM-DD'), i_until_day, to_date(i_maturity_date,'YYYY-MM-DD'), i_employee);
-   
+
    update overpayments t 
    set t.last_status='Досудебное соглашение' 
    where t.op_id=i_op_id;
    commit;
+
+   exception when dup_val_on_index then
+     log('ADD_PTA', 'DUP_VAL_ON_INDEX. OP_ID: '||i_op_id||', date_pretrial: '||to_date(i_date_pretrial,'YYYY-MM-DD'));
+     update pt_agreements pt
+     set    pt.until_day=i_until_day,
+            pt.maturity_date=to_date(i_maturity_date,'YYYY-MM-DD')
+     where pt.op_id=i_op_id and pt.date_pretrial=to_date(i_date_pretrial,'YYYY-MM-DD');
+     commit;
  end add_pta;
 
  procedure add_scammer( i_op_id in number, 
@@ -159,66 +170,64 @@ create or replace package body op is
    v_exist := exist_person(i_iin);
    
    if v_exist=1 then
+     begin
      insert into scammers (op_id, iin, scammer_org_name, employee)
      values    (i_op_id, i_iin, i_scammer_org_name, i_employee);
      commit;
+     end;
    end if;
+   exception when dup_val_on_index then
+     update scammers sc
+     set    sc.scammer_org_name=case when i_scammer_org_name is not null then i_scammer_org_name else sc.scammer_org_name end,
+            sc.employee=i_employee
+     where  sc.op_id=i_op_id and sc.iin=i_iin;
+     commit;
  end add_scammer;
 
  procedure add_law( i_op_id in number, 
                     i_submission_date in varchar2, 
                     i_decision_date in varchar2, 
+                    i_effective_date in varchar2,
                     i_decision in varchar2,
                     i_orgname in varchar2,
                     i_employee in varchar2)
  is
  begin
-   -- При первом обращении в ПО даты решения еще нет
-   if i_decision_date is null
-     then
-     insert into law_decisions (op_id, submission_date, org_name, employee)
-     values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), i_orgname, i_employee);
-
-     update overpayments t 
-     set t.last_status='Обращение в ПО'
-     where t.op_id=i_op_id;
-   end if;
-   
-   -- Вводим "задним" числом дату обращения и дату решения
-   -- Или делаем корректировку
-   if i_decision_date is not null and i_submission_date is not null
-     then
-       begin
-         insert into law_decisions (op_id, submission_date, decision_date, decision, org_name, employee)
-         values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), to_date(i_decision_date,'YYYY-MM-DD'), 
-                   i_decision, i_orgname, i_employee);
-         exception when dup_val_on_index then
-             log('ADD_LAW', '1. IDECISION: '||i_decision||', ORGNAME: '||i_orgname);
-             update law_decisions ld
-             set    ld.decision=case when i_decision is not null then i_decision else ld.decision end,
-                    ld.employee=i_employee,
-                    ld.org_name=case when i_orgname is not null then i_orgname else ld.org_name end
-             where  ld.op_id=i_op_id
-             and    ld.submission_date=to_date(i_submission_date,'YYYY-MM-DD');
-       end;     
+   begin
+     insert into law_decisions (op_id, submission_date, decision_date, effective_date, decision, org_name, employee)
+     values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), to_date(i_decision_date,'YYYY-MM-DD'), 
+               to_date(i_effective_date,'YYYY-MM-DD'), 
+               i_decision, i_orgname, i_employee);
+   exception when dup_val_on_index then
+       log('ADD_LAW', '1. IDECISION: '||i_decision||', ORGNAME: '||i_orgname);
+       update law_decisions ld
+       set    ld.decision=case when i_decision is not null then i_decision else ld.decision end,
+              ld.decision_date=case when i_decision_date is not null then to_date(i_decision_date,'YYYY-MM-DD') else ld.decision_date end,
+              ld.effective_date=case when i_effective_date is not null then to_date(i_effective_date,'YYYY-MM-DD') else ld.effective_date end,
+              ld.employee=i_employee,
+              ld.org_name=case when i_orgname is not null then i_orgname else ld.org_name end
+       where  ld.op_id=i_op_id
+       and    ld.submission_date=to_date(i_submission_date,'YYYY-MM-DD');
+   end;     
        
-       update overpayments t 
-       set t.last_status='Обращение в ПО',
-           t.verdict_date=to_date(i_decision_date,'YYYY-MM-DD'),
-           t.last_source_solution=case when i_orgname is not null then i_orgname else t.last_source_solution end,
-           t.last_solution=case when i_decision is not null then i_decision else t.last_solution end
-       where t.op_id=i_op_id;
 
-       commit;
-       log('ADD_LAW', '2. IDECISION: '||i_decision||', ORGNAME: '||i_orgname);
-   end if;
-
+   update overpayments t 
+   set t.last_status='Обращение в ПО',
+       t.verdict_date=to_date(i_decision_date,'YYYY-MM-DD'),
+       t.last_source_solution=case when i_orgname is not null then i_orgname else t.last_source_solution end,
+       t.effective_date=case when i_effective_date is not null and to_date(i_effective_date,'YYYY-MM-DD')>i_effective_date 
+                             then to_date(i_effective_date,'YYYY-MM-DD') 
+                             else t.effective_date 
+                        end,
+       t.last_solution=case when i_decision is not null then i_decision else t.last_solution end
+   where t.op_id=i_op_id;
    commit;
  end add_law;
 
  procedure add_crime_court( i_op_id in number, 
                     i_submission_date in varchar2, 
                     i_verdict_date in varchar2, 
+                    i_effective_date in varchar2,
                     i_compensated_amount in varchar2,
                     i_solution_crime_part in varchar2,
                     i_solution_civ_part in varchar2,
@@ -229,9 +238,18 @@ create or replace package body op is
    -- При первом обращении в ПО даты решения еще нет
    if i_verdict_date is null
      then
-     insert into civ_court (op_id, submission_date, court_name, employee)
-     values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), i_court_name, i_employee);
-
+       begin
+         insert into crime_court (op_id, submission_date, court_name, employee)
+         values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), i_court_name, i_employee);
+       exception when dup_val_on_index then
+         update crime_court cc
+         set cc.compensated_amount=i_compensated_amount,
+             cc.solution_crime_part=case when i_solution_crime_part is not null then i_solution_crime_part else cc.solution_crime_part end,
+             cc.solution_civ_part=case when i_solution_civ_part is not null then i_solution_civ_part else cc.solution_civ_part end,
+             cc.court_name=case when i_court_name is not null then i_court_name else cc.court_name end,
+             cc.employee=i_employee
+         where cc.op_id=i_op_id and cc.submission_date=to_date(i_submission_date,'YYYY-MM-DD');         
+       end;
      update overpayments t 
      set t.last_status='Обращение в уголовный суд'
      where t.op_id=i_op_id;
@@ -248,17 +266,21 @@ create or replace package body op is
        exception when dup_val_on_index then
          update crime_court cc
          set cc.verdict_date=to_date(i_verdict_date,'YYYY-MM-DD'),
+             cc.effective_date=case when i_effective_date is not null then to_date(i_effective_date,'YYYY-MM-DD') else cc.effective_date end,
              cc.compensated_amount=i_compensated_amount,
              cc.solution_crime_part=case when i_solution_crime_part is not null then i_solution_crime_part else cc.solution_crime_part end,
              cc.solution_civ_part=case when i_solution_civ_part is not null then i_solution_civ_part else cc.solution_civ_part end,
              cc.court_name=case when i_court_name is not null then i_court_name else cc.court_name end,
              cc.employee=i_employee
-         where cc.op_id=i_op_id and cc.submission_date=i_submission_date;
+         where cc.op_id=i_op_id and cc.submission_date=to_date(i_submission_date,'YYYY-MM-DD');
        end;
                  
        update overpayments t 
        set t.last_status='Обращение в уголовный суд',
-           t.verdict_date=to_date(i_verdict_date,'YYYY-MM-DD'),
+           t.verdict_date=case when i_verdict_date is not null and to_date(i_verdict_date,'YYYY-MM-DD')>t.verdict_date then to_date(i_verdict_date,'YYYY-MM-DD')
+                               when i_submission_date is not null and to_date(i_submission_date,'YYYY-MM-DD')>t.verdict_date then to_date(i_submission_date,'YYYY-MM-DD')
+                               else t.verdict_date
+                          end,
            t.last_source_solution=case when i_court_name is not null then i_court_name else t.last_source_solution end,
            t.last_solution=i_solution_crime_part||' : '||i_solution_civ_part
        where t.op_id=i_op_id;
@@ -270,101 +292,85 @@ create or replace package body op is
  procedure add_civ_court( i_op_id in number, 
                     i_submission_date in varchar2, 
                     i_solution_date in varchar2, 
+                    i_effective_date in varchar2,
                     i_num_solution in varchar2,
                     i_solution in varchar2,
                     i_court_name in varchar2,
                     i_employee in varchar2)
  is
  begin
-   -- При первом обращении в ПО даты решения еще нет
-   if i_solution_date is null
-     then
-     insert into civ_court (op_id, submission_date, court_name, employee)
-     values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), i_court_name, i_employee);
-
-     update overpayments t 
-     set t.last_status='Обращение в гражданский суд'
-     where t.op_id=i_op_id;
-   end if;
-
-   -- Вводим "задним" числом дату обращения и дату решения
-   -- либо делаем корректировку уже введенных данных
-   if i_solution_date is not null and i_submission_date is not null
-     then
-       begin
-         insert into civ_court (op_id, submission_date, solution_date, num_solution, solution, court_name, employee)
-         values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), to_date(i_solution_date,'YYYY-MM-DD'), 
-                    i_num_solution, i_solution, i_court_name, i_employee);
-       exception when dup_val_on_index then
-         update civ_court cc
-         set    cc.solution_date=to_date(i_solution_date,'YYYY-MM-DD'),
-                cc.num_solution=case when i_num_solution is not null then i_num_solution else cc.num_solution end,
-                cc.solution=case when i_solution is not null then i_solution else cc.solution end,
-                cc.court_name=case when i_court_name is not null then i_court_name else cc.court_name end,
-                cc.employee=i_employee
-         where cc.op_id=i_op_id and cc.submission_date=i_submission_date;
-       end;
+   begin
+     insert into civ_court (op_id, submission_date, solution_date, effective_date, num_solution, solution, court_name, employee)
+     values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), to_date(i_solution_date,'YYYY-MM-DD'), 
+                to_date(i_effective_date,'YYYY-MM-DD'), 
+                i_num_solution, i_solution, i_court_name, i_employee);
+   exception when dup_val_on_index then
+     update civ_court cc
+     set    cc.solution_date=to_date(i_solution_date,'YYYY-MM-DD'),
+            cc.effective_date=case when i_effective_date is not null then to_date(i_effective_date,'YYYY-MM-DD') else cc.effective_date end,
+            cc.num_solution=case when i_num_solution is not null then i_num_solution else cc.num_solution end,
+            cc.solution=case when i_solution is not null then i_solution else cc.solution end,
+            cc.court_name=case when i_court_name is not null then i_court_name else cc.court_name end,
+            cc.employee=i_employee
+     where cc.op_id=i_op_id and cc.submission_date=to_date(i_submission_date,'YYYY-MM-DD');
+   end;
               
-       update overpayments t 
-       set t.last_status='Обращение в гражданский суд',
-           t.verdict_date=to_date(i_solution_date,'YYYY-MM-DD'),
-           t.last_source_solution=case when i_court_name is not null then i_court_name else t.last_source_solution end,
-           t.last_solution=case when i_solution is not null then i_solution else t.last_solution end
-       where t.op_id=i_op_id;
-   end if;
+   update overpayments t 
+   set t.last_status='Обращение в гражданский суд',
+       t.verdict_date=case when i_solution_date is not null and to_date(i_solution_date,'YYYY-MM-DD')>t.verdict_date then to_date(i_solution_date,'YYYY-MM-DD')
+                           when i_submission_date is not null and to_date(i_submission_date,'YYYY-MM-DD')>t.verdict_date then to_date(i_submission_date,'YYYY-MM-DD')
+                           else t.verdict_date 
+                      end,
+       t.effective_date=case when i_effective_date is not null and to_date(i_effective_date,'YYYY-MM-DD')>t.effective_date then to_date(i_effective_date,'YYYY-MM-DD')
+                             else t.effective_date 
+                        end,
+       t.last_source_solution=case when i_court_name is not null then i_court_name else t.last_source_solution end,
+       t.last_solution=case when i_solution is not null then i_solution else t.last_solution end
+   where t.op_id=i_op_id;
 
    commit;
  end add_civ_court;
 
  procedure add_appeal( i_op_id in number, 
                     i_appeal_date in varchar2, 
+                    i_effective_date in varchar2,
                     i_appeal_solution in varchar2, 
                     i_cassation_appeal_solution in varchar2, 
                     i_court_name in varchar2, 
                     i_employee in varchar2)
  is
  begin
-   -- При первом обращении в ПО кассации еще нет
-   if i_cassation_appeal_solution is null
-     then
-     insert into civ_court (op_id, submission_date, court_name, employee)
-     values    (i_op_id, to_date(i_appeal_date,'YYYY-MM-DD'), i_court_name, i_employee);
-
-     update overpayments t 
-     set t.last_status='Обращение в аппеляционный суд',
-           t.last_source_solution=i_court_name,
-           t.last_solution=i_appeal_solution
-     where t.op_id=i_op_id;
-   end if;
-   
-   -- Вводим "задним" числом дату аппеляции и кассационное решение
-   -- Или делаем корреткировку
-   if i_appeal_date is not null and i_cassation_appeal_solution is not null
-     then
-       begin
-         insert into appeal_court (op_id, appeal_date, appeal_solution, cassation_appeal_solution, court_name, employee)
-         values    (i_op_id, to_date(i_appeal_date,'YYYY-MM-DD'), i_appeal_solution, i_cassation_appeal_solution, 
-                    i_court_name, i_employee);
-       exception when dup_val_on_index then
-         update appeal_court cc
-         set    cc.appeal_solution=i_appeal_solution,
-                cc.cassation_appeal_solution=i_cassation_appeal_solution,
-                cc.court_name=i_court_name,
-                cc.employee=i_employee
-         where  cc.op_id=i_op_id
-         and    cc.appeal_date=i_appeal_date;         
-       end;
+   begin
+     insert into appeal_court (op_id, appeal_date, effective_date, appeal_solution, cassation_appeal_solution, court_name, employee)
+     values    (i_op_id, to_date(i_appeal_date,'YYYY-MM-DD'), to_date(i_effective_date,'YYYY-MM-DD'),
+                i_appeal_solution, i_cassation_appeal_solution, 
+                i_court_name, i_employee);
+   exception when dup_val_on_index then
+     update appeal_court cc
+     set    cc.appeal_solution=i_appeal_solution,
+            cc.effective_date=case when i_effective_date is not null then to_date(i_effective_date,'YYYY-MM-DD') else cc.effective_date end,     
+            cc.cassation_appeal_solution=i_cassation_appeal_solution,
+            cc.court_name=i_court_name,
+            cc.employee=i_employee
+     where  cc.op_id=i_op_id
+     and    cc.appeal_date=to_date(i_appeal_date,'YYYY-MM-DD');         
+   end;
                  
-       update overpayments t 
-       set t.last_status='Обращение в аппеляционный суд',
-           t.verdict_date=to_date(i_appeal_date,'YYYY-MM-DD'),
-           t.last_source_solution=case when i_court_name is not null then i_court_name else t.last_source_solution end,
-           t.last_solution=case when i_cassation_appeal_solution is not null then i_cassation_appeal_solution
-                                when i_appeal_solution is not null then i_appeal_solution
-                                else t.last_solution
-                           end
-       where t.op_id=i_op_id;
-   end if;
+   update overpayments t 
+   set t.last_status='Обращение в аппеляционный суд',
+       t.verdict_date=case 
+                           when i_appeal_date is not null and to_date(i_appeal_date,'YYYY-MM-DD')>t.verdict_date then to_date(i_appeal_date,'YYYY-MM-DD')
+                           else t.verdict_date
+                      end,
+       t.effective_date=case when i_effective_date is not null and to_date(i_effective_date,'YYYY-MM-DD')>t.effective_date then to_date(i_effective_date,'YYYY-MM-DD')
+                             else t.effective_date 
+                        end,
+       t.last_source_solution=case when i_court_name is not null then i_court_name else t.last_source_solution end,
+       t.last_solution=case when i_cassation_appeal_solution is not null then i_cassation_appeal_solution
+                            when i_appeal_solution is not null then i_appeal_solution
+                            else t.last_solution
+                       end
+   where t.op_id=i_op_id;
 
    commit;
  end add_appeal;
@@ -377,52 +383,43 @@ create or replace package body op is
                           i_employee in varchar2
                         )
  is
-   r_row executions%rowtype;
  begin
+   begin
+      insert into executions( op_id, transfer_date, start_date, phone, court_executor, employee )
+      values (
+                i_op_id, 
+                to_date(i_transfer_date,'YYYY-MM-DD'), 
+                to_date(i_start_date,'YYYY-MM-DD'), 
+                i_phone,
+                i_court_executor, 
+                i_employee
+      );   
+      log('ADD EXECUTION', 'OP_ID: '||i_op_id||', TRANSFER_DATE: '||i_transfer_date||', START_DATE: '||
+                i_start_date||', PHONE: '||i_phone||', COURT_EXECUTOR: '||i_court_executor);
+   exception when dup_val_on_index then
+       log('UPD EXECUTION', 'OP_ID: '||i_op_id||', TRANSFER_DATE: '||i_transfer_date||', START_DATE: '||
+                i_start_date||', PHONE: '||i_phone||', COURT_EXECUTOR: '||i_court_executor);
+       update executions e
+       set    e.start_date=to_date(i_start_date,'YYYY-MM-DD'),
+              e.phone=case when i_phone is not null then i_phone else e.phone end,
+              e.court_executor=case when i_court_executor is not null then i_court_executor else e.court_executor end,
+              e.employee=i_employee
+       where  e.op_id=i_op_id
+       and    e.transfer_date=to_date(i_transfer_date,'YYYY-MM-DD');
+       commit;
+   end;   
 
-   -- При первом обращении в ПО даты кассации еще нет
-   if i_start_date is null
-     then
-     insert into executions (op_id, transfer_date, employee)
-     values    (i_op_id, to_date(i_transfer_date,'YYYY-MM-DD'), i_employee);
-
-     update overpayments t 
-     set t.last_status='Передано на исполнение',
-           t.last_source_solution=i_court_executor
-     where t.op_id=i_op_id;
-   end if;
-   
-   -- Вводим "задним" числом дату обращения и дату начала исполнения
-   -- Или делаем корректировку
-   if i_transfer_date is not null and i_start_date is not null
-     then
-        begin
-          insert into executions( op_id, transfer_date, start_date, phone, court_executor, employee )
-          values (
-                    i_op_id, 
-                    to_date(i_transfer_date,'YYYY-MM-DD'), 
-                    to_date(i_start_date,'YYYY-MM-DD'), 
-                    i_phone,
-                    i_court_executor, i_employee
-          );   
-        exception when dup_val_on_index then
-           update executions e
-           set    e.start_date=to_date(i_start_date,'YYYY-MM-DD'),
-                  e.phone=i_phone,
-                  e.court_executor=i_court_executor,
-                  e.employee=i_employee
-           where  e.op_id=i_op_id
-           and    e.transfer_date=r_row.transfer_date;
-        end;   
-        
-       update overpayments t 
-       set t.last_status='Передано на исполнение',
-           t.verdict_date=to_date(i_start_date,'YYYY-MM-DD'),
-           t.last_source_solution=i_court_executor
-       where t.op_id=i_op_id;
-   end if;
-
-  commit;
+   update overpayments t 
+   set t.last_status='Передано на исполнение',
+       t.verdict_date=case 
+                           when i_transfer_date is not null and to_date(i_transfer_date,'YYYY-MM-DD')>t.verdict_date then to_date(i_transfer_date,'YYYY-MM-DD')
+                           when i_start_date is not null and to_date(i_start_date,'YYYY-MM-DD')>t.verdict_date then to_date(i_start_date,'YYYY-MM-DD')
+                           else t.verdict_date
+                      end,           
+       t.last_source_solution=i_court_executor
+   where t.op_id=i_op_id;
+       
+   commit;
  end add_execution;
 
  procedure add_refunding( i_op_id in number, 

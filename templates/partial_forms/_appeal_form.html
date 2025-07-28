@@ -8,6 +8,10 @@
                 <td style="border: none; text-align: left">📅 {{ res_value('APPEAL_DATE') }}:</td>
                 <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="appeal_date" required></td>
             </tr>
+            <tr class="disabled-row">
+                <td style="border: none; text-align: left">📅 {{ res_value('EFFECTIVE_DATE') }}:</td>
+                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="effective_date" required></td>
+            </tr>
 
             <tr class="disabled-row">
                 <td style="border: none; text-align: left">{{ res_value('APPEAL_SOLUTION') }}:</td>
@@ -17,8 +21,6 @@
                         <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-lable - отображается -->
-                            <a data-value="{{res_value('SOLUTION_YES')}}" data-label="{{res_value('SOLUTION_YES')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_YES')}}</a>
-                            <a data-value="{{res_value('SOLUTION_NONE')}}" data-label="{{res_value('SOLUTION_NONE')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_NONE')}}</a>
                             <a data-value="{{res_value('SOLUTION_SATISFY')}}" data-label="{{res_value('SOLUTION_SATISFY')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_SATISFY')}}</a>
                             <a data-value="{{res_value('SOLUTION_REFUSE')}}" data-label="{{res_value('SOLUTION_REFUSE')}}"><i class="fas fa-info-circle"></i>{{res_value('SOLUTION_REFUSE')}}</a>
                         </div>
@@ -28,7 +30,7 @@
             </tr>
 
             <tr class="disabled-row">
-                <td style="border: none; text-align: left">{{ res_value('CASSATION_APPEAL_SOLUTION') }}:</td>
+                <td style="border: none; text-align: left">{{ res_value('APPEAL_CASSATION_SOLUTION') }}:</td>
 
                 <td style="border: none; text-align: left">
                     <div class="dropdown">
@@ -36,8 +38,6 @@
                         <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-lable - отображается -->
-                            <a data-value="{{res_value('SOLUTION_YES')}}" data-label="{{res_value('SOLUTION_YES')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_YES')}}</a>
-                            <a data-value="{{res_value('SOLUTION_NONE')}}" data-label="{{res_value('SOLUTION_NONE')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_NONE')}}</a>
                             <a data-value="{{res_value('SOLUTION_SATISFY')}}" data-label="{{res_value('SOLUTION_SATISFY')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_SATISFY')}}</a>
                             <a data-value="{{res_value('SOLUTION_REFUSE')}}" data-label="{{res_value('SOLUTION_REFUSE')}}"><i class="fas fa-info-circle"></i>{{res_value('SOLUTION_REFUSE')}}</a>
                         </div>
