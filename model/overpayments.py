@@ -78,7 +78,7 @@ def get_pretrial_items(order_num):
             for rec in records:
                 res = {'op_id': rec[0], 'pretrial_date': rec[1], 'until_day': rec[2] or '-//-', 'maturity_date': rec[3] or '-//-', 'employee': rec[4] }
                 result.append(res)
-            log.info(f'------ GET PRETRIAL ITEMS. RESULT:\n\t{result}')
+            log.debug(f'------ GET PRETRIAL ITEMS. RESULT:\n\t{result}')
             return result
 
 
@@ -104,7 +104,7 @@ def get_scammer_items(order_num):
             for rec in records:
                 res = {'op_id': rec[0], 'iin': rec[1], 'scammer_fio': rec[2] or 'Нет в таблице LOADER.PERSON', 'scammer_org_name': rec[3], 'employee': rec[4] }
                 result.append(res)
-            log.info(f'------ GET SCAMMER ITEMS. RESULT:\n\t{result}')
+            log.debug(f'------ GET SCAMMER ITEMS. RESULT:\n\t{result}')
             return result
 
 
@@ -131,7 +131,7 @@ def get_law_items(order_num):
             for rec in records:
                 res = {'op_id': rec[0], 'submission_date': rec[1], 'decision_date': rec[2], 'decision': rec[3], 'orgname': rec[4], 'employee': rec[5] }
                 result.append(res)
-            log.info(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
+            log.debug(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
             return result
 
 
@@ -164,7 +164,7 @@ def get_court_crime_items(order_num):
                        'solution_crime_part': rec[5], "solution_civ_part": rec[6], 'court_name': rec[7],
                        'employee': rec[8] }
                 result.append(res)
-            log.info(f'------ GET CRIME COURT ITEMS. RESULT:\n\t{result}')
+            log.debug(f'------ GET CRIME COURT ITEMS. RESULT:\n\t{result}')
             return result
 
 
@@ -192,7 +192,7 @@ def get_court_civ_items(order_num):
             for rec in records:
                 res = {'op_id': rec[0], 'submission_date': rec[1], 'solution_date': rec[2], 'num_solution': rec[3], 'solution': rec[4], 'court_name': rec[5], 'employee': rec[6] }
                 result.append(res)
-            log.info(f'------ GET CIV COURT ITEMS. RESULT:\n\t{result}')
+            log.debug(f'------ GET CIV COURT ITEMS. RESULT:\n\t{result}')
             return result
 
 
@@ -219,7 +219,7 @@ def get_appeal_items(order_num):
             for rec in records:
                 res = {'op_id': rec[0], 'appeal_date': rec[1], 'appeal_solution': rec[2], 'cassation_appeal_solution': rec[3], 'court_name': rec[4], 'employee': rec[5] }
                 result.append(res)
-            log.info(f'------ GET APPEAL COURT ITEMS. RESULT:\n\t{result}')
+            log.debug(f'------ GET APPEAL COURT ITEMS. RESULT:\n\t{result}')
             return result
 
 
@@ -246,7 +246,7 @@ def get_execution_items(order_num):
             for rec in records:
                 res = {'op_id': rec[0], 'transfer_date': rec[1], 'start_date': rec[2], 'phone': rec[3], 'court_executor': rec[4], 'employee': rec[5], }
                 result.append(res)
-            log.info(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
+            log.debug(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
             return result
 
 
@@ -273,7 +273,7 @@ def get_refunding_items(order_num):
             for rec in records:
                 res = {'op_id': rec[0], 'submission_date': rec[1], 'decision_date': rec[2], 'decision': rec[3], 'orgname': rec[4], 'employee': rec[5], }
                 result.append(res)
-            log.info(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
+            log.debug(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
             return result
 
 

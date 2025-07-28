@@ -10,17 +10,33 @@
             </tr>
             <tr class="disabled-row">
                 <td style="border: none; text-align: left">📆 {{ res_value('SOLUTION_DATE') }}:</td>
-                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="solution_date" required></td>
+                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="solution_date"></td>
             </tr>
 
             <tr class="disabled-row">
                 <td style="border: none; text-align: left">{{ res_value('NUM_SOLUTION') }}:</td>
-                <td style="border: none; text-align: left"><input style="width: 220px" class="input_s_form" type="text" name="num_solution" required></td>
+                <td style="border: none; text-align: left"><input style="width: 220px" class="input_s_form" type="text" name="num_solution"></td>
             </tr>
 
             <tr class="disabled-row">
                 <td style="border: none; text-align: left">{{ res_value('SOLUTION_CIV_PART') }}:</td>
-                <td style="border: none; text-align: left"><input style="width: 220px" class="input_s_form" type="text" name="solution" required></td>
+
+                <td style="border: none; text-align: left">
+                    <div class="dropdown">
+                        <input type="hidden" name="solution" id="menuValue" style="width: 220px" class="input_s_form">
+                        <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
+                        <div class="dropdown-content">
+                            <!-- data-value - отправляется через submit, data-label - отображается -->
+                            <a data-value="{{res_value('SOLUTION_SATISFY')}}" data-label="{{res_value('SOLUTION_SATISFY')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_SATISFY')}}</a>
+                            <a data-value="{{res_value('SOLUITON_REFUSE')}}" data-label="{{res_value('SOLUITON_REFUSE')}}"><i class="fas fa-home"></i>{{res_value('SOLUITON_REFUSE')}}</a>
+                            <a data-value="{{res_value('SOLUTION_MEDIATION_AGGREMENT')}}" data-label="{{res_value('SOLUTION_MEDIATION_AGGREMENT')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_MEDIATION_AGGREMENT')}}</a>
+                            <a data-value="{{res_value('SOLUTION_SETTLEMENT_AGGREMENT')}}" data-label="{{res_value('SOLUTION_SETTLEMENT_AGGREMENT')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_SETTLEMENT_AGGREMENT')}}</a>
+                            <a data-value="{{res_value('SOLUTION_RETURN_DOC')}}" data-label="{{res_value('SOLUTION_RETURN_DOC')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_RETURN_DOC')}}</a>
+                            <a data-value="{{res_value('SOLUTION_TERMINATION')}}" data-label="{{res_value('SOLUTION_TERMINATION')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_TERMINATION')}}</a>
+                            <a data-value="{{res_value('SOLUTION_DISMISSED')}}" data-label="{{res_value('SOLUTION_DISMISSED')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_DISMISSED')}}</a>
+                        </div>
+                    </div>
+                </td>
             </tr>
 
             <tr class="disabled-row">
