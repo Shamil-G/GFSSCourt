@@ -34,9 +34,9 @@
                     <th data-help="rfpm_id" class="has-helper">{{ res_value('RFPM_ID') }}</th>
                     <th>{{ res_value('ESTIMATED_DAMAGE_AMOUNT') }}</th>
                     <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
-                    <th>{{ res_value('COURT_DAMAGE_AMOUNT') }}</th>
                     <th data-help="last_status" class="has-helper">{{ res_value('STATUS_OVERPAY') }}</th>
                     <th data-help="force_date" class="has-helper">{{ res_value('FORCE_DATE') }}</th>
+                    <th data-help="force_date" class="has-helper">{{ res_value('EFFECTIVE_DATE') }}</th>
                     <th data-help="last_source_solution" class="has-helper">{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
                     <th data-help="last_solution" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
                 </tr>
@@ -50,8 +50,8 @@
                 {% for el in list_op %}
                 <tr data-order="{{ el.order_num }}" class="clickable-row">
                     <!--<td>
-                        <a>{{ el.order_num }}</a>
-                    </td>-->
+        <a>{{ el.order_num }}</a>
+    </td>-->
                     <td>
                         <a>{{ el.order_num }}</a>
                     </td>
@@ -74,14 +74,14 @@
                     <td style="text-align: right">
                         {{ el.compensated_amount }}
                     </td>
-                    <td style="text-align: right">
-                        {{ el.court_amount }}
-                    </td>
                     <td style="text-align: left">
                         {{ el.last_status }}
                     </td>
                     <td>
                         {{ el.verdict_date }}
+                    </td>
+                    <td>
+                        {{ el.effective_date }}
                     </td>
                     <td style="text-align: left">
                         {{ el.last_source_solution }}
@@ -196,11 +196,8 @@
             </div>
 
             <div id="refunding" class="tab-panel">
-                <button data-form="refundingForm" data-type="refunding" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
-<!--                <button id="refundingRefreshButton" onclick="API.refreshTab('refunding')">🔄 Обновить</button>-->
                 <button class="refresh-btn" data-tab="refunding" id="refundingRefreshButton">🔄 Обновить</button>
 
-                <div id="refundingFormContainer"><!-- Here will be FORM _execution_items --></div>
                 <div id="refundingContent"><!-- Here will be fragment _execution_items --></div>
                 <div id="refundingTimestamp" class="tab-timestamp"></div>
             </div>

@@ -161,6 +161,7 @@ def view_court_crime_add():
     submission_date = request.form['submission_date']
     verdict_date = request.form.get('verdict_date','')
     effective_date = request.form.get('effective_date','')
+    sum_civ_amount = request.form.get('sum_civ_amount','')
     compensated_amount = request.form.get('compensated_amount','')
     solution_crime_part = request.form.get('solution_crime_part','')
     solution_civ_part = request.form.get('solution_civ_part','')
@@ -168,13 +169,10 @@ def view_court_crime_add():
 
     log.debug(f'----->\n\tADD COURT\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
     if submission_date=='':
-        return jsonify({ "success": False, "messages": ["⚠️ Вы должны <Дата обращения>"] }), 200
-    if verdict_date!='' and (solution_crime_part=='' or solution_civ_part==''):
-            log.info(f'----->\n\tADD LAW\n\t{get_i18n_value('MUST_BE_ALL_FIELD')}')
-            return jsonify({ "success": False, "messages": [ get_i18n_value('MUST_BE_ALL_FIELD') ] }), 200
+        return jsonify({ "success": False, "messages": ["⚠️ Вы должны ввести дату в поле <Дата обращения>"] }), 200
 
     if order_num and g.user.full_name:
-        add_crime_court(order_num, submission_date, verdict_date, effective_date, compensated_amount, 
+        add_crime_court(order_num, submission_date, verdict_date, effective_date, sum_civ_amount, compensated_amount, 
                         solution_crime_part, solution_civ_part, court_name, g.user.full_name)      
         return jsonify({ "success": True }), 200
     # Сохраняем в БД или обрабатываем
@@ -288,28 +286,28 @@ def view_execution_fragment():
     return render_template("partials/_execution_fragment.html", execution_items=execution_items, selected_order=order_num)
 
 
-@app.route('/add_refunding', methods=['POST'])
-@login_required
-def view_refunding_add():
-    order_num = request.form.get('order_num')
-    submission_date = request.form['submission_date']
+# @app.route('/add_refunding', methods=['POST'])
+# @login_required
+# def view_refunding_add():
+#     order_num = request.form.get('order_num')
+#     submission_date = request.form['submission_date']
 
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tsubmission_date: {submission_date}')
+#     log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tsubmission_date: {submission_date}')
 
-    decision_date = request.form['decision_date']
-    decision = request.form['decision']
+#     decision_date = request.form['decision_date']
+#     decision = request.form['decision']
 
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tdecision: {decision}')
+#     log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tdecision: {decision}')
 
-    orgname = request.form['orgname']
+#     orgname = request.form['orgname']
 
-    log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
-    if order_num and g.user.full_name:
-        add_law(order_num, submission_date, decision_date, decision, orgname, g.user.full_name)      
-        return { "success": True }, 200
-    # Сохраняем в БД или обрабатываем
-    return { "success": False, "message": "Тестовый режим" }, 200
-    # return redirect(url_for('view_list_overpayments', order_num=order_num, tab='law'))
+#     log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
+#     if order_num and g.user.full_name:
+#         add_law(order_num, submission_date, decision_date, decision, orgname, g.user.full_name)      
+#         return { "success": True }, 200
+#     # Сохраняем в БД или обрабатываем
+#     return { "success": False, "message": "Тестовый режим" }, 200
+#     # return redirect(url_for('view_list_overpayments', order_num=order_num, tab='law'))
 
 
 @app.route('/refunding_fragment')

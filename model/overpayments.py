@@ -112,9 +112,9 @@ def get_scammer_items(order_num):
 def get_law_items(order_num):
     stmt = """
         select op_id, 
-               to_char(submission_date,'dd.mm.yyyy HH24'), 
-               to_char(decision_date,'dd.mm.yyyy HH24'), 
-               to_char(effective_date,'dd.mm.yyyy HH24'), 
+               to_char(submission_date,'dd.mm.yyyy'), 
+               to_char(decision_date,'dd.mm.yyyy'), 
+               to_char(effective_date,'dd.mm.yyyy'), 
                decision,
                org_name,
                employee
@@ -132,7 +132,7 @@ def get_law_items(order_num):
             records = cursor.fetchall()
             for rec in records:
                 res = { 'op_id': rec[0], 'submission_date': rec[1], 'decision_date': rec[2], 'effective_date': rec[3], 
-                        'decision': rec[3], 'orgname': rec[4], 'employee': rec[5] }
+                        'decision': rec[4], 'orgname': rec[5], 'employee': rec[6] }
                 result.append(res)
             log.debug(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
             return result
@@ -141,11 +141,11 @@ def get_law_items(order_num):
 def get_court_crime_items(order_num):
     stmt = """
         select op_id, 
-               to_char(submission_date,'dd.mm.yyyy HH24') as submission_date, 
-               to_char(verdict_date,'dd.mm.yyyy HH24') as verdict_date, 
-               to_char(effective_date,'dd.mm.yyyy HH24') as effective_date, 
-               estimated_damage_amount,
-               compensated_amount,
+               to_char(submission_date,'dd.mm.yyyy') as submission_date, 
+               to_char(verdict_date,'dd.mm.yyyy') as verdict_date, 
+               to_char(effective_date,'dd.mm.yyyy') as effective_date, 
+               to_char(coalesce(cc.sum_civ_amount,0),'9999990.99'),
+               to_char(coalesce(cc.compensated_amount,0),'9999990.99'),
                solution_crime_part,
                solution_civ_part,
                court_name,
@@ -164,7 +164,7 @@ def get_court_crime_items(order_num):
             records = cursor.fetchall()
             for rec in records:
                 res = {'op_id': rec[0], 'submission_date': rec[1], 
-                       'verdict_date': rec[2], 'effective_date': rec[3], 'estimated_damage_amount': rec[4], 
+                       'verdict_date': rec[2], 'effective_date': rec[3], 'sum_civ_amount': rec[4], 
                        'compensated_amount': rec[5], 'solution_crime_part': rec[6], "solution_civ_part": rec[7], 
                        'court_name': rec[8], 'employee': rec[9] }
                 result.append(res)
@@ -175,9 +175,9 @@ def get_court_crime_items(order_num):
 def get_court_civ_items(order_num):
     stmt = """
         select op_id, 
-               to_char(submission_date,'dd.mm.yyyy HH24') as submission_date, 
-               to_char(solution_date,'dd.mm.yyyy HH24') as solution_date, 
-               to_char(effective_date,'dd.mm.yyyy HH24') as effecive_date, 
+               to_char(submission_date,'dd.mm.yyyy') as submission_date, 
+               to_char(solution_date,'dd.mm.yyyy') as solution_date, 
+               to_char(effective_date,'dd.mm.yyyy') as effecive_date, 
                num_solution,
                solution,
                court_name,
@@ -195,7 +195,7 @@ def get_court_civ_items(order_num):
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'op_id': rec[0], 'submission_date': rec[1], 'solution_date': rec[2], 'solution_date': rec[3], 
+                res = {'op_id': rec[0], 'submission_date': rec[1], 'solution_date': rec[2], 'effective_date': rec[3], 
                        'num_solution': rec[4], 'solution': rec[5], 'court_name': rec[6], 'employee': rec[7] }
                 result.append(res)
             log.debug(f'------ GET CIV COURT ITEMS. RESULT:\n\t{result}')
@@ -205,8 +205,8 @@ def get_court_civ_items(order_num):
 def get_appeal_items(order_num):
     stmt = """
         select op_id,
-               to_char(appeal_date,'dd.mm.yyyy HH24') as appeal_date,
-               to_char(effective_date,'dd.mm.yyyy HH24') as efectivel_date,
+               to_char(appeal_date,'dd.mm.yyyy') as appeal_date,
+               to_char(effective_date,'dd.mm.yyyy') as efectivel_date,
                appeal_solution, 
                cassation_appeal_solution, 
                court_name,
@@ -224,7 +224,7 @@ def get_appeal_items(order_num):
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'op_id': rec[0], 'appeal_date': rec[1], 'effective_date': rec[2] or '', 'appeal_solution': rec[3], 'cassation_appeal_solution': rec[4] or '-//-', 'court_name': rec[5], 'employee': rec[6] }
+                res = {'op_id': rec[0], 'appeal_date': rec[1], 'effective_date': rec[2] or '', 'appeal_solution': rec[3] or '-//-', 'cassation_appeal_solution': rec[4] or '-//-', 'court_name': rec[5], 'employee': rec[6] }
                 result.append(res)
             log.debug(f'------ GET APPEAL COURT ITEMS. RESULT:\n\t{result}')
             return result
@@ -233,8 +233,8 @@ def get_appeal_items(order_num):
 def get_execution_items(order_num):
     stmt = """
         select op_id, 
-               to_char(transfer_date,'dd.mm.yyyy HH24'), 
-               to_char(start_date,'dd.mm.yyyy HH24'), 
+               to_char(transfer_date,'dd.mm.yyyy'), 
+               to_char(start_date,'dd.mm.yyyy'), 
                phone,
                court_executor,
                employee
@@ -260,8 +260,8 @@ def get_execution_items(order_num):
 def get_refunding_items(order_num):
     stmt = """
         select op_id, 
-               to_char(submission_date,'dd.mm.yyyy HH24'), 
-               to_char(decision_date,'dd.mm.yyyy HH24'), 
+               to_char(submission_date,'dd.mm.yyyy'), 
+               to_char(decision_date,'dd.mm.yyyy'), 
                decision,
                org_name,
                employee
@@ -273,6 +273,8 @@ def get_refunding_items(order_num):
         return []
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            cursor.execute('begin op.check_refunding(:op_id); end;', op_id=order_num)
+
             cursor.execute(stmt, op_id=order_num)
             
             result = []
@@ -320,30 +322,31 @@ def add_law(op_id, submission_date, decision_date, effective_date, decision, org
         with connection.cursor() as cursor:
             log.info(f'ADD_LAW\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tDECISION_DATE: {decision_date}\n\tDECISION: {decision}\n\tORGNAME: {orgname}\n\temployee: {employee}')
             try:
-                cursor.execute('begin op.add_law(:op_id, :submission_date, :decision_date, :decision, :orgname, :employee); end;', 
+                cursor.execute('begin op.add_law(:op_id, :submission_date, :decision_date, :effective_date, :decision, :orgname, :employee); end;', 
                                op_id=int(op_id), submission_date=submission_date, decision_date=decision_date, 
                                effective_date=effective_date, decision=decision, orgname=orgname, employee=employee)
             finally:
                 log.info(f'ADD_LAW\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tDECISION_DATE: {decision_date}\n\tDECISION: {decision}\n\tORGNAME: {orgname}\n\temployee: {employee}')
 
 
-def add_crime_court(op_id, submission_date, verdict_date, effective_date, compensated_amount, solution_crime_part, solution_civ_part, court_name, employee):
+def add_crime_court(op_id, submission_date, verdict_date, effective_date, sum_civ_amount, compensated_amount, solution_crime_part, solution_civ_part, court_name, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
-                cursor.execute('begin op.add_crime_court(:op_id, :submission_date, :verdict_date, :compensated_amount, :solution_crime_part, :solution_civ_part, :court_name, :employee); end;', 
+                cursor.execute('begin op.add_crime_court(:op_id, :submission_date, :verdict_date, :effective_date, :sum_civ_amount,'
+                               ' :compensated_amount, :solution_crime_part, :solution_civ_part, :court_name, :employee); end;', 
                                op_id=op_id, submission_date=submission_date, 
-                               verdict_date=verdict_date, effective_date=effective_date, compensated_amount=compensated_amount, 
+                               verdict_date=verdict_date, effective_date=effective_date, sum_civ_amount=sum_civ_amount, compensated_amount=compensated_amount, 
                                solution_crime_part=solution_crime_part,solution_civ_part=solution_civ_part, court_name=court_name, employee=employee)
             finally:
-                log.info(f'ADD_CRIME_COURT\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tVERDICT_DATE: {verdict_date}\n\tSOLUTION_CRIME: {solution_crime_part}\n\tCOURT_NAME: {court_name}\n\temployee: {employee}')
+                log.info(f'ADD_CRIME_COURT\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tVERDICT_DATE: {verdict_date}\n\tSUM_CIV_AMOUNT: {sum_civ_amount}\n\tSOLUTION_CRIME: {solution_crime_part}\n\tCOURT_NAME: {court_name}\n\temployee: {employee}')
 
 
 def add_civ_court(op_id, submission_date, solution_date, effective_date, num_solution, solution, court_name, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
-                cursor.execute('begin op.add_civ_court(:op_id, :submission_date, :solution_date, :num_solution, :solution, :court_name, :employee); end;', 
+                cursor.execute('begin op.add_civ_court(:op_id, :submission_date, :solution_date, :effective_date, :num_solution, :solution, :court_name, :employee); end;', 
                                op_id=op_id, submission_date=submission_date, 
                                solution_date=solution_date, effective_date=effective_date, 
                                num_solution=num_solution, solution=solution, court_name=court_name, employee=employee)
@@ -355,7 +358,7 @@ def add_appeal(op_id, appeal_date, effective_date, appeal_solution, cassation_ap
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
-                cursor.execute('begin op.add_appeal(:op_id, :appeal_date, :appeal_solution, :cassation_appeal_solution, :court_name, :employee); end;', 
+                cursor.execute('begin op.add_appeal(:op_id, :appeal_date, :effective_date, :appeal_solution, :cassation_appeal_solution, :court_name, :employee); end;', 
                                op_id=op_id, appeal_date=appeal_date, effective_date=effective_date, 
                                appeal_solution=appeal_solution, cassation_appeal_solution=cassation_appeal_solution, 
                                court_name=court_name, employee=employee)

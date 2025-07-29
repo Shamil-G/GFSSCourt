@@ -1,13 +1,16 @@
 {% if court_civ_items %}
 <table style="width: 100%; margin-top: 4px">
     <colgroup>
-        <col style="width: 175px">
+        <col style="width: 155px">
+        <col style="width: 155px">
+        <col style="width: 220px">
         <col style="width: 155px">
     </colgroup>
     <thead>
         <tr>
             <th>{{ res_value('SUBMISSION_DATE') }}</th>
             <th>{{ res_value('SOLUTION_DATE') }}</th>
+            <th>{{ res_value('EFFECTIVE_DATE') }}</th>
             <th>{{ res_value('NUM_SOLUTION') }}</th>
             <th>{{ res_value('SOLUTION_CIV_PART') }}</th>
             <th>{{ res_value('COURT_NAME') }}</th>
@@ -20,6 +23,7 @@
         <tr>
             <td>{{ item.submission_date }}</td>
             <td>{{ item.solution_date }}</td>
+            <td>{{ item.effective_date }}</td>
             <td>{{ item.num_solution }}</td>
             <td>{{ item.solution }}</td>
             <td style="text-align: left">{{ item.court_name }}</td>

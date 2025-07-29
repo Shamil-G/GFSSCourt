@@ -1,11 +1,13 @@
 {% if appeal_items %}
 <table style="width: 100%; margin-top: 4px">
     <colgroup>
-        <col style="width: 175px">
+        <col style="width: 155px">
+        <col style="width: 210px">
     </colgroup>
     <thead>
         <tr>
             <th>{{ res_value('APPEAL_DATE') }}</th>
+            <th>{{ res_value('EFFECTIVE_DATE') }}</th>
             <th>{{ res_value('APPEAL_SOLUTION') }}</th>
             <th>{{ res_value('APPEAL_CASSATION_SOLUTION') }}</th>
             <th>{{ res_value('COURT_NAME') }}</th>
@@ -17,11 +19,12 @@
         {% for item in appeal_items %}
         <tr>
             <td>{{ item.appeal_date }}</td>
+            <td>{{ item.effective_date }}</td>
             <td>{{ item.appeal_solution }}</td>
             <td>{{ item.cassation_appeal_solution }}</td>
             <td style="text-align: left">{{ item.court_name }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
-        <tr>
+<tr>
         {% endfor %}
     </tbody>
 </table>
