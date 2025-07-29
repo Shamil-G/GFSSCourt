@@ -16,6 +16,9 @@ const MAX_CACHE_SIZE = 512;
 function getOrderNum() {
   return document.getElementById('sharedOrderNum')?.value || '';
 }
+function getCurrentTabId() {
+    return document.getElementById('sharedTabId')?.value || 'pretrial';
+}
 //////////////////////////////////////////////////////////////////////////////
 function updateRefreshButton(id){
   const orderNum = getOrderNum();
@@ -161,7 +164,7 @@ function addToCache(key, html) {
 ///////////////////////////////////////////////////////////////////////////
 // Главная таблица переплат в LIST_OVERPAYMENTS.HTML
 // Когда щелкаем мышкой по записям TR надо менять фильтр orderNum для TABS
-function filterByOrder(orderNum, tabId) {
+function filterByOrder(orderNum) {
   // После клика мышкой - делаем подсветку выбранной строки
   const rows = document.querySelectorAll('table tbody tr[data-order]');
   rows.forEach(row => {
@@ -172,11 +175,13 @@ function filterByOrder(orderNum, tabId) {
   const shared = document.getElementById('sharedOrderNum');
   if (shared) shared.value = orderNum;
 
+  const tabId = getCurrentTabId();
+  console.log('filterByOrder. sharedTabId: ' + tabId);
   // Синхронизировать ORDER_NUM во все формы
   // Сейчас это делает submitFormViaFetch"
   //syncOrderNumToForms();
 
-  console.log("filterByOrder. currentTab: "+tabId, 'orderNum: ' + orderNum)
+  console.log("filterByOrder", "sharedTabId: "+tabId, "orderNum: " + orderNum)
   loadTabContent(tabId || 'pretrial');
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -249,6 +254,7 @@ function loadTabContent(id) {
 /////////////////////////////////////////////////////////////////////////////////
 // Переходим с одного tab на другой и должны показываться соответствующие панели
 // Функция переключения между вкладками с выборкой его содержимого
+// Функция привязывается в list_overpayments.html 
 function showTab(id) {
   console.log("showTab. ID: " + id);
   const sharedTab = document.getElementById('sharedTabId');
@@ -337,7 +343,7 @@ window.addEventListener('DOMContentLoaded', () => {
     activeTab = tabFromUrl || tabFromField || 'pretrial';
 
     // 💡 Установим всё в правильной последовательности:
-    filterByOrder(orderNum, activeTab);
+    filterByOrder(orderNum);
     console.log("DOMContentLoaded. ActiveTab: "+activeTab)
     showTab(activeTab);
   }
@@ -355,7 +361,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.clickable-row').forEach(row => {
     row.addEventListener('click', () => {
       const orderNum = row.dataset.order;
-      API.filterByOrder(orderNum, activeTab); // возможно, без tabId — если уже сохранён currentTab
+      API.filterByOrder(orderNum); // возможно, без tabId — если уже сохранён currentTab
     });
   });
 
