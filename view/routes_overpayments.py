@@ -12,14 +12,11 @@ log.info("Routes-OverPayments стартовал...")
 @app.route('/list_op', methods=['POST', 'GET'])
 @login_required
 def view_list_overpayments():
-    order_num = None
-    # pretrial_items = []
-
-    order_num = request.form.get('order_num')
-    log.info(f"LIST_OVERPAYMENTS. USER: {g.user.full_name}\n\tTOP_CONTROL: {g.user.top_control}\n\tDEPNAME: {g.user.dep_name}")
+    order_num = request.form.get('order_num','')
+    log.info(f"LIST_OVERPAYMENTS. ORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}\n\tTOP_CONTROL: {g.user.top_control}\n\tDEPNAME: {g.user.dep_name}")
     list_op = list_overpayments(g.user.top_control, g.user.dep_name)
 
-    log.debug(f"LIST_OVERPAYMENTS\n\tORDER_NUM: {order_num}")
+    log.info(f"LIST_OVERPAYMENTS\n\list_op: {list_op}")
     return render_template("list_overpayments.html", list_op=list_op, selected_order=order_num)
 
 
@@ -27,12 +24,12 @@ def view_list_overpayments():
 @login_required
 def view_add_op():
     if request.method == 'POST':
-        region = request.form['region']
-        iin = request.form['iin']
-        rfpm_id = request.form['rfpm_id']
-        status = 'Первичный ввод'
-        estimated_damage_amount = request.form['estimate_damage_amount']
-        add_op(region, iin, rfpm_id, estimated_damage_amount, status)      
+        region = request.form.get('region','')
+        iin = request.form.get('iin', '')
+        risk_date = request.form.get('risk_date','')
+        rfpm_id = request.form.get('rfpm_id', '')
+        sum_civ_amount = request.form.get('sum_civ_amount','')
+        add_op(region, iin, risk_date, rfpm_id, sum_civ_amount)      
         return redirect(url_for('view_list_overpayments'))            
     log.debug(f"ADD OP. REGION: {g.user.dep_name}, TTOP_CONTROL: {g.user.top_control}")
     return render_template("add_op.html", region=g.user.dep_name, top_control=g.user.top_control)
@@ -282,7 +279,7 @@ def view_execution_add():
 def view_execution_fragment():
     order_num = request.args.get('order_num')
     execution_items = get_execution_items(order_num) if order_num else []
-    log.info(f"EXECUTION_FRAGMENT\n\tORDER_NUM: {order_num}\n\tEXECUTION_ITEMS: {execution_items}")
+    log.debug(f"EXECUTION_FRAGMENT\n\tORDER_NUM: {order_num}\n\tEXECUTION_ITEMS: {execution_items}")
     return render_template("partials/_execution_fragment.html", execution_items=execution_items, selected_order=order_num)
 
 
@@ -314,6 +311,7 @@ def view_execution_fragment():
 @login_required
 def view_refunding_fragment():
     order_num = request.args.get('order_num')
+    log.info(f"REFUNDING_FRAGMENT\n\tORDER_NUM: {order_num}")
     refunding_items = get_refunding_items(order_num) if order_num else []
-    log.debug(f"COURT_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {refunding_items}")
+    log.info(f"REFUNDING_FRAGMENT\n\tORDER_NUM: {order_num}\n\tREFUNDING_ITEMS: {refunding_items}")
     return render_template("partials/_refunding_fragment.html", refunding_items=refunding_items, selected_order=order_num)

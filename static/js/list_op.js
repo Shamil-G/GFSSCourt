@@ -80,7 +80,7 @@ function refreshTabDirect(tabId) {
 
   fetch(`/${tabId}_fragment?order_num=${orderNum}`)
     .then(res => res.text())
-    .then(html => {
+      .then(html => {
       const fragment = document.createRange().createContextualFragment(html);
       
       const hasTableRows = fragment.querySelectorAll('table tbody tr').length > 0;
@@ -172,11 +172,11 @@ function filterByOrder(orderNum, tabId) {
   const shared = document.getElementById('sharedOrderNum');
   if (shared) shared.value = orderNum;
 
-    // Синхронизировать ORDER_NUM во все формы
-    // Сейчас это делает submitFormViaFetch"
-    // syncOrderNumToForms();
+  // Синхронизировать ORDER_NUM во все формы
+  // Сейчас это делает submitFormViaFetch"
+  //syncOrderNumToForms();
 
-  console.log("filterByOrder. currentTab: "+tabId)
+  console.log("filterByOrder. currentTab: "+tabId, 'orderNum: ' + orderNum)
   loadTabContent(tabId || 'pretrial');
 }
 /////////////////////////////////////////////////////////////////////////////////////

@@ -10,7 +10,8 @@ def list_overpayments(top_control, user_region):
                      op.region, 
                      p.lastname||' '||p.firstname||' '||p.middlename as fio,
                      op.iin,  
-                     to_char(op.estimated_damage_amount,'999999990.99'),
+                     to_char(op.risk_date,'dd.mm.yyyy') as verdict_date,  
+                     to_char(op.sum_civ_amount,'999999990.99'),
                      to_char(coalesce(op.compensated_amount,0),'9999990.99'),
                      op.rfpm_id,
                      op.last_status,
@@ -28,7 +29,8 @@ def list_overpayments(top_control, user_region):
                      op.region, 
                      p.lastname||' '||p.firstname||' '||p.middlename as fio,
                      op.iin,  
-                     to_char(op.estimated_damage_amount,'999999990.99'),
+                     to_char(op.risk_date,'dd.mm.yyyy') as verdict_date,  
+                     to_char(op.sum_civ_amount,'999999990.99'),
                      to_char(coalesce(op.compensated_amount,0),'9999990.99'),
                      op.rfpm_id,
                      op.last_status,
@@ -51,12 +53,13 @@ def list_overpayments(top_control, user_region):
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'order_num': rec[0], 'region': rec[1], 'fio': rec[2], 'iin': rec[3], 'estimated_amount': rec[4], 'compensated_amount': rec[5],
-                       'rfpm_id': rec[6], 'last_status': rec[7], 
-                       'verdict_date': rec[8] or '', 'effective_date': rec[9] or '', 
-                       'last_source_solution': rec[10] or '-//-', 
-                       'last_solution': rec[11] or '-//-',
-                       'employee': rec[12]}
+                res = {'order_num': rec[0], 'region': rec[1], 'fio': rec[2], 'iin': rec[3], 'risk_date': rec[4], 
+                       'sum_civ_amount': rec[5], 'compensated_amount': rec[6],
+                       'rfpm_id': rec[7], 'last_status': rec[8], 
+                       'verdict_date': rec[9] or '', 'effective_date': rec[10] or '', 
+                       'last_source_solution': rec[11] or '-//-', 
+                       'last_solution': rec[12] or '-//-',
+                       'employee': rec[13]}
                 result.append(res)
             return result
 
@@ -259,42 +262,39 @@ def get_execution_items(order_num):
 
 def get_refunding_items(order_num):
     stmt = """
-        select op_id, 
-               to_char(submission_date,'dd.mm.yyyy'), 
-               to_char(decision_date,'dd.mm.yyyy'), 
-               decision,
-               org_name,
-               employee
-        from law_decisions pt
-        where pt.op_id=:op_id
+        select op_id, iin, mhmh_id, pmdl_n, to_char(pay_date,'dd.mm.yyyy'), to_char(coalesce(sum_pay,0),'9999990.99') 
+        from refunding rf
+        where rf.op_id=:op_id
+        order by mhmh_id, pmdl_n
     """
     if not order_num:
-        log.info(f'------ GET LAW ITEMS\n\tORDER_NUM is EMPTY')
+        log.info(f'------ GET REFUNDING ITEMS\n\tORDER_NUM is EMPTY')
         return []
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            log.info(f'------ GET REFUNDING ITEMS. CHECK')
             cursor.execute('begin op.check_refunding(:op_id); end;', op_id=order_num)
 
+            log.info(f'------ GET REFUNDING ITEMS. EXECUTE')
             cursor.execute(stmt, op_id=order_num)
             
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'op_id': rec[0], 'submission_date': rec[1], 'decision_date': rec[2], 'decision': rec[3], 'orgname': rec[4], 'employee': rec[5], }
+                res = {'op_id': rec[0], 'iin': rec[1], 'mhmh_id': rec[2], 'pmdl_n': rec[3], 'pay_date': rec[4], 'sum_pay': rec[5], }
                 result.append(res)
-            log.debug(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
+            log.info(f'------ GET REFUNDING ITEMS. RESULT:\n\t{result}')
             return result
 
 
-def add_op(region, iin, rfpm_id, estimated_damage_amount, last_status):
+def add_op(region, iin, risk_date, rfpm_id, sum_civ_amount):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
-                cursor.execute('begin op.add_op(:region, :iin, :rfpm_id, :estimated_damage_amount, :last_status); end;', 
-                           region=region, iin=iin, rfpm_id=rfpm_id, estimated_damage_amount=estimated_damage_amount, 
-                           last_status=last_status)
+                cursor.execute('begin op.add_op(:region, :iin, :risk_date, :rfpm_id, :sum_civ_amount); end;', 
+                           region=region, iin=iin, risk_date=risk_date, rfpm_id=rfpm_id, sum_civ_amount=sum_civ_amount)
             finally:
-                log.info(f'ADD_OVERPAYMENTS\n\tINN: {iin}\n\tREGION: {region}\n\tEstimated_damage_amount: {estimated_damage_amount}')
+                log.info(f'ADD_OVERPAYMENTS\n\tINN: {iin}\n\tREGION: {region}\n\tEstimated_damage_amount: {sum_civ_amount}')
 
 
 def add_pta(op_id, date_pretrial, until_day, maturity_date, employee):

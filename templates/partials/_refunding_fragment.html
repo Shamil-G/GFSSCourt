@@ -1,26 +1,33 @@
-{% if execution_items %}
+{% if refunding_items %}
 <table style="width: 840px; margin-top:4px">
     <colgroup>
-        <col style="width: 176px">
-        <col style="width: 176px">
+        <col style="width: 260px">
+        <col style="width: 200px">
+        <col style="width: 155px">
+        <col style="width: 155px">
+        <col style="width: 240px">
     </colgroup>
     <thead>
         <tr>
-            <th>{{ res_value('PRETRIAL_DATE') }}</th>
-            <th>{{ res_value('MATURITY_DATE') }}</th>
-            <th>{{ res_value('EMPLOYEE') }}</th>
+            <th>{{ res_value('IIN') }}</th>
+            <th>{{ res_value('MHMH_ID') }}</th>
+            <th>{{ res_value('PMDL_N') }}</th>
+            <th>{{ res_value('PAY_DATE') }}</th>
+            <th>{{ res_value('SUM_PAY') }}</th>
         </tr>
     </thead>
     <tfoot></tfoot>
     <tbody>
-        {% for item in pretrial_items %}
+        {% for item in refunding_items %}
         <tr>
-            <td>{{ item.pretrial_date }}</td>
-            <td>{{ item.maturity_date }}</td>
-            <td style="text-align: left">{{ item.employee }}</td>
+            <td>{{ item.iin }}</td>
+            <td>{{ item.mhmh_id}}</td>
+            <td>{{ item.pmdl_n}}</td>
+            <td>{{ item.pay_date}}</td>
+            <td style="text-align: right">{{ item.sum_pay }}</td>
         </tr>
         {% endfor %}
-</tbody>
+    </tbody>
 </table>
 {% else %}
 <p>{{ res_value('NONE_REFUNDING_ITEMS') }}</p>

@@ -31,8 +31,9 @@
                     <th data-help="region" class="has-helper">{{ res_value('FILIAL_NAME') }}</th>
                     <th>{{ res_value('FIO_OVERPAY') }}</th>
                     <th>{{ res_value('IIN_OVERPAY') }}</th>
+                    <th>{{ res_value('RISK_DATE') }}</th>
                     <th data-help="rfpm_id" class="has-helper">{{ res_value('RFPM_ID') }}</th>
-                    <th>{{ res_value('ESTIMATED_DAMAGE_AMOUNT') }}</th>
+                    <th>{{ res_value('SUM_CIV_AMOUNT') }}</th>
                     <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
                     <th data-help="last_status" class="has-helper">{{ res_value('STATUS_OVERPAY') }}</th>
                     <th data-help="force_date" class="has-helper">{{ res_value('FORCE_DATE') }}</th>
@@ -49,9 +50,6 @@
                 </tr>
                 {% for el in list_op %}
                 <tr data-order="{{ el.order_num }}" class="clickable-row">
-                    <!--<td>
-        <a>{{ el.order_num }}</a>
-    </td>-->
                     <td>
                         <a>{{ el.order_num }}</a>
                     </td>
@@ -65,11 +63,14 @@
                     <td>
                         {{ el.iin }}
                     </td>
+                    <td>
+                        {{ el.risk_date }}
+                    </td>
                     <td style="text-align: left">
                         {{ el.rfpm_id }}
                     </td>
                     <td style="text-align: right">
-                        {{ el.estimated_amount }}
+                        {{ el.sum_civ_amount }}
                     </td>
                     <td style="text-align: right">
                         {{ el.compensated_amount }}
@@ -196,8 +197,10 @@
             </div>
 
             <div id="refunding" class="tab-panel">
+                <button data-form="refundingForm" data-type="refunding" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
                 <button class="refresh-btn" data-tab="refunding" id="refundingRefreshButton">🔄 Обновить</button>
 
+                <div id="refundingFormContainer"><!-- Here will be FORM _execution_items --></div>
                 <div id="refundingContent"><!-- Here will be fragment _execution_items --></div>
                 <div id="refundingTimestamp" class="tab-timestamp"></div>
             </div>
