@@ -7,7 +7,7 @@ const tabCache = {};
 const tabCacheOrder = [];
 
 // Предлагаем обновить данные, если прошло 10 минут
-const REFRESH_RECOMMENDED_THRESHOLD = 30 * 60 * 1000; // 10 минут
+const REFRESH_RECOMMENDED_THRESHOLD = 1 * 60 * 1000; // 10 минут
 // Удаляем из кэша принудительно, если прошло 2 часа
 const CACHE_LIFETIME = 2 * 60 * 60 * 1000; // 2 часа в мс
 // В кэше храним 512 документов
@@ -21,6 +21,7 @@ function getCurrentTabId() {
 }
 //////////////////////////////////////////////////////////////////////////////
 function updateRefreshButton(id){
+
   const orderNum = getOrderNum();
   if (!orderNum) return;
 
@@ -51,9 +52,7 @@ function showTableLoader(tabId, start) {
 
   const tfoot = contentZone.querySelector('tfoot');
   if (tfoot) {
-    console.log("showTableLoader " + start)
     if(start==1){
-        console.log("showTableLoader Пишем " + start)
         tfoot.innerHTML = `
           <tr>
             <td colspan="100%" style="text-align:center; padding:8px">
@@ -63,7 +62,6 @@ function showTableLoader(tabId, start) {
         `;
     } 
     else {
-        console.log("showTableLoader Чистим " + start)
         tfoot.innerHTML = '';
     } 
   }
@@ -74,7 +72,6 @@ function refreshTabDirect(tabId) {
   const orderNum = getOrderNum();
   if (!orderNum) return;
 
-  console.log("refershTabDirect. orderNum: "+orderNum)
   const contentZone = document.getElementById(`${tabId}Content`);
   const timestampZone = document.getElementById(`${tabId}Timestamp`);
   const cacheKey = `${tabId}_${orderNum}`;
@@ -84,35 +81,38 @@ function refreshTabDirect(tabId) {
   fetch(`/${tabId}_fragment?order_num=${orderNum}`)
     .then(res => res.text())
       .then(html => {
-      const fragment = document.createRange().createContextualFragment(html);
+
+        const fragment = document.createRange().createContextualFragment(html);
       
-      const hasTableRows = fragment.querySelectorAll('table tbody tr').length > 0;
+        const hasTableRows = fragment.querySelectorAll('table tbody tr').length > 0;
 
-      if (hasTableRows) {
-        const cacheKey = `${tabId}_${orderNum}`;
-        const cached = tabCache[cacheKey];
+        if (hasTableRows) {
+            const cacheKey = `${tabId}_${orderNum}`;
+            const cached = tabCache[cacheKey];
 
-        if(!cached || html != cached.html){
-            delete tabCache[cacheKey];
-            addToCache(cacheKey, html);
-            contentZone.innerHTML = html;
-            timestampZone.textContent = `Обновлено: ${new Date().toLocaleTimeString()}`;
-            UIBinder.init();
+            if (!cached || html != cached.html) {
+                delete tabCache[cacheKey];
+                addToCache(cacheKey, html);
+                //contentZone.innerHTML = html;
+                contentZone.innerHTML = ''; // очистка
+                contentZone.appendChild(fragment);
+                //
+                timestampZone.textContent = `Обновлено: ${new Date().toLocaleTimeString()}`;
+                UIBinder.init();
+            }
+            else {
+                console.info('ℹ️ Обновлений нет! ' + cacheKey);
+            }
         }
-        else{
-            console.info('ℹ️ Обновлений нет! '+cacheKey);
-        }
-        tabCache[cacheKey].timestamp=Date.now();
+        tabCache[cacheKey].timestamp = Date.now();
 
         // ✅ Обновить кнопку в любом случае:
         updateRefreshButton(tabId);
-        showTableLoader(tabId,0);
-      }
+        showTableLoader(tabId, 0);
     })
     .catch(err => {
       console.error(`Ошибка загрузки вкладки ${tabId}:`, err);
     });
-  
 }
 ///////////////////////////////////////////////////////////////////////////
 // Кнопка Refresh

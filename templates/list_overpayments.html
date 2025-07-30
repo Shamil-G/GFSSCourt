@@ -24,20 +24,20 @@
     <!-- Верхняя область: список документов -->
     <div class="documents">
         <table>
-            <colgroup><col style="width: 120px;"><col><col><col><col><col><col><col><col><col><col></colgroup>
+            <colgroup><col style="width: 100px;"><col><col><col style="width: 140px;"><col><col><col><col><col><col><col></colgroup>
             <thead>
                 <tr>
                     <th data-help="overpayment_id" class="has-helper">{{ res_value('ORDER_NUM') }}</th>
                     <th data-help="region" class="has-helper">{{ res_value('FILIAL_NAME') }}</th>
                     <th>{{ res_value('FIO_OVERPAY') }}</th>
-                    <th>{{ res_value('IIN_OVERPAY') }}</th>
-                    <th>{{ res_value('RISK_DATE') }}</th>
+                    <th data-help="iin" class="has-helper">{{ res_value('IIN_OVERPAY') }}</th>
+                    <th data-help="risk_date" class="has-helper">{{ res_value('RISK_DATE') }}</th>
                     <th data-help="rfpm_id" class="has-helper">{{ res_value('RFPM_ID') }}</th>
-                    <th>{{ res_value('SUM_CIV_AMOUNT') }}</th>
+                    <th data-help="sum_civ_amount" class="has-helper">{{ res_value('SUM_CIV_AMOUNT') }}</th>
                     <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
                     <th data-help="last_status" class="has-helper">{{ res_value('STATUS_OVERPAY') }}</th>
-                    <th data-help="force_date" class="has-helper">{{ res_value('FORCE_DATE') }}</th>
-                    <th data-help="force_date" class="has-helper">{{ res_value('EFFECTIVE_DATE') }}</th>
+                    <th data-help="court_date" class="has-helper">{{ res_value('COURT_DATE') }}</th>
+                    <th data-help="effective_date" class="has-helper">{{ res_value('EFFECTIVE_DATE') }}</th>
                     <th data-help="last_source_solution" class="has-helper">{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
                     <th data-help="last_solution" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
                 </tr>

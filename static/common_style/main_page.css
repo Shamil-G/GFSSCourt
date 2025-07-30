@@ -1,6 +1,6 @@
 /* Class container  - аналого ARTICLE */
 .container { 
-    margin: auto;
+    margin: 2px;
     padding: 20px;
 
     display: flex;

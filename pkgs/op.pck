@@ -4,8 +4,8 @@ create or replace package op is
   -- Created : 02.07.2025 17:04:41
   -- Purpose : Работы с переплатами
   
- procedure add_op(i_region in varchar2, i_iin in varchar2, i_rfpm_id in varchar2, 
-           i_estimated_damage_amount in number, i_last_status in varchar2);
+ procedure add_op(i_region in varchar2, i_iin in varchar2, i_risk_date in varchar2, i_rfpm_id in varchar2, 
+           i_sum_civ_amount in number);
            
  procedure add_pta( i_op_id in number, 
                     i_date_pretrial in varchar2, 
@@ -64,6 +64,8 @@ create or replace package op is
 
  procedure check_refunding(i_op_id in varchar2);
  procedure check_full_refunding; 
+ procedure clean;
+
  
 end op;
 /
@@ -89,8 +91,8 @@ create or replace package body op is
    exception when no_data_found then return 0;
   end exist_person;
   
- procedure add_op(i_region in varchar2, i_iin in varchar2, i_rfpm_id in varchar2, 
-           i_estimated_damage_amount in number, i_last_status in varchar2)
+ procedure add_op( i_region in varchar2, i_iin in varchar2, i_risk_date in varchar2, i_rfpm_id in varchar2, 
+                   i_sum_civ_amount in number)
  is
    v_exist pls_integer default 0;
  begin
@@ -104,32 +106,37 @@ create or replace package body op is
       return;
    end if;
 
-   if i_rfpm_id is null then
-      log('add_op', 'RFPM_ID is NULL');
+   if i_risk_date is null then
+      log('add_op', 'RISK_DATE is NULL');
       return;
    end if;
 
-   if i_estimated_damage_amount is null then
-      log('add_op', 'ESTIMATED_DAMAGE_AMOUNT is NULL');
+   if i_sum_civ_amount is null then
+      log('add_op', 'SUM_CIV_AMOUNT is NULL');
       return;
    end if;
    
-   if i_last_status is null then
-      log('add_op', 'LAST_STATUS is NULL');
-      return;
-   end if;
-
    v_exist := exist_person(i_iin);
    if v_exist = 1 then
-     insert into overpayments (estimated_damage_amount, compensated_amount, iin, 
-                 rfpm_id, last_status, region, verdict_date, effective_date, last_source_solution, last_solution)
-     values    ( i_estimated_damage_amount, 0,  
-               i_iin, i_rfpm_id, i_last_status, i_region, '', '', '', '');
+     begin
+       log('add_op', 'IIN: '||i_iin||', sum_civ_amount: '||i_sum_civ_amount||', risk_date: '||i_risk_date||', rfpm_id: '||i_rfpm_id||', region: '||i_region);
+       insert into overpayments (sum_civ_amount, iin, 
+                    risk_date, 
+                   rfpm_id, region, last_status )
+       values    ( i_sum_civ_amount, i_iin, 
+                   to_date(i_risk_date,'YYYY-MM-DD'), 
+                   i_rfpm_id, i_region, 'Первичный ввод');
+     exception when dup_val_on_index then
+       update overpayments op
+       set    op.sum_civ_amount=case when i_sum_civ_amount is not null then i_sum_civ_amount else op.sum_civ_amount end,
+              op.region=case when i_region is not null then i_region else op.region end,
+              op.rfpm_id=case when i_rfpm_id is not null then i_rfpm_id else op.rfpm_id end
+       where op.iin=i_iin and op.risk_date=to_date(i_risk_date,'YYYY-MM-DD');
+       
+     end;
      commit;
-     return;
    end if;
    
-   log('add_op', 'IIN not found: '||i_iin);
  end add_op;
  
   procedure add_pta( i_op_id in number, 
@@ -412,27 +419,35 @@ create or replace package body op is
 
  procedure check_refunding(i_op_id in varchar2)
  is
+  v_sum_refunding number(19,2);
  begin
    log('CHECK REFUNDING', 'OP_ID: '||i_op_id);
-   for cur in (select * from overpayments op where op.op_id=i_op_id and op.estimated_damage_amount>op.compensated_amount)
+   for cur in (select * from overpayments op where op.op_id=i_op_id and op.sum_civ_amount>coalesce(op.compensated_amount, 0))
    loop
+      v_sum_refunding:=0;
       for cur_pay in (
           select dl.pay_sum, pd.mhmh_id, dl.pmdl_n, pd.pay_date
           from  loader.pmpd_pay_doc pd, loader.pmdl_doc_list_s dl, loader.person p
           where pd.mhmh_id=dl.mhmh_id
           and   pd.pay_date=dl.pay_date
-          and   pd.pay_date>cur.op_date
+--           and   pd.pay_date>cur.op_date
           and   pd.cipher_id_knp=get_refund_knp(cur.rfpm_id)
           and   pd.r_account= 'KZ70125KZT1001300134'
           and   dl.sicid=p.sicid
           and   p.iin=cur.iin
       )
       loop
+        v_sum_refunding:=v_sum_refunding+cur_pay.pay_sum;
         begin
+          log('CHECK REFUNDING', 'ADD. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
           insert into refunding (op_id, iin, mhmh_id, pmdl_n, pay_date, sum_pay)
           values    (cur.op_id, cur.iin, cur_pay.mhmh_id, cur_pay.pmdl_n, cur_pay.pay_date, cur_pay.pay_sum);
         exception when dup_val_on_index then null;
         end;
+        update overpayments op
+        set    op.compensated_amount=v_sum_refunding
+        where  op.op_id=cur.op_id
+        and    op.iin=cur.iin;
       end loop;
    end loop;
    commit;
@@ -442,12 +457,25 @@ create or replace package body op is
  procedure check_full_refunding
  is
  begin
-   for cur in (select * from overpayments op where op.estimated_damage_amount>op.compensated_amount)
+   for cur in (select * from overpayments op where op.sum_civ_amount>op.compensated_amount)
    loop
      check_refunding(cur.op_id);
    end loop;
  end check_full_refunding;
  
+ procedure clean
+ is
+ begin
+   execute immediate 'truncate table overpayments';
+   execute immediate 'truncate table refunding ';
+   execute immediate 'truncate table pt_agreements';
+   execute immediate 'truncate table law_decisions';   
+   execute immediate 'truncate table executions';   
+   execute immediate 'truncate table crime_court';   
+   execute immediate 'truncate table civ_court';   
+   execute immediate 'truncate table civ_court';   
+   execute immediate 'truncate table appeal_court';   
+ end clean; 
  
 begin
   null;
