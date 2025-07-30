@@ -28,9 +28,20 @@
             <td>{{ item.solution }}</td>
             <td style="text-align: left">{{ item.court_name }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
-<tr>
-        {% endfor %}
+        <tr>
+            {% endfor %}
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="999">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1px;">
+                    <span id="footer-left"></span>
+                    <span id="footer-center" style="text-align: center;"></span>
+                    <span id="court_civTimestamp" class="tab-timestamp" style="text-align: right;"></span>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
 </table>
 {% else %}
 <p>{{ res_value('NONE_COURT_CIV_ITEMS') }}</p>

@@ -7,7 +7,7 @@ const tabCache = {};
 const tabCacheOrder = [];
 
 // Предлагаем обновить данные, если прошло 10 минут
-const REFRESH_RECOMMENDED_THRESHOLD = 1 * 60 * 1000; // 10 минут
+const REFRESH_RECOMMENDED_THRESHOLD = 20 * 60 * 1000; // 10 минут
 // Удаляем из кэша принудительно, если прошло 2 часа
 const CACHE_LIFETIME = 2 * 60 * 60 * 1000; // 2 часа в мс
 // В кэше храним 512 документов
@@ -18,6 +18,29 @@ function getOrderNum() {
 }
 function getCurrentTabId() {
     return document.getElementById('sharedTabId')?.value || 'pretrial';
+}
+//////////////////////////////////////////////////////////////////////////////
+function fadeInsert(contentZone, fragment, html) {
+    // 1. Погасить
+    contentZone.classList.add('fade-out');
+
+    setTimeout(() => {
+        // 2. Вставка HTML
+        contentZone.innerHTML = '';
+        contentZone.appendChild(fragment);
+
+        // 3. Показать
+        contentZone.classList.remove('fade-out');
+    }, 600); // время синхронизировано с CSS
+}
+//////////////////////////////////////////////////////////////////////////////
+function updateFooterRight(id, text) {
+    const tsNode = document.getElementById(`${id}Timestamp`);
+    if (tsNode) {
+        tsNode.textContent = text;
+    } else {
+        console.warn(`⚠️ Не удалось найти элемент таймера для "${id}"`);
+    }
 }
 //////////////////////////////////////////////////////////////////////////////
 function updateRefreshButton(id){
@@ -47,26 +70,20 @@ function updateRefreshButton(id){
 }
 //////////////////////////////////////////////////////////////////////////////
 function showTableLoader(tabId, start) {
-  const contentZone = document.getElementById(`${tabId}Content`);
-  if (!contentZone) return;
+    const contentZone = document.getElementById(`${tabId}Content`);
+    if (!contentZone) return;
 
-  const tfoot = contentZone.querySelector('tfoot');
-  if (tfoot) {
-    if(start==1){
-        tfoot.innerHTML = `
-          <tr>
-            <td colspan="100%" style="text-align:center; padding:8px">
-              <span class="loader">Загрузка...</span>
-            </td>
-          </tr>
-        `;
-    } 
-    else {
-        tfoot.innerHTML = '';
-    } 
-  }
+    const table = contentZone.querySelector('table');
+    if (!table) return;
+
+    let tfoot = table.querySelector('tfoot');
+
+    const centerSpan = tfoot.querySelector(`#footer-center`);
+    if (centerSpan) {
+        centerSpan.textContent = start === 1 ? 'Загрузка...' : '';
+    }
 }
-//////////////////////////////////////////////////////////////////////////////
+
 // Только при ручном обновлении через кнопку Обновить
 function refreshTabDirect(tabId) {
   const orderNum = getOrderNum();
@@ -96,6 +113,7 @@ function refreshTabDirect(tabId) {
                 //contentZone.innerHTML = html;
                 contentZone.innerHTML = ''; // очистка
                 contentZone.appendChild(fragment);
+                //fadeInsert(contentZone, fragment, html);
                 //
                 timestampZone.textContent = `Обновлено: ${new Date().toLocaleTimeString()}`;
                 UIBinder.init();
@@ -222,8 +240,12 @@ function loadTabContent(id) {
   if (tabCache[cacheKey]) {
     const cached = tabCache[cacheKey];
     container.innerHTML = cached.html;
+
     updateRefreshButton(id);
-    document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
+      let element = document.getElementById(`${id}Timestamp`)
+      if (element)
+          element.textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
+    //document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
     return;
   }
 
@@ -236,10 +258,17 @@ function loadTabContent(id) {
       container.classList.add('fade-out');
       setTimeout(() => {
         container.innerHTML = html;
+
         initFragment(container, id);
         config.onInit?.(container);
 
-        document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(Date.now())}`;
+        //document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(Date.now())}`;
+        // ✅ Ищем таймстамп внутри container
+        const tsNode = container.querySelector(`#${id}Timestamp`);
+        if (tsNode) {
+            tsNode.textContent = `🕓 Загружено ${formatAge(Date.now())}`;
+        }
+
         container.classList.remove('fade-out');
         addToCache(cacheKey, html);
         updateRefreshButton(id);

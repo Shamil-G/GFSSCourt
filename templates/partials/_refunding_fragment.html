@@ -16,7 +16,6 @@
             <th>{{ res_value('SUM_PAY') }}</th>
         </tr>
     </thead>
-    <tfoot></tfoot>
     <tbody>
         {% for item in refunding_items %}
         <tr>
@@ -28,6 +27,17 @@
         </tr>
         {% endfor %}
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="999">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1px;">
+                    <span id="footer-left"></span>
+                    <span id="footer-center" style="text-align: center;"></span>
+                    <span id="refundingTimestamp" class="tab-timestamp" style="text-align: right;"></span>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
 </table>
 {% else %}
 <p>{{ res_value('NONE_REFUNDING_ITEMS') }}</p>

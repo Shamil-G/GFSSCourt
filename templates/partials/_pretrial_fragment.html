@@ -13,7 +13,6 @@
             <th>{{ res_value('EMPLOYEE') }}</th>
         </tr>
     </thead>
-    <tfoot></tfoot>
     <tbody>
         {% for item in pretrial_items %}
         <tr>
@@ -23,7 +22,18 @@
             <td style="text-align: left">{{ item.employee }}</td>
         </tr>
         {% endfor %}
-</tbody>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="999">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1px;">
+                    <span id="footer-left"></span>
+                    <span id="footer-center" style="text-align: center;"></span>
+                    <span id="pretrialTimestamp" class="tab-timestamp" style="text-align: right;"></span>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
 </table>
 {% else %}
 <p>{{ res_value('NONE_PRETRIAL_ITEMS') }}</p>

@@ -53,6 +53,15 @@ select {
 .tab-panel {
     display: none;
 }
+.tab-content-zone {
+    opacity: 1;
+    min-height: 300px; /* или средн€€ высота таба */
+    transition: opacity 200ms ease-in-out;
+}
+
+.tab-content-zone.fade-out {
+  opacity: 0;
+}
 
 .tab-panel.active {
     display: block;
