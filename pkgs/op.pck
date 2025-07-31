@@ -415,7 +415,12 @@ create or replace package body op is
   v_sum_refunding number(19,2);
  begin
    log('CHECK REFUNDING', 'OP_ID: '||i_op_id);
-   for cur in (select * from overpayments op where op.op_id=i_op_id and op.sum_civ_amount>coalesce(op.compensated_amount, 0))
+   for cur in ( select * 
+                from overpayments op 
+                where op.op_id=i_op_id 
+                and op.sum_civ_amount>coalesce(op.compensated_amount, 0)
+                order by op.risk_date desc
+              )
    loop
       v_sum_refunding:=0;
       for cur_pay in (
@@ -428,21 +433,25 @@ create or replace package body op is
           and   pd.r_account= 'KZ70125KZT1001300134'
           and   dl.sicid=p.sicid
           and   p.iin=cur.iin
+          order by pd.pay_date
       )
       loop
-        v_sum_refunding:=v_sum_refunding+cur_pay.pay_sum;
         begin
-          insert into refunding (op_id, iin, mhmh_id, pmdl_n, pay_date, sum_pay)
-          values    (cur.op_id, cur.iin, cur_pay.mhmh_id, cur_pay.pmdl_n, cur_pay.pay_date, cur_pay.pay_sum);
-          log('CHECK REFUNDING', 'ADD. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
+          if v_sum_refunding+cur_pay.pay_sum<=cur.sum_civ_amount+100
+            then
+              insert into refunding (op_id, iin, mhmh_id, pmdl_n, pay_date, sum_pay)
+              values    (cur.op_id, cur.iin, cur_pay.mhmh_id, cur_pay.pmdl_n, cur_pay.pay_date, cur_pay.pay_sum);
+              log('CHECK REFUNDING', 'ADD. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
+              v_sum_refunding:=v_sum_refunding+cur_pay.pay_sum;
+          end if;
         exception when dup_val_on_index then 
           log('CHECK REFUNDING', 'DUP_VAL_ON_INDEX. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
         end;
-        update overpayments op
-        set    op.compensated_amount=v_sum_refunding
-        where  op.op_id=cur.op_id
-        and    op.iin=cur.iin;
       end loop;
+      update overpayments op
+      set    op.compensated_amount=v_sum_refunding
+      where  op.op_id=cur.op_id
+      and    op.iin=cur.iin;   
    end loop;
    commit;
  end check_refunding;
