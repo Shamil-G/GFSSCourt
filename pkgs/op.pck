@@ -22,6 +22,7 @@ create or replace package op is
                     i_submission_date in varchar2, 
                     i_decision_date in varchar2, 
                     i_effective_date in varchar2,
+                    i_submission_doc in varchar2,
                     i_decision in varchar2,
                     i_orgname in varchar2,
                     i_employee in varchar2);
@@ -96,11 +97,6 @@ create or replace package body op is
  is
    v_exist pls_integer default 0;
  begin
-   if i_region is null then
-      log('add_op', 'REGION is NULL');
-      return;
-   end if;
-
    if i_iin is null then
       log('add_op', 'IIN is NULL');
       return;
@@ -111,11 +107,6 @@ create or replace package body op is
       return;
    end if;
 
-   if i_sum_civ_amount is null then
-      log('add_op', 'SUM_CIV_AMOUNT is NULL');
-      return;
-   end if;
-   
    v_exist := exist_person(i_iin);
    if v_exist = 1 then
      begin
@@ -191,15 +182,17 @@ create or replace package body op is
                     i_submission_date in varchar2, 
                     i_decision_date in varchar2, 
                     i_effective_date in varchar2,
+                    i_submission_doc in varchar2,
                     i_decision in varchar2,
                     i_orgname in varchar2,
                     i_employee in varchar2)
  is
  begin
    begin
-     insert into law_decisions (op_id, submission_date, decision_date, effective_date, decision, org_name, employee)
+     insert into law_decisions (op_id, submission_date, decision_date, effective_date, submission_doc, decision, org_name, employee)
      values    (i_op_id, to_date(i_submission_date,'YYYY-MM-DD'), to_date(i_decision_date,'YYYY-MM-DD'), 
                to_date(i_effective_date,'YYYY-MM-DD'), 
+               i_submission_doc,
                i_decision, i_orgname, i_employee);
    exception when dup_val_on_index then
        log('ADD_LAW', '1. IDECISION: '||i_decision||', ORGNAME: '||i_orgname);
@@ -207,12 +200,12 @@ create or replace package body op is
        set    ld.decision=case when i_decision is not null then i_decision else ld.decision end,
               ld.decision_date=case when i_decision_date is not null then to_date(i_decision_date,'YYYY-MM-DD') else ld.decision_date end,
               ld.effective_date=case when i_effective_date is not null then to_date(i_effective_date,'YYYY-MM-DD') else ld.effective_date end,
+              ld.submission_doc=case when i_submission_doc is not null then i_submission_doc else ld.submission_doc end,
               ld.employee=i_employee,
               ld.org_name=case when i_orgname is not null then i_orgname else ld.org_name end
        where  ld.op_id=i_op_id
        and    ld.submission_date=to_date(i_submission_date,'YYYY-MM-DD');
    end;     
-       
 
    update overpayments t 
    set t.last_status='Обращение в ПО',
@@ -430,7 +423,7 @@ create or replace package body op is
           from  loader.pmpd_pay_doc pd, loader.pmdl_doc_list_s dl, loader.person p
           where pd.mhmh_id=dl.mhmh_id
           and   pd.pay_date=dl.pay_date
---           and   pd.pay_date>cur.op_date
+          and   pd.pay_date>cur.risk_date
           and   pd.cipher_id_knp=get_refund_knp(cur.rfpm_id)
           and   pd.r_account= 'KZ70125KZT1001300134'
           and   dl.sicid=p.sicid
@@ -439,10 +432,11 @@ create or replace package body op is
       loop
         v_sum_refunding:=v_sum_refunding+cur_pay.pay_sum;
         begin
-          log('CHECK REFUNDING', 'ADD. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
           insert into refunding (op_id, iin, mhmh_id, pmdl_n, pay_date, sum_pay)
           values    (cur.op_id, cur.iin, cur_pay.mhmh_id, cur_pay.pmdl_n, cur_pay.pay_date, cur_pay.pay_sum);
-        exception when dup_val_on_index then null;
+          log('CHECK REFUNDING', 'ADD. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
+        exception when dup_val_on_index then 
+          log('CHECK REFUNDING', 'DUP_VAL_ON_INDEX. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
         end;
         update overpayments op
         set    op.compensated_amount=v_sum_refunding
@@ -457,7 +451,7 @@ create or replace package body op is
  procedure check_full_refunding
  is
  begin
-   for cur in (select * from overpayments op where op.sum_civ_amount>op.compensated_amount)
+   for cur in (select * from overpayments op where op.sum_civ_amount>coalesce(op.compensated_amount,0))
    loop
      check_refunding(cur.op_id);
    end loop;

@@ -3,13 +3,15 @@
     <colgroup>
         <col style="width: 155px">
         <col style="width: 155px">
-        <col style="width: 210px">
+        <col style="width: 155px">
+        <col style="width: 165px">
     </colgroup>
     <thead>
         <tr>
             <th>{{ res_value('SUBMISSION_DATE') }}</th>
             <th>{{ res_value('DECISION_DATE') }}</th>
             <th>{{ res_value('EFFECTIVE_DATE') }}</th>
+            <th>{{ res_value('SUBMISSION_DOC') }}</th>
             <th>{{ res_value('LAW_DECISION') }}</th>
             <th>{{ res_value('ORG_NAME') }}</th>
             <th>{{ res_value('EMPLOYEE') }}</th>
@@ -22,11 +24,12 @@
             <td>{{ item.submission_date }}</td>
             <td>{{ item.decision_date }}</td>
             <td>{{ item.effective_date }}</td>
+            <td>{{ item.submission_doc }}</td>
             <td style="text-align: left">{{ item.decision }}</td>
             <td style="text-align: left">{{ item.orgname }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
         <tr>
-            {% endfor %}
+        {% endfor %}
     </tbody>
     <tfoot>
         <tr>

@@ -112,4 +112,6 @@ MHMH_ID=Идентификатор поступившего платежа
 PMDL_N=Номер строки в платеже
 PAY_DATE=Дата платежа
 SUM_PAY=Сумма платежа
-RISK_DATE=Дата переплаты
+RISK_DATE=Дата риска
+SUBMISSION_DOC=Номер документа
+REFRESH_REFUNDING=Обновить

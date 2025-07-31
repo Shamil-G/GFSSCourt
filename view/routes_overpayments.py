@@ -23,16 +23,22 @@ def view_list_overpayments():
 @app.route('/add_op', methods=['POST', 'GET'])
 @login_required
 def view_add_op():
+    mess=''
     if request.method == 'POST':
         region = request.form.get('region','')
+        log.info(f'ADD_OP. CONTENT FORM: {request.form}')
+
         iin = request.form.get('iin', '')
         risk_date = request.form.get('risk_date','')
         rfpm_id = request.form.get('rfpm_id', '')
         sum_civ_amount = request.form.get('sum_civ_amount','')
-        add_op(region, iin, risk_date, rfpm_id, sum_civ_amount)      
-        return redirect(url_for('view_list_overpayments'))            
+        if iin and region:
+            add_op(region, iin, risk_date, rfpm_id, sum_civ_amount)      
+            return redirect(url_for('view_list_overpayments'))            
+        else:
+            mess = 'Не все обязательные поля заполнены'
     log.debug(f"ADD OP. REGION: {g.user.dep_name}, TTOP_CONTROL: {g.user.top_control}")
-    return render_template("add_op.html", region=g.user.dep_name, top_control=g.user.top_control)
+    return render_template("add_op.html", region=g.user.dep_name, top_control=g.user.top_control, mess=mess)
 
 
 @app.route('/form_fragment')
@@ -125,6 +131,7 @@ def view_law_add():
     decision_date = request.form.get('decision_date','')
     effective_date = request.form.get('effective_date','')
 
+    submission_doc = request.form.get('submission_doc','')
     decision = request.form.get('decision','')
     orgname = request.form.get('orgname','')
 
@@ -132,11 +139,8 @@ def view_law_add():
     if submission_date=='':
         log.info(f'----->\n\tADD LAW\n\tSUBMISSION_DATE and DECISION_DATE is NULL')
         return jsonify({ "success": False, "messages": ["⚠️ Вы должны не указали <Дата обращения>"] }), 200
-    if decision_date!='' and (decision=='' or orgname==''):
-            log.info(f'----->\n\tADD LAW\n\t{get_i18n_value('MUST_BE_ALL_FIELD')}')
-            return jsonify({ "success": False, "messages": [ get_i18n_value('MUST_BE_ALL_FIELD') ] }), 200
     if order_num and g.user.full_name:
-        add_law(order_num, submission_date, decision_date, effective_date, decision, orgname, g.user.full_name)      
+        add_law(order_num, submission_date, decision_date, effective_date, submission_doc, decision, orgname, g.user.full_name)      
         return { "success": True }, 200
     # Сохраняем в БД или обрабатываем
     return { "success":  False, "message": "Не все поля заполнены\n'Решение ПО' или 'Правоохранительный орган'?" }, 200
@@ -283,28 +287,13 @@ def view_execution_fragment():
     return render_template("partials/_execution_fragment.html", execution_items=execution_items, selected_order=order_num)
 
 
-# @app.route('/add_refunding', methods=['POST'])
-# @login_required
-# def view_refunding_add():
-#     order_num = request.form.get('order_num')
-#     submission_date = request.form['submission_date']
-
-#     log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tsubmission_date: {submission_date}')
-
-#     decision_date = request.form['decision_date']
-#     decision = request.form['decision']
-
-#     log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tdecision: {decision}')
-
-#     orgname = request.form['orgname']
-
-#     log.info(f'----->\n\tADD LAW\n\tORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}')
-#     if order_num and g.user.full_name:
-#         add_law(order_num, submission_date, decision_date, decision, orgname, g.user.full_name)      
-#         return { "success": True }, 200
-#     # Сохраняем в БД или обрабатываем
-#     return { "success": False, "message": "Тестовый режим" }, 200
-#     # return redirect(url_for('view_list_overpayments', order_num=order_num, tab='law'))
+@app.route('/recalc_refunding')
+@login_required
+def view_recalc_refunding():
+    log.info(f'----->\n\tRECALC REFUNDING\n\tUSER: {g.user.full_name}')
+    if g.user.top_control and g.user.full_name:
+        recalc_refunding()
+    return redirect(url_for('view_list_overpayments'))
 
 
 @app.route('/refunding_fragment')

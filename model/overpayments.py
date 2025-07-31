@@ -118,6 +118,7 @@ def get_law_items(order_num):
                to_char(submission_date,'dd.mm.yyyy'), 
                to_char(decision_date,'dd.mm.yyyy'), 
                to_char(effective_date,'dd.mm.yyyy'), 
+               submission_doc,
                decision,
                org_name,
                employee
@@ -135,7 +136,7 @@ def get_law_items(order_num):
             records = cursor.fetchall()
             for rec in records:
                 res = { 'op_id': rec[0], 'submission_date': rec[1], 'decision_date': rec[2], 'effective_date': rec[3], 
-                        'decision': rec[4], 'orgname': rec[5], 'employee': rec[6] }
+                        'submission_doc': rec[4], 'decision': rec[5], 'orgname': rec[6], 'employee': rec[7] }
                 result.append(res)
             log.debug(f'------ GET LAW ITEMS. RESULT:\n\t{result}')
             return result
@@ -317,14 +318,14 @@ def add_scammer(op_id, iin, scammer_org_name, employee):
                 log.info(f'ADD_SCAMMER\n\tOP_ID: {op_id}\n\tIIN: {iin}\n\tSCAMMER_ORG_NAME: {scammer_org_name}\n\temployee: {employee}')
 
 
-def add_law(op_id, submission_date, decision_date, effective_date, decision, orgname, employee):
+def add_law(op_id, submission_date, decision_date, effective_date, submission_doc, decision, orgname, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             log.info(f'ADD_LAW\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tDECISION_DATE: {decision_date}\n\tDECISION: {decision}\n\tORGNAME: {orgname}\n\temployee: {employee}')
             try:
-                cursor.execute('begin op.add_law(:op_id, :submission_date, :decision_date, :effective_date, :decision, :orgname, :employee); end;', 
+                cursor.execute('begin op.add_law(:op_id, :submission_date, :decision_date, :effective_date, :submission_doc, :decision, :orgname, :employee); end;', 
                                op_id=int(op_id), submission_date=submission_date, decision_date=decision_date, 
-                               effective_date=effective_date, decision=decision, orgname=orgname, employee=employee)
+                               effective_date=effective_date, submission_doc=submission_doc, decision=decision, orgname=orgname, employee=employee)
             finally:
                 log.info(f'ADD_LAW\n\tOP_ID: {op_id}\n\tSUBMISSION_DATE: {submission_date}\n\tDECISION_DATE: {decision_date}\n\tDECISION: {decision}\n\tORGNAME: {orgname}\n\temployee: {employee}')
 
@@ -379,3 +380,13 @@ def add_execution(op_id, transfer_date, start_date, phone, court_executor, emplo
                                )
             finally:
                 log.info(f'ADD_EXECUTION\n\tOP_ID: {op_id}\n\tTRANSFER_DATE: {transfer_date}\n\tSTART_DATE: {start_date}\n\tPHONE: {phone}\n\tCOURT_EXECUTOR: {court_executor}\n\temployee: {employee}')
+
+
+def recalc_refunding():
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute('begin op.check_full_refunding; end;')
+            finally:
+                log.info(f'RECALC_REFUNDING')
+
