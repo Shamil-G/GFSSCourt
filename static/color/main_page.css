@@ -1,14 +1,11 @@
-.tabs {
-    background: #e8eff6;
-    border: 1px solid #aaa;
-    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-} 
 /* јктивна€ вкладка Ч "вдавленна€" */
 .tab.active {
     background: #0f03;
     background-color: #d0ebff;
-    border-bottom: 1px solid #fff; /* сливаетс€ с панелью */
-    font-weight: 600;
+    border-top: 1px solid #75a6fd;
+    border-left: 1px solid #75a6fd;
+    border-right: 1px solid #75a6fd;
+/**/ font-weight: 600;
 }
 .tab:hover {
     background: green;
@@ -19,6 +16,13 @@
 }
 .tab-content {
     background-color: #d0ebff;
+}
+.tab-content.active {
+    border-top: 1px solid #75a6fd;
+    border-right: 1px solid #75a6fd;
+    border-left: 1px solid #75a6fd;
+/*    background-color: #d0ebff;*/
+    border-radius: 6px;
 }
 .recommend {
     color: #d86;

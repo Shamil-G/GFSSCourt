@@ -1,7 +1,7 @@
 /* Class container  - аналого ARTICLE */
 .container { 
-    margin: 2px;
-    padding: 20px;
+    margin: 0px;
+    padding: 2px;
 
     display: flex;
     flex-direction: column;
@@ -13,11 +13,10 @@
     overflow-y: auto;
 
     min-height: 0;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     border-bottom: 1px solid #ccc;
 }
 .tabs {
-    padding: 8px 16px;
     border-bottom: none;
     border-radius: 8px 8px 0 0;
     cursor: pointer;
@@ -25,10 +24,16 @@
 
     flex: 0 0 auto;
 }
+.tab-content.active {
+    border-radius: 6px;
+}
 /* јктивна€ вкладка Ч "вдавленна€" */
 .tab.active {
     z-index: 1;
     position: relative;
+
+    font-weight: bold;
+    border-bottom: none;
 }
 select {
     padding: 8px;
@@ -38,9 +43,8 @@ select {
 
 .tab-buttons {
     display: flex;
-    gap: 4px;
-    padding: 4px;
-    border-bottom: 1px solid #bbb;
+    gap: 2px;
+    padding: 0px;
 }
 
 .tab {

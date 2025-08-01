@@ -52,7 +52,7 @@
                     <td style="min-width: 190px">
                         <form method="GET" style="padding: 0px; margin: 0px; border:none" action="{{ url_for('view_list_overpayments') }}">
                             <input class="input_s_form" style="width: 130px; padding: 4px 8px; font-size: 16px; border: 1px solid #ccc" pattern="[0-9]{12}" 
-                                   maxlength="12" type="number" name="iin_filter" placeholder="Введите ИИН" value="{{ request.args.get('iin_filter', '') }}">
+                                   maxlength="12" type="number" name="iin_filter" placeholder="ИИН" value="{{ request.args.get('iin_filter', '') }}">
                             <button type="submit" class="tiny-btn">🔍</button>
                         </form>
                     </td>

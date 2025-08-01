@@ -21,7 +21,18 @@ form {
     border: 1px solid rgba(180, 180, 180, 0.1);
     box-shadow: 6px 6px 8px rgba(70, 205, 79, 0.2);
 }
-
+input.input_d:focus, input.input_s_form:focus {
+    border-color: #007acc;
+    box-shadow: 0 0 4px rgba(0, 122, 204, 0.4);
+    outline: none;
+}
+input.input_s_form:focus {
+    /*border-color: #0060ff;*/
+    border-color: #007acc;
+    border: 1px solid #75a6fd;
+    /*box-shadow: 0 0 2px #0026ff;*/
+    outline: none;
+}
 .input_s:hover {
     /*color: bisque;*/
     align-items: center;
