@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, g, jsonify
+from flask import render_template, request, redirect, url_for, g, jsonify, session
 from flask_login import login_required
 from main_app import app, log
 from util.i18n import get_i18n_value
@@ -12,11 +12,19 @@ log.info("Routes-OverPayments стартовал...")
 @app.route('/list_op', methods=['POST', 'GET'])
 @login_required
 def view_list_overpayments():
-    order_num = request.form.get('order_num','')
-    log.info(f"LIST_OVERPAYMENTS. ORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}\n\tTOP_CONTROL: {g.user.top_control}\n\tDEPNAME: {g.user.dep_name}")
-    list_op = list_overpayments(g.user.top_control, g.user.dep_name)
+    list_op=[]
+    iin_filter=''
+    if request.method=='POST':
+        iin_filter = request.form.get('iin_filter','')
+    else:
+        iin_filter = request.args.get('iin_filter','')
 
-    log.info(f"LIST_OVERPAYMENTS\n\list_op: {list_op}")
+    order_num = request.form.get('order_num','')
+    log.info(f"LIST_OVERPAYMENTS. ORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}\n\tTOP_CONTROL: {g.user.top_control}\n\tFILTER: {iin_filter}\n\tDEPNAME: {g.user.dep_name}")
+
+    list_op = list_overpayments(g.user.top_control, g.user.dep_name, iin_filter)
+
+    log.info(f"LIST_OVERPAYMENTS. LEN list_op: {len(list_op)}")
     return render_template("list_overpayments.html", list_op=list_op, selected_order=order_num)
 
 
@@ -304,3 +312,16 @@ def view_refunding_fragment():
     refunding_items = get_refunding_items(order_num) if order_num else []
     log.info(f"REFUNDING_FRAGMENT\n\tORDER_NUM: {order_num}\n\tREFUNDING_ITEMS: {refunding_items}")
     return render_template("partials/_refunding_fragment.html", refunding_items=refunding_items, selected_order=order_num)
+
+
+@app.route('/update-field', methods=['POST'])
+@login_required
+def view_update_field():
+    data = request.get_json()
+    field = data.get('field')
+    value = data.get('value')
+    op_id = data.get('id')
+
+    if field == 'risk_date':
+        update_risk_date(op_id, value)
+    return { "success": True }, 200

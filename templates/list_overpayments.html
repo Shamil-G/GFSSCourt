@@ -24,7 +24,7 @@
     <!-- Верхняя область: список документов -->
     <div class="documents">
         <table>
-            <colgroup><col style="width: 100px;"><col><col><col style="width: 140px;"><col><col><col><col><col><col><col></colgroup>
+            <colgroup><col style="width: 100px;"><col><col><col style="width: 140px;"><col style="width: 140px;"><col><col><col><col><col><col></colgroup>
             <thead>
                 <tr>
                     <th data-help="overpayment_id" class="has-helper">{{ res_value('ORDER_NUM') }}</th>
@@ -49,7 +49,13 @@
                     </td>
                     <td />
                     <td />
-                    <td />
+                    <td style="min-width: 190px">
+                        <form method="GET" style="padding: 0px; margin: 0px; border:none" action="{{ url_for('view_list_overpayments') }}">
+                            <input class="input_s_form" style="width: 130px; padding: 4px 8px; font-size: 16px; border: 1px solid #ccc" pattern="[0-9]{12}" 
+                                   maxlength="12" type="number" name="iin_filter" placeholder="Введите ИИН" value="{{ request.args.get('iin_filter', '') }}">
+                            <button type="submit" class="tiny-btn">🔍</button>
+                        </form>
+                    </td>
                     <td />
                     <td />
                     <td />
@@ -76,8 +82,18 @@
                     <td>
                         {{ el.iin }}
                     </td>
-                    <td>
-                        {{ el.risk_date }}
+                    <td style="min-width: 230px">
+                        {% set parts = el.risk_date.split('.') %}
+                        {% set html_date = parts[2] ~ '-' ~ parts[1] ~ '-' ~ parts[0] %}
+                        <input type="date" style="width: 128px; padding: 4px 6px"
+                               name="risk_date"
+                               value="{{ html_date }}"
+                               readonly
+                               class="risk-input input_d" />
+
+                        <button class="edit-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date">✏️</button>
+                        <button class="save-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date" style="display:none;">💾</button>
+                        <button class="cancel-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date" style="display:none;">❌</button>
                     </td>
                     <td style="text-align: left">
                         {{ el.rfpm_id }}

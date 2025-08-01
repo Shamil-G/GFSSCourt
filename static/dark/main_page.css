@@ -18,3 +18,8 @@
 .tab-content {
     background: #5557;
 }
+input.risk-input.editing {
+    color: #333;
+    background-color: #fffde7;
+    border: 1px solid #ffa726;
+}

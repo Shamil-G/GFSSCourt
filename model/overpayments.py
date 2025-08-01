@@ -3,7 +3,7 @@ from    db.connect import get_connection
 
 
 
-def list_overpayments(top_control, user_region):
+def list_overpayments(top_control, user_region, iin_filter):
     if top_control:      
         stmt = """
                 select op.op_id,
@@ -22,6 +22,7 @@ def list_overpayments(top_control, user_region):
                      op.employee
                 from overpayments op, loader.person p
                 where op.iin=p.iin(+)
+                and op.iin like :iin_filter
             """
     else:
         stmt = """
@@ -42,13 +43,15 @@ def list_overpayments(top_control, user_region):
                 from overpayments op, loader.person p
                 where op.iin=p.iin(+)
                 and op.region=:region
-            """
+                and op.iin like :iin_filter
+             """
+
     with get_connection() as connection:
         with connection.cursor() as cursor:
             if top_control:
-                cursor.execute(stmt)
+                cursor.execute(stmt, iin_filter=f'{iin_filter}%')
             else:
-                cursor.execute(stmt, region=user_region)
+                cursor.execute(stmt, region=user_region, iin_filter=f'{iin_filter}%')
             
             result = []
             records = cursor.fetchall()
@@ -390,3 +393,11 @@ def recalc_refunding():
             finally:
                 log.info(f'RECALC_REFUNDING')
 
+
+def update_risk_date(op_id, risk_date):
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute("begin update overpayments op set op.risk_date=to_date(:risk_date,'YYYY-MM-DD') where op.op_id=:op_id; commit; end;", op_id=op_id, risk_date=risk_date)
+            finally:
+                log.info(f'UPDATE RISK DATE\n\tOP_ID: {op_id}\n\tRISK_DATE: {risk_date}')

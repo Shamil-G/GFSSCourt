@@ -82,3 +82,15 @@ button:hover {
     display: inline-block;
     text-align: center;
 }
+.tiny-btn {
+    all: unset;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    margin: 0;
+    line-height: 1;
+    background: none;
+    color: #333;
+    border: 1px solid;
+    border-radius: 3px;
+}
