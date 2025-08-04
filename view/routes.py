@@ -49,11 +49,12 @@ def try_auto_login():
 
 @app.route('/')
 def view_root():
-    if g and g.user.is_anonymous:
+    if not g or g.user.is_anonymous:
         # LOGIN with session variable
         log.info(f'User is anonymous ...')
-    if 'username' not in session:
         try_auto_login()
+        log.info("--------> Now will go to LIST_OVERPAYMENTS")
+        return redirect(url_for('view_list_overpayments'))
     return render_template("index.html")
 
 

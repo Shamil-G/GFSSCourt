@@ -63,6 +63,10 @@ create or replace package op is
                           i_employee in varchar2
                         );                  
 
+ procedure update_region(i_op_id in number, i_region in varchar2, i_employee in varchar2);
+ procedure update_sum_civ(i_op_id in number, i_sum_civ in number, i_employee in varchar2);
+ procedure update_risk_date(i_op_id in number, i_risk_date in date, i_employee in varchar2);
+
  procedure check_refunding(i_op_id in varchar2);
  procedure check_full_refunding; 
  procedure clean;
@@ -72,11 +76,11 @@ end op;
 /
 create or replace package body op is
 
-  procedure log(iproc in varchar2, imsg in varchar2)
+  procedure log(iproc in varchar2, i_op_id in number, i_employee in varchar2, imsg in varchar2)
   is
   pragma autonomous_transaction;
   begin
-    insert into log(package, proc, msg) values('OP', iproc, imsg);
+    insert into court_log(proc, op_id, employee, msg) values(iproc, i_op_id, i_employee, imsg);
     commit;
   end log;
   
@@ -98,19 +102,19 @@ create or replace package body op is
    v_exist pls_integer default 0;
  begin
    if i_iin is null then
-      log('add_op', 'IIN is NULL');
+      log('add_op', 0, '', 'IIN is NULL');
       return;
    end if;
 
    if i_risk_date is null then
-      log('add_op', 'RISK_DATE is NULL');
+      log('add_op', 0, '', 'RISK_DATE is NULL');
       return;
    end if;
 
    v_exist := exist_person(i_iin);
    if v_exist = 1 then
      begin
-       log('add_op', 'IIN: '||i_iin||', sum_civ_amount: '||i_sum_civ_amount||', risk_date: '||i_risk_date||', rfpm_id: '||i_rfpm_id||', region: '||i_region);
+       log('add_op', 0, '', 'IIN: '||i_iin||', sum_civ_amount: '||i_sum_civ_amount||', risk_date: '||i_risk_date||', rfpm_id: '||i_rfpm_id||', region: '||i_region);
        insert into overpayments (sum_civ_amount, iin, 
                     risk_date, 
                    rfpm_id, region, last_status )
@@ -127,8 +131,8 @@ create or replace package body op is
      end;
      commit;
    end if;
-   
  end add_op;
+
  
   procedure add_pta( i_op_id in number, 
                     i_date_pretrial in varchar2, 
@@ -146,7 +150,7 @@ create or replace package body op is
    commit;
 
    exception when dup_val_on_index then
-     log('ADD_PTA', 'DUP_VAL_ON_INDEX. OP_ID: '||i_op_id||', date_pretrial: '||to_date(i_date_pretrial,'YYYY-MM-DD'));
+     log('ADD_PTA', i_op_id, i_employee, 'DUP_VAL_ON_INDEX. OP_ID: '||i_op_id||', date_pretrial: '||to_date(i_date_pretrial,'YYYY-MM-DD'));
      update pt_agreements pt
      set    pt.until_day=i_until_day,
             pt.maturity_date=to_date(i_maturity_date,'YYYY-MM-DD')
@@ -195,7 +199,7 @@ create or replace package body op is
                i_submission_doc,
                i_decision, i_orgname, i_employee);
    exception when dup_val_on_index then
-       log('ADD_LAW', '1. IDECISION: '||i_decision||', ORGNAME: '||i_orgname);
+       log('ADD_LAW', i_op_id, i_employee, 'IDECISION: '||i_decision||', ORGNAME: '||i_orgname);
        update law_decisions ld
        set    ld.decision=case when i_decision is not null then i_decision else ld.decision end,
               ld.decision_date=case when i_decision_date is not null then to_date(i_decision_date,'YYYY-MM-DD') else ld.decision_date end,
@@ -244,7 +248,7 @@ create or replace package body op is
                 to_date(i_effective_date,'YYYY-MM-DD'), i_sum_civ_amount,
                 i_compensated_amount, i_solution_crime_part, i_solution_civ_part, i_court_name, i_employee);
    exception when dup_val_on_index then
-     log('ADD CRIME COURT', 'OP_ID: '||i_op_id||', i_sum_civ_amount: '||i_sum_civ_amount);
+     log('ADD CRIME COURT', i_op_id, i_employee, 'OP_ID: '||i_op_id||', i_sum_civ_amount: '||i_sum_civ_amount);
      update crime_court cc
      set cc.verdict_date=case when i_verdict_date is not null then to_date(i_verdict_date,'YYYY-MM-DD') else cc.verdict_date end,
          cc.effective_date=case when i_effective_date is not null then to_date(i_effective_date,'YYYY-MM-DD') else cc.effective_date end,
@@ -383,10 +387,10 @@ create or replace package body op is
                 i_court_executor, 
                 i_employee
       );   
-      log('ADD EXECUTION', 'OP_ID: '||i_op_id||', TRANSFER_DATE: '||i_transfer_date||', START_DATE: '||
+      log('ADD EXECUTION', i_op_id, i_employee, 'OP_ID: '||i_op_id||', TRANSFER_DATE: '||i_transfer_date||', START_DATE: '||
                 i_start_date||', PHONE: '||i_phone||', COURT_EXECUTOR: '||i_court_executor);
    exception when dup_val_on_index then
-       log('UPD EXECUTION', 'OP_ID: '||i_op_id||', TRANSFER_DATE: '||i_transfer_date||', START_DATE: '||
+       log('UPD EXECUTION', i_op_id, i_employee, 'OP_ID: '||i_op_id||', TRANSFER_DATE: '||i_transfer_date||', START_DATE: '||
                 i_start_date||', PHONE: '||i_phone||', COURT_EXECUTOR: '||i_court_executor);
        update executions e
        set    e.start_date=case when i_start_date is not null then to_date(i_start_date,'YYYY-MM-DD') else e.start_date end,
@@ -410,11 +414,45 @@ create or replace package body op is
    commit;
  end add_execution;
 
+
+ procedure update_region(i_op_id in number, i_region in varchar2, i_employee in varchar2)
+   is
+ begin
+   update overpayments op 
+   set op.region=i_region 
+   where op.op_id=i_op_id;
+   commit;
+   log('UPDATE_REGION', i_op_id, i_employee, 'SET REGION='||i_region);
+ end update_region;
+
+ 
+ procedure update_sum_civ(i_op_id in number, i_sum_civ in number, i_employee in varchar2)
+   is
+ begin
+   update overpayments op 
+   set op.sum_civ_amount=i_sum_civ
+   where op.op_id=i_op_id;
+   commit;
+   log('UPDATE_SUM_CIV', i_op_id, i_employee, 'SET SUM_CIV_AMOUNT='||i_sum_civ);
+ end update_sum_civ;
+
+
+ procedure update_risk_date(i_op_id in number, i_risk_date in date, i_employee in varchar2)
+   is
+ begin
+   update overpayments op 
+   set op.risk_date=i_risk_date 
+   where op.op_id=i_op_id;
+   commit;
+   log('UPDATE_RISK_DATE', i_op_id, i_employee, 'SET RISK_DATE='||i_risk_date);
+ end update_risk_date;
+
+ 
  procedure check_refunding(i_op_id in varchar2)
  is
   v_sum_refunding number(19,2);
  begin
-   log('CHECK REFUNDING', 'OP_ID: '||i_op_id);
+   log('CHECK REFUNDING', 0, '', 'OP_ID: '||i_op_id);
    for cur in ( select * 
                 from overpayments op 
                 where op.op_id=i_op_id 
@@ -437,15 +475,17 @@ create or replace package body op is
       )
       loop
         begin
-          if v_sum_refunding+cur_pay.pay_sum<=cur.sum_civ_amount+100
+          if v_sum_refunding+cur_pay.pay_sum<=coalesce(cur.sum_civ_amount,0)+100 or months_between(cur_pay.pay_date, cur.risk_date)<13
             then
+              v_sum_refunding:=v_sum_refunding+cur_pay.pay_sum;
               insert into refunding (op_id, iin, mhmh_id, pmdl_n, pay_date, sum_pay)
               values    (cur.op_id, cur.iin, cur_pay.mhmh_id, cur_pay.pmdl_n, cur_pay.pay_date, cur_pay.pay_sum);
-              log('CHECK REFUNDING', 'ADD. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
-              v_sum_refunding:=v_sum_refunding+cur_pay.pay_sum;
+          else
+              log('CHECK REFUNDING', 0, '', 'ADD. OP_ID: '||i_op_id||', PAY_DATE: '||cur_pay.pay_date||', RISK_DATA: '||cur.risk_date||', SUM_PAY: '||v_sum_refunding||' : '||cur_pay.pay_sum||' > '||coalesce(cur.sum_civ_amount,0) );
           end if;
         exception when dup_val_on_index then 
-          log('CHECK REFUNDING', 'DUP_VAL_ON_INDEX. OP_ID: '||i_op_id||', SUM_PAY: '||cur_pay.pay_sum);
+          log('CHECK REFUNDING', 0, '', 'DUP_VAL_ON_INDEX. OP_ID: '||i_op_id||', SUM_PAY: '||
+                     cur_pay.pay_sum||', MHMH_ID: '||cur_pay.mhmh_id||', PMDL_N '||cur_pay.pmdl_n||', sqlerr: '||sqlerrm);
         end;
       end loop;
       update overpayments op

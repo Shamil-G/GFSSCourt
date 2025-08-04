@@ -63,7 +63,7 @@ article {
 }
 article_title {
     display: grid; /*Для выравнивания заголовка по центру*/
-    padding: 2px 24px;
+    padding-right: 8px;
     font-size: 20px;
     align-items: center; /* Выравниваем по вертикали*/
     align-items: center; /*Для выравнивания заголовка по центру*/

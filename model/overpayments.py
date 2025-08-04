@@ -1,6 +1,6 @@
 from    util.logger import log
 from    db.connect import get_connection
-
+from decimal import Decimal
 
 
 def list_overpayments(top_control, user_region, iin_filter):
@@ -394,10 +394,28 @@ def recalc_refunding():
                 log.info(f'RECALC_REFUNDING')
 
 
-def update_risk_date(op_id, risk_date):
+def update_risk_date(op_id, risk_date, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
-                cursor.execute("begin update overpayments op set op.risk_date=to_date(:risk_date,'YYYY-MM-DD') where op.op_id=:op_id; commit; end;", op_id=op_id, risk_date=risk_date)
+                cursor.execute("begin op.update_risk_date(:op_id, to_date(:risk_date,'YYYY-MM-DD'), :employee); end;", op_id=op_id, risk_date=risk_date, employee=employee)
             finally:
                 log.info(f'UPDATE RISK DATE\n\tOP_ID: {op_id}\n\tRISK_DATE: {risk_date}')
+
+
+def update_sum_civ(op_id, sum_civ_amount, employee):
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute("begin op.update_sum_civ(:op_id, :sum_civ, :employee); end;", op_id=op_id, sum_civ=Decimal(sum_civ_amount), employee=employee)
+            finally:
+                log.info(f'UPDATE SUM_CIV_AMOUNT\n\tOP_ID: {op_id}\n\tSUM_CIV_AMOUNT: {sum_civ_amount}')
+
+
+def update_region(op_id, region, employee):
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute("begin op.update_region(:op_id, :region, :employee); end;", op_id=op_id, region=region, employee=employee)
+            finally:
+                log.info(f'UPDATE REGION\n\tOP_ID: {op_id}\n\tREGION: {region}')

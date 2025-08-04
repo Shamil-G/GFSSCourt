@@ -322,6 +322,12 @@ def view_update_field():
     value = data.get('value')
     op_id = data.get('id')
 
-    if field == 'risk_date':
-        update_risk_date(op_id, value)
+    match field:
+        case 'risk_date':
+            update_risk_date(op_id, value, g.user.full_name)
+        case 'sum_civ_amount':
+            update_sum_civ(op_id, value, g.user.full_name)
+        case 'region':
+            update_region(op_id, value, g.user.full_name)
+
     return { "success": True }, 200
