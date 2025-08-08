@@ -63,7 +63,6 @@ TAB_LAW=Обращения в ПО
 TAB_COURT_CRIME=Уголовный суд
 TAB_COURT_CIV=Гражданский суд
 TAB_APPEAL=Апелляция/кассация
-TAB_EXECUTION=Исполнение
 SCAMMER_IIN=ИИН ИП
 SCAMMER_FIO=ФИО ИП
 SCAMMER_ORG_NAME=Организация - мошенник
