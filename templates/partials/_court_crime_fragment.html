@@ -1,11 +1,15 @@
 {% if court_crime_items %}
 <table style="width: 100%; margin-top: 4px">
     <colgroup>
-        <col style="width: 155px">
-        <col style="width: 155px">
-        <col style="width: 210px">
-        <col style="width: 230px">
-        <col style="width: 200px">
+        <col style="width: 154px">
+        <col style="width: 154px">
+        <col style="width: 154px">
+        <col style="width: 130px">
+        <col style="width: 130px">
+        <col style="width: 154px">
+        <col style="width: 260px">
+        <col />
+        <col style="width: 360px">
     </colgroup>
     <thead>
         <tr>
@@ -29,8 +33,8 @@
             <td>{{ item.effective_date }}</td>
             <td style="text-align: right">{{ item.sum_civ_amount }}</td>
             <td style="text-align: right">{{ item.compensated_amount }}</td>
-            <td>{{ item.solution_crime_part }}</td>
-            <td>{{ item.solution_civ_part }}</td>
+            <td style="text-align: left">{{ item.solution_crime_part }}</td>
+            <td style="text-align: left">{{ item.solution_civ_part }}</td>
             <td style="text-align: left">{{ item.court_name }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
         <tr>

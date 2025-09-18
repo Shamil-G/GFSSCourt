@@ -1,10 +1,13 @@
 {% if court_civ_items %}
 <table style="width: 100%; margin-top: 4px">
     <colgroup>
-        <col style="width: 155px">
-        <col style="width: 155px">
-        <col style="width: 220px">
-        <col style="width: 155px">
+        <col style="width: 160px">
+        <col style="width: 160px">
+        <col style="width: 160px">
+        <col style="width: 200px">
+        <col style="width: 260px">
+        <col />
+        <col style="width: 360px">
     </colgroup>
     <thead>
         <tr>
@@ -25,7 +28,7 @@
             <td>{{ item.solution_date }}</td>
             <td>{{ item.effective_date }}</td>
             <td>{{ item.num_solution }}</td>
-            <td>{{ item.solution }}</td>
+            <td style="text-align: left">{{ item.solution }}</td>
             <td style="text-align: left">{{ item.court_name }}</td>
             <td style="text-align: left">{{ item.employee }}</td>
         <tr>
