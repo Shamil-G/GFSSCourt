@@ -245,7 +245,9 @@ function loadTabContent(id) {
       let element = document.getElementById(`${id}Timestamp`)
       if (element)
           element.textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
-    //document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
+      //document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
+    // После потери фокуса закэшированных Табов, слетают привязки, в том числе helper и их надо ставить по новой
+    UIBinder.init(document.getElementById(id));
     return;
   }
 
