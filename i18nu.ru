@@ -16,6 +16,7 @@ FIRST_PAGE=Главная страница
 BUTTON_FINISH=Завершить
 BUTTON_SAVE=Сохранить
 BUTTON_ADD=Добавить
+BUTTON_CLOSE=Закрыть
 LIST_OVERPAYMENTS=Список дел с переплатами
 ORDER_NUM=№
 FILIAL_NAME=Филиал

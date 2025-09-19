@@ -319,12 +319,20 @@ function showTab(id) {
 //////////////////////////////////////////////////////////////////////////////////
 // Переключаем область видимости на кнопке "Добавить" в области TAB
 function toggleForm(formName,formType) {
-  const container = document.getElementById(`${formName}Container`);
-  const form = document.getElementById(formName);
+    const container = document.getElementById(`${formName}Container`);
+    const form = document.getElementById(formName);
+
+    // Найдем  panel, в которой находится container и кнопка Добавить
+    const panel = container.closest('.tab-panel');
+    const addBtn = panel?.querySelector('.add-btn');
 
   if (form) {
     // Если форма уже загружена — удалим
-    container.innerHTML = '';
+      container.innerHTML = '';
+      // Изменим название кнопки на Добавить
+      if (addBtn) {
+          addBtn.textContent = addBtn.dataset.labelAdd;
+      }
   } else {
     // Загружаем HTML по fetch
     fetch(`/form_fragment?form=${formType}&order_num=${getOrderNum()}`)
@@ -350,6 +358,12 @@ function toggleForm(formName,formType) {
         // Синхронизировать ORDER_NUM во все формы
         // Сейчас это делает submitFormViaFetch"
         // syncOrderNumToForms(); // вставить значение в форму
+
+        // В конце загрузки изменим название кнопки Добавить на Закрыть
+        if (addBtn) {
+            addBtn.textContent = addBtn.dataset.labelClose;
+        }
+
       })
       .catch(error => console.error('Error load fragment form: ${formType}:', error));
   }

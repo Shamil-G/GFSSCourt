@@ -193,7 +193,11 @@
         <div class="tab-content active">
 
             <div id="pretrial" class="tab-panel">
-                <button data-form="pretrialForm" data-type="pretrial" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button data-form="pretrialForm" data-type="pretrial" class="add-btn"
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                    ➕ {{ res_value('BUTTON_ADD') }}
+                </button>
                 <button class="refresh-btn" data-tab="pretrial" id="pretrialRefreshButton">🔄 Обновить</button>
 
                 <div id="pretrialFormContainer"></div>
@@ -202,7 +206,11 @@
             </div>
 
             <div id="scammer" class="tab-panel">
-                <button data-form="scammerForm" data-type="scammer" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button data-form="scammerForm" data-type="scammer" class="add-btn"
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                    ➕ {{ res_value('BUTTON_ADD') }}
+                </button>
                 <button class="refresh-btn" data-tab="scammer" id="scammerRefreshButton">🔄 Обновить</button>
                 <!--<button id="scammerRefreshButton" onclick="API.refreshTab('scammer')">🔄 Обновить</button>-->
 
@@ -212,7 +220,11 @@
             </div>
 
             <div id="law" class="tab-panel">
-                <button data-form="lawForm" data-type="law" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button data-form="lawForm" data-type="law" class="add-btn"
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                    ➕ {{ res_value('BUTTON_ADD') }}
+                </button>
                 <button class="refresh-btn" data-tab="law" id="lawRefreshButton">🔄 Обновить</button>
                 <!--<button id="lawRefreshButton" onclick="API.refreshTab('law')">🔄 Обновить</button>-->
 
@@ -222,8 +234,12 @@
             </div>
 
             <div id="court_crime" class="tab-panel">
-                <button data-form="court_crimeForm" data-type="court_crime" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
-<!--                <button id="courtRefreshButton" onclick="API.refreshTab('court_crime')">🔄 Обновить</button>-->
+                <button data-form="court_crimeForm" data-type="court_crime" class="add-btn"
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                    ➕ {{ res_value('BUTTON_ADD') }}
+                </button>
+                <!--                <button id="courtRefreshButton" onclick="API.refreshTab('court_crime')">🔄 Обновить</button>-->
                 <button class="refresh-btn" data-tab="court_crime" id="court_crimeRefreshButton">🔄 Обновить</button>
 
                 <div id="court_crimeFormContainer"><!-- Here will be FORM _court_items --></div>
@@ -232,8 +248,12 @@
             </div>
 
             <div id="court_civ" class="tab-panel">
-                <button data-form="court_civForm" data-type="court_civ" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
-<!--                <button id="court_civRefreshButton" onclick="API.refreshTab('court_civ')">🔄 Обновить</button>-->
+                <button data-form="court_civForm" data-type="court_civ" class="add-btn"
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                    ➕ {{ res_value('BUTTON_ADD') }}
+                </button>
+                <!--                <button id="court_civRefreshButton" onclick="API.refreshTab('court_civ')">🔄 Обновить</button>-->
                 <button class="refresh-btn" data-tab="court_civ" id="court_civRefreshButton">🔄 Обновить</button>
 
 
@@ -243,7 +263,11 @@
             </div>
 
             <div id="appeal" class="tab-panel">
-                <button data-form="appealForm" data-type="appeal" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button data-form="appealForm" data-type="appeal" class="add-btn"
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                    ➕ {{ res_value('BUTTON_ADD') }}
+                </button>
                 <!--<button id="appealRefreshButton" onclick="API.refreshTab('appeal')">🔄 Обновить</button>-->
                 <button class="refresh-btn" data-tab="appeal" id="appealRefreshButton">🔄 Обновить</button>
 
@@ -253,7 +277,9 @@
             </div>
 
             <div id="execution" class="tab-panel">
-                <button data-form="executionForm" data-type="execution" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>
+                <button data-form="executionForm" data-type="execution" class="add-btn" 
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"  
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">➕ {{ res_value('BUTTON_ADD') }}</button>
 <!--                <button id="executionRefreshButton" onclick="API.refreshTab('execution')">🔄 Обновить</button>-->
                 <button class="refresh-btn" data-tab="execution" id="executionRefreshButton">🔄 Обновить</button>
 
