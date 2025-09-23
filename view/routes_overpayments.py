@@ -8,6 +8,34 @@ from model.overpayments import *
 
 log.info("Routes-OverPayments стартовал...")
 
+@app.route('/to-do')
+@login_required
+def filter_to_do():
+    if 'to-do' not in session or session['to-do'] == 'active':
+        session['to-do'] = 'closed'
+    else:
+        session['to-do'] = 'active'
+    return redirect(url_for('view_list_overpayments'))
+
+
+@app.route('/filter-period-overpayments', methods=['GET','POST'])
+def filter_period_list_op():
+    if request.method=='POST':
+        period_src = request.form.get('period','')
+    else:
+        period_src = request.args.get('period','')
+    log.info(f'PERIOD: {period_src}')
+
+    match period_src:
+        case 'За месяц': period = "trunc(sysdate,'MM')"
+        case 'За год': period = "add_months(trunc(sysdate,'MM'), -12)"
+        case _: period = ''
+
+    session['period_list_op'] = period
+
+    rows = list_overpayments(g.user.top_control, g.user.dep_name, iin_filter='', period=period,  active='active' if 'to-do' not in session else session['to-do'] )
+    return render_template('partials/_list_op_fragment.html', rows=rows)
+
 
 @app.route('/list_op', methods=['POST', 'GET'])
 @login_required
@@ -19,10 +47,16 @@ def view_list_overpayments():
     else:
         iin_filter = request.args.get('iin_filter','')
 
+    if 'period_list_op' not in session:
+        period = " trunc(sysdate, 'MM')"
+    else:
+        period = f'{session['period_list_op']}'
+
     order_num = request.form.get('order_num','')
+
     log.info(f"LIST_OVERPAYMENTS. ORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}\n\tTOP_CONTROL: {g.user.top_control}\n\tFILTER: {iin_filter}\n\tDEPNAME: {g.user.dep_name}")
 
-    list_op = list_overpayments(g.user.top_control, g.user.dep_name, iin_filter)
+    list_op = list_overpayments(g.user.top_control, g.user.dep_name, iin_filter=iin_filter, period=period,  active='active' if 'to-do' not in session else session['to-do'] )
 
     log.info(f"LIST_OVERPAYMENTS. LEN list_op: {len(list_op)}")
     return render_template("list_overpayments.html", list_op=list_op, selected_order=order_num)

@@ -370,6 +370,7 @@ function toggleForm(formName,formType) {
       .catch(error => console.error('Error load fragment form: ${formType}:', error));
   }
 }
+
 /////////////////////////////////////////////////////////////////////////////////////
 // При первоначальной загрузке страницы должна получить первый order_num
 window.addEventListener('DOMContentLoaded', () => {
@@ -423,8 +424,56 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // 🧩 Общая инициализация UI
-  UIBinder.init();
+    UIBinder.init();
+
+    function handleMenuChanged(event) {
+        const dropdown = event.target;
+        // Фильтрация по вашему атрибуту
+        if (dropdown.getAttribute('data-track') === 'true') {
+            const { value } = event.detail;
+            const url = dropdown.getAttribute('data-url')
+
+            if (!url) {
+                console.log('handleMenuItemDropDown without URL: ', dropdown)
+                return
+            }
+            updateTable(url, value);
+        }
+    }
+
+    document.addEventListener('menu-changed', handleMenuChanged);
 });
+///////////////////////////////////////////////////////////////////////
+function updateTable(url, period) {
+    fetch(`${url}?period=${encodeURIComponent(period)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error on request: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            const tbody = document.getElementById('tableBody');
+            if (!tbody) {
+                console.warn('tableBody not found');
+                return;
+            }
+            // Remove all rows with data-order (data)
+            const rowsToRemove = tbody.querySelectorAll('tr[data-order]');
+            rowsToRemove.forEach(row => row.remove());
+
+            // Append new string
+            const tempContainer = document.createElement('tbody');
+            tempContainer.innerHTML = html;
+
+            const newRows = tempContainer.querySelectorAll('tr');
+            newRows.forEach(row => tbody.appendChild(row));
+        })
+        .catch(error => {
+            console.error('Error on update table:', error);
+        });
+}
+
 
 
 const globalAPI = {

@@ -1,13 +1,6 @@
 .dropdown-button {
-    /*background-color: #43a047;*/
     background-color: #efefd3e6;
     color: black;
-}
-
-.dropdown-button:hover {
-    background-color: #388e3c;
-    /*color: black;*/
-    color: #efefd3e6;
 }
 
 .dropdown-content {

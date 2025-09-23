@@ -2,63 +2,65 @@ from    util.logger import log
 from    db.connect import get_connection
 from decimal import Decimal
 
+stmt_list_op = ""
 
-def list_overpayments(top_control, user_region, iin_filter):
-    if top_control:      
-        stmt = """
-                select op.op_id,
-                     op.region, 
-                     p.lastname||' '||p.firstname||' '||p.middlename as fio,
-                     op.iin,  
-                     to_char(op.risk_date,'dd.mm.yyyy') as verdict_date,  
-                     to_char(op.sum_civ_amount,'999999990.99'),
-                     to_char(coalesce(op.compensated_amount,0),'9999990.99'),
-                     op.rfpm_id,
-                     op.last_status,
-                     to_char(op.verdict_date,'dd.mm.yyyy'),
-                     to_char(op.effective_date,'dd.mm.yyyy'),
-                     op.last_source_solution,
-                     op.last_solution,
-                     op.employee
-                from overpayments op, loader.person p
-                where op.iin=p.iin(+)
-                and op.iin like :iin_filter
-            """
+def list_overpayments(top_control, user_region, period, iin_filter, active):
+    global stmt_list_op
+    stmt_list_op = """
+        select op.op_id,
+                op.region, 
+                p.lastname||' '||p.firstname||' '||p.middlename as fio,
+                op.iin,  
+                to_char(op.risk_date,'dd.mm.yyyy') as verdict_date,  
+                to_char(op.sum_civ_amount,'999999990.99'),
+                to_char(coalesce(op.compensated_amount,0),'9999990.99'),
+                op.rfpm_id,
+                op.last_status,
+                to_char(op.verdict_date,'dd.mm.yyyy'),
+                to_char(op.effective_date,'dd.mm.yyyy'),
+                op.last_source_solution,
+                op.last_solution,
+                op.employee
+        from overpayments op, loader.person p
+        where op.iin=p.iin(+)
+        """
+
+    log.info(f'PERIOD: {period}')
+    # Для филиалов
+    if not top_control:   
+        stmt_list_op = stmt_list_op + ' and op.region=:region'
+    if period:
+        stmt_list_op = stmt_list_op + f' and op.risk_date>={period}';
+    
+    # Для поиска по ИИН
+    if iin_filter:
+        stmt_list_op = stmt_list_op + ' and op.iin like :iin_filter'
+    # Для поиска по активным судебным искам
+    if active=='active':
+        stmt_list_op = stmt_list_op + ' and op.sum_civ_amount>coalesce(op.compensated_amount,0)'
+    # Для поиска по завершенным судебным искам
     else:
-        stmt = """
-                select op.op_id,
-                     op.region, 
-                     p.lastname||' '||p.firstname||' '||p.middlename as fio,
-                     op.iin,  
-                     to_char(op.risk_date,'dd.mm.yyyy') as verdict_date,  
-                     to_char(op.sum_civ_amount,'999999990.99'),
-                     to_char(coalesce(op.compensated_amount,0),'9999990.99'),
-                     op.rfpm_id,
-                     op.last_status,
-                     to_char(op.verdict_date,'dd.mm.yyyy'),
-                     to_char(op.effective_date,'dd.mm.yyyy'),
-                     op.last_source_solution,
-                     op.last_solution,
-                     op.employee
-                from overpayments op, loader.person p
-                where op.iin=p.iin(+)
-                and op.region=:region
-                and op.iin like :iin_filter
-             """
+        stmt_list_op = stmt_list_op + ' and op.sum_civ_amount<=coalesce(op.compensated_amount,0)'
 
     with get_connection() as connection:
         with connection.cursor() as cursor:
             if top_control:
-                cursor.execute(stmt, iin_filter=f'{iin_filter}%')
+                if not iin_filter:
+                    cursor.execute(stmt_list_op)
+                else:
+                    cursor.execute(stmt_list_op, iin_filter=f'{iin_filter}%')
             else:
-                cursor.execute(stmt, region=user_region, iin_filter=f'{iin_filter}%')
+                if not iin_filter:
+                    cursor.execute(stmt_list_op, region=user_region)
+                else:
+                    cursor.execute(stmt_list_op, region=user_region, iin_filter=f'{iin_filter}%')
             
             result = []
             records = cursor.fetchall()
             for rec in records:
                 res = {'order_num': rec[0], 'region': rec[1], 'fio': rec[2], 'iin': rec[3], 'risk_date': rec[4], 
                        'sum_civ_amount': rec[5], 'compensated_amount': rec[6],
-                       'rfpm_id': rec[7], 'last_status': rec[8], 
+                       'rfpm_id': rec[7], 'last_status': rec[8] or '', 
                        'verdict_date': rec[9] or '', 'effective_date': rec[10] or '', 
                        'last_source_solution': rec[11] or '-//-', 
                        'last_solution': rec[12] or '-//-',
