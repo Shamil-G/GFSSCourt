@@ -403,13 +403,12 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 📦 Клики по строкам
-  document.querySelectorAll('.clickable-row').forEach(row => {
-    row.addEventListener('click', () => {
-      const orderNum = row.dataset.order;
-      API.filterByOrder(orderNum); // возможно, без tabId — если уже сохранён currentTab
-    });
-  });
+  //document.querySelectorAll('.clickable-row').forEach(row => {
+  //  row.addEventListener('click', () => {
+  //    const orderNum = row.dataset.order;
+  //    API.filterByOrder(orderNum); // возможно, без tabId — если уже сохранён currentTab
+  //  });
+  //});
 
   // 🔁 Кнопки "Обновить"
   const tabsZone = document.querySelector('.tabs');
@@ -425,6 +424,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 🧩 Общая инициализация UI
     UIBinder.init();
+
+    //// 📦 Клики по строкам. Привязываем к таблице
+    document.getElementById('tableBody').addEventListener('click', event => {
+        const row = event.target.closest('.clickable-row');
+        if (row) {
+            const orderNum = row.dataset.order;
+            API.filterByOrder(orderNum);
+        }
+    });
 
     function handleMenuChanged(event) {
         const dropdown = event.target;
@@ -468,6 +476,9 @@ function updateTable(url, period) {
 
             const newRows = tempContainer.querySelectorAll('tr');
             newRows.forEach(row => tbody.appendChild(row));
+
+            // 🔁 Повторная привязка событий
+            // rebindTableEvents();
         })
         .catch(error => {
             console.error('Error on update table:', error);
