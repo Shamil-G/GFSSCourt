@@ -1,0 +1,89 @@
+﻿    {% for el in rows %}
+    <tr data-order="{{ el.order_num }}" class="clickable-row">
+        <td>
+            <a>{{ el.order_num }}</a>
+        </td>
+
+        {% if g.user.top_control==0 %}
+        <td style="text-align: left">
+            {{ el.region }}
+        </td>
+        {% else %}
+        <td style="min-width: 355px; padding: 4px 4px; text-align: left">
+            <input style="width: 290px; text-align: left; font-size: 16px"
+                   type="text"
+                   name="region"
+                   value="{{ el.region }}"
+                   autocomplete="off"
+                   readonly
+                   class="region input_s_form" />
+
+            <button class="edit-btn tiny-btn" data-id="{{ el.order_num }}" data-field="region">✏️</button>
+            <button class="save-btn tiny-btn" data-id="{{ el.order_num }}" data-field="region" style="display:none;">💾</button>
+            <button class="cancel-btn tiny-btn" data-id="{{ el.order_num }}" data-field="region" style="display:none;">❌</button>
+        </td>
+        {% endif %}
+
+        <td style="text-align: left">
+            {{ el.fio }}
+        </td>
+        <td>
+            {{ el.iin }}
+        </td>
+        <td style="min-width: 202px; padding: 4px 4px; text-align: left ">
+            {% set parts = el.risk_date.split('.') %}
+            {% set html_date = parts[2] ~ '-' ~ parts[1] ~ '-' ~ parts[0] %}
+            <input type="date" style="width: 136px;"
+                   name="risk_date"
+                   value="{{ html_date }}"
+                   readonly
+                   class="risk-input input_d" />
+
+            <button class="edit-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date">✏️</button>
+            <button class="save-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date" style="display:none;">💾</button>
+            <button class="cancel-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date" style="display:none;">❌</button>
+        </td>
+        <td style="text-align: left">
+            {{ el.rfpm_id }}
+        </td>
+        {% if g.user.top_control==0 %}
+        <td style="text-align: right">
+            {{ el.sum_civ_amount }}
+        </td>
+        {% else %}
+        <td style="min-width: 180px; text-align: left; padding: 4px 4px;">
+            <input type="text" style="width: 115px; text-align: right; font-family: monospace; font-size: 16px"
+                   name="sum_civ_amount"
+                   value="{{ el.sum_civ_amount.strip() }}"
+                   inputmode="decimal"
+                   pattern="^\d+(\.\d{1,2})?$"
+                   readonly
+                   class="sum_civ_amount input_s_form" />
+
+            <button class="edit-btn tiny-btn" data-id="{{ el.order_num }}" data-field="sum_civ_amount">✏️</button>
+            <button class="save-btn tiny-btn" data-id="{{ el.order_num }}" data-field="sum_civ_amount" style="display:none;">💾</button>
+            <button class="cancel-btn tiny-btn" data-id="{{ el.order_num }}" data-field="sum_civ_amount" style="display:none;">❌</button>
+        </td>
+        {% endif %}
+        <td style="text-align: right">
+            {{ el.compensated_amount }}
+        </td>
+        <td style="text-align: left">
+            {{ el.last_status }}
+        </td>
+        <td>
+            {{ el.verdict_date }}
+        </td>
+        <td>
+            {{ el.effective_date }}
+        </td>
+        <td style="text-align: left">
+            {{ el.last_source_solution }}
+        </td>
+        <td style="text-align: left">
+            {{ el.last_solution }}
+        </td>
+
+    </tr>
+    {% endfor %}
+

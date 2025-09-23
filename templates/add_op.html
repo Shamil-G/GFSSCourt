@@ -25,11 +25,11 @@
             <tbody>
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none; width: 240px">* {{res_value('IIN')}}</td>
-                    <td style="text-align: left; border:none;"><input style="margin-left: 0px; width: 144px" class="input_s" name="iin" pattern="[0-9]{12}" type="text" maxlength="12" autocomplete="off" required></td>
+                    <td style="text-align: left; border:none;"><input style="margin: 4px 0px; width: 144px; border-color: lightgray" class="input_s" name="iin" pattern="[0-9]{12}" type="text" maxlength="12" autocomplete="off" required></td>
                 </tr>
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none; width: 240px">* {{res_value('RISK_DATE')}}</td>
-                    <td style="text-align: left; border:none;"><input style="margin-left: 0px; width: 144px" class="input_d" name="risk_date" pattern="[0-9]{12}" type="date" autocomplete="off" required></td>
+                    <td style="text-align: left; border:none; padding: 4px 0px"><input style="margin: 5px 0px 4px 3px; width: 150px; font-size: 18px" class="input_d" name="risk_date" pattern="[0-9]{12}" type="date" autocomplete="off" required></td>
                 </tr>
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none;">{{res_value('RFPM_ID')}}</td>
@@ -37,8 +37,12 @@
 
                         <div class="dropdown">
                             <input type="hidden" name="rfpm_id" id="menuValue">
-                            <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{res_value('SELECT_RFPM')}}</button>
-                            <div class="dropdown-content">
+                            <button style="min-width: 194px; border: 1px solid lightgray; padding: 4px 0px" type="button" class="dropdown-button  period-button" id="menuButton">
+                                <i class="fas fa-bars"></i>
+                                <span class="label">{{res_value('SELECT_RFPM')}}</span>
+                                <span style="display: inline-block" class="caret"></span>
+                            </button>
+                            <div style="min-width: 140px;" class="dropdown-content">
                                 <a data-value="{{res_value('RFPM_0701')}}" data-label="{{res_value('RFPM_0701')}}"><i class="fas fa-home"></i>{{res_value('RFPM_0701')}}</a>
                                 <a><i class="fas fa-info-circle"></i>{{res_value('RFPM_0702')}}</a>
                                 <a><i class="fas fa-envelope"></i>{{res_value('RFPM_0703')}}</a>
@@ -51,15 +55,15 @@
                 </tr>
                 <tr class="disabled-row">
                     <td style="text-align: left; border: none;">{{res_value('SUM_CIV_AMOUNT')}}</td>
-                    <td style="text-align: left; border: none;"><input style="margin-left: 0px" class="input_s" type="number" min="0.00" name="sum_civ_amount" autocomplete="off"></td>
+                    <td style="text-align: left; border: none;"><input style="margin: 4px 0px; border-color: lightgray" class="input_s" type="number" min="0.00" name="sum_civ_amount" autocomplete="off"></td>
                 </tr>
                 <tr class="disabled-row">
                     <td style="text-align: left; border: none; margin-bottom: 16px">* {{res_value('FILIAL_NAME')}}</td>
                     <td style="text-align: left; border: none;">
                         {% if top_control==1 %}
-                        <input style="margin: 8px 16px 16px 0px; width: 640px" class="input_s" type="text" name="region" autocomplete="on" required>
+                        <input style="margin: 4px 16px 16px 0px; width: 640px; border-color: lightgray" class="input_s" type="text" name="region" autocomplete="on" required>
                         {% else %}
-                        <input style="margin: 8px 16px 16px 0px; width: 640px" class="input_s" type="text" name="region" placeholder="{{ g.user.dep_name }}" value="{{region}}" autocomplete="on"  readonly required>
+                        <input style="margin: 4px 16px 16px 0px; width: 640px; border-color: lightgray" class="input_s" type="text" name="region" placeholder="{{ g.user.dep_name }}" value="{{region}}" autocomplete="on"  readonly required>
                         {% endif %}
                     </td>
                 </tr>
