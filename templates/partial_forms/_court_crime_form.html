@@ -5,11 +5,11 @@
         </colgroup>
         <tbody>
             <tr class="disabled-row">
-                <td style="border: none; width: 260px; text-align: left" data-help="solution_crime_part" class="has-helper">📅 * {{ res_value('RECIEPT_DATE') }}:</td>
+                <td style="border: none; width: 260px; text-align: left" data-help="solution_crime_part" data-role="helper" class="has-helper">📅 * {{ res_value('RECIEPT_DATE') }}:</td>
                 <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="submission_date" required></td>
             </tr>
             <tr class="disabled-row">
-                <td style="border: none; text-align: left" data-help="solution_civ_part" class="has-helper">📆 {{ res_value('VERDICT_DATE') }}:</td>
+                <td style="border: none; text-align: left" data-help="solution_civ_part" data-role="helper" class="has-helper">📆 {{ res_value('VERDICT_DATE') }}:</td>
                 <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="verdict_date"></td>
             </tr>
             <tr class="disabled-row">
@@ -19,7 +19,7 @@
 
 
             <tr class="disabled-row">
-                <td style="border: none; text-align: left" data-help="sum_civ_amount" class="has-helper">{{ res_value('SUM_CIV_AMOUNT') }}:</td>
+                <td style="border: none; text-align: left" data-help="sum_civ_amount" data-role="helper" class="has-helper">{{ res_value('SUM_CIV_AMOUNT') }}:</td>
                 <td style="border: none; text-align: left"><input style="font-size: 18px; width: 100px;" class="input_s_form" type="text" name="sum_civ_amount"></td>
             </tr>
 
@@ -29,11 +29,14 @@
             </tr>
 
             <tr class="disabled-row">
-                <td style="border: none; text-align: left" data-help="solution_crime_part" class="has-helper">{{ res_value('SOLUTION_CRIME_PART') }}:</td>
+                <td style="border: none; text-align: left" data-help="solution_crime_part" data-role="helper" class="has-helper">{{ res_value('SOLUTION_CRIME_PART') }}:</td>
                 <td style="border: none; text-align: left">
-                    <div class="dropdown">
+                    <div class="dropdown" data-role="menu">
                         <input type="hidden" name="solution_crime_part" id="menuValue">
-                        <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
+                        <button type="button" class="dropdown-button" id="menuButton">
+                        <i class="fas fa-bars"></i>
+                        <span class="label">{{ res_value('SELECT_SOLUTION') }}</span>
+                        </button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-lable - отображается -->
                             <a data-value="{{res_value('SOLUTION_GUILTY')}}" data-label="{{res_value('SOLUTION_GUILTY')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_GUILTY')}}</a>
@@ -45,12 +48,15 @@
             </tr>
 
             <tr class="disabled-row">
-                <td style="border: none; text-align: left" data-help="solution_civ_part" class="has-helper">{{ res_value('SOLUTION_CIV_PART') }}:</td>
+                <td style="border: none; text-align: left" data-help="solution_civ_part" data-role="helper" class="has-helper">{{ res_value('SOLUTION_CIV_PART') }}:</td>
 
                 <td style="border: none; text-align: left">
-                    <div class="dropdown">
+                    <div class="dropdown" data-role="menu">
                         <input type="hidden" name="solution_civ_part" id="menuValue">
-                        <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
+                        <button type="button" class="dropdown-button" id="menuButton">
+                        <i class="fas fa-bars"></i>
+                        <span class="label">{{ res_value('SELECT_SOLUTION') }}</span>
+                        </button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-lable - отображается -->
                             <a data-value="{{res_value('SOLUTION_SATISFY')}}" data-label="{{res_value('SOLUTION_SATISFY')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_SATISFY')}}</a>

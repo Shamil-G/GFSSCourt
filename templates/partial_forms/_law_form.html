@@ -14,11 +14,11 @@
                 <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="decision_date"></td>
             </tr>
             <tr class="disabled-row">
-                <td style="border: none; text-align: left" data-help="effective_date" class="has-helper">📅 {{ res_value('RESOLUTION_DATE') }}:</td>
+                <td style="border: none; text-align: left" data-help="effective_date" data-role="helper" class="has-helper">📅 {{ res_value('RESOLUTION_DATE') }}:</td>
                 <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="effective_date"></td>
             </tr>
             <tr class="disabled-row">
-                <td style="border: none; text-align: left" data-help="submission_doc" class="has-helper">📅 {{ res_value('SUBMISSION_DOC') }}:</td>
+                <td style="border: none; text-align: left" data-help="submission_doc" data-role="helper" class="has-helper">📅 {{ res_value('SUBMISSION_DOC') }}:</td>
                 <td style="border: none; text-align: left"><input class="input_s_form" style="font-size: 18px;width: 240px" type="text" name="submission_doc"></td>
             </tr>
 
@@ -27,9 +27,12 @@
                 <td style="border: none; text-align: left; font-size: 18px;">{{ res_value('LAW_DECISION') }}:</td>
 
                 <td style="border: none; text-align: left">
-                    <div class="dropdown">
+                    <div class="dropdown" data-role="menu">
                         <input type="hidden" name="decision" id="menuValue">
-                        <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
+                        <button type="button" class="dropdown-button" id="menuButton">
+                        <i class="fas fa-bars"></i>
+                        <span class="label">{{ res_value('SELECT_SOLUTION') }}</span>
+                        </button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-lable - отображается -->
                             <a data-value="{{res_value('SELECT_LAW_REGISTRING')}}" data-label="{{res_value('SELECT_LAW_REGISTRING')}}"><i class="fas fa-home"></i>{{res_value('SELECT_LAW_REGISTRING')}}</a>

@@ -16,9 +16,12 @@
             <tr class="disabled-row">
                 <td style="border: none; text-align: left">{{ res_value('APPEAL_SOLUTION') }}:</td>
                 <td style="border: none; text-align: left">
-                    <div class="dropdown">
+                    <div class="dropdown" data-role="menu">
                         <input class="input_s_form" type="hidden" name="appeal_solution" id="menuValue">
-                        <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
+                        <button type="button" class="dropdown-button" id="menuButton">
+                        <i class="fas fa-bars"></i>
+                        <span class="label">{{ res_value('SELECT_SOLUTION') }}</span>
+                        </button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-lable - отображается -->
                             <a data-value="{{res_value('APPEAL_SOLUTION_SATISFY')}}" data-label="{{res_value('APPEAL_SOLUTION_SATISFY')}}"><i class="fas fa-home"></i>{{res_value('APPEAL_SOLUTION_SATISFY')}}</a>
@@ -33,9 +36,12 @@
                 <td style="border: none; text-align: left">{{ res_value('APPEAL_CASSATION_SOLUTION') }}:</td>
 
                 <td style="border: none; text-align: left">
-                    <div class="dropdown">
+                    <div class="dropdown" data-role="menu">
                         <input class="input_s_form" type="hidden" name="cassation_appeal_solution" id="menuValue">
-                        <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
+                        <button type="button" class="dropdown-button" id="menuButton">
+                        <i class="fas fa-bars"></i>
+                        <span class="label">{{ res_value('SELECT_SOLUTION') }}</span>
+                        </button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-lable - отображается -->
                             <a data-value="{{res_value('APPEAL_SOLUTION_SATISFY')}}" data-label="{{res_value('APPEAL_SOLUTION_SATISFY')}}"><i class="fas fa-home"></i>{{res_value('APPEAL_SOLUTION_SATISFY')}}</a>

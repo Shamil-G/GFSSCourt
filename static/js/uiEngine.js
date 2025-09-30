@@ -1,24 +1,24 @@
 ﻿import { showTooltipPopover } from './popoverEngine.js';
 
-////////////////////////////////////////////////////////////////////
-function bindMutualExclusive(zone, nameA, nameB) {
-  const inputA = zone.querySelector(`[name="${nameA}"]`);
-  const inputB = zone.querySelector(`[name="${nameB}"]`);
+//////////////////////////////////////////////////////////////////////
+//function bindMutualExclusive(zone, nameA, nameB) {
+//  const inputA = zone.querySelector(`[name="${nameA}"]`);
+//  const inputB = zone.querySelector(`[name="${nameB}"]`);
   
-  if (!inputA || !inputB) return;
+//  if (!inputA || !inputB) return;
 
-  inputA.addEventListener('input', () => {
-    inputB.disabled = !!inputA.value;
-    if (inputA.value) inputB.value = '';
-    showTooltipPopover(inputA, 'Поле <📆 Дата погашения> будет недоступно, пока указано значение дня');
-  });
+//  inputA.addEventListener('input', () => {
+//    inputB.disabled = !!inputA.value;
+//    if (inputA.value) inputB.value = '';
+//    showTooltipPopover(inputA, 'Поле <📆 Дата погашения> будет недоступно, пока указано значение дня');
+//  });
 
-  inputB.addEventListener('input', () => {
-    inputA.disabled = !!inputB.value;
-    if (inputB.value) inputA.value = '';
-    showTooltipPopover(inputB, 'Поле <Каждый месяц до> будет недоступно, пока указана дата <📆 Дата погашения>');
-  });
-}
+//  inputB.addEventListener('input', () => {
+//    inputA.disabled = !!inputB.value;
+//    if (inputB.value) inputA.value = '';
+//    showTooltipPopover(inputB, 'Поле <Каждый месяц до> будет недоступно, пока указана дата <📆 Дата погашения>');
+//  });
+//}
 ////////////////////////////////////////////////////////////////////
 function requireAtLeastOne(fields, errorMessage) {
     const hasValue = fields.some(name => document.querySelector(`input[name='${name}']`)?.value.trim());
@@ -47,7 +47,6 @@ function waitForElementInZone(zone, selector, callback) {
 function initPretrialLogic(zone) {
   console.log("initPretrialLogic");
 
-  bindMutualExclusive(zone, 'until_day', 'execution_date');
 }
 
 function initScammerLogic(zone) {

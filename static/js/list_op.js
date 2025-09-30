@@ -1,6 +1,10 @@
-﻿import { initFragment, submitFormViaFetch } from './uiEngine.js';
-import { UIBinder } from './uiBinder.js';
+﻿import { submitFormViaFetch } from './uiEngine.js';
 import { TabConfig } from './tabConfig.js';
+
+import { FragmentBinder } from './fragmentBinder.js';
+import { BinderRegistry } from './binderRegistry.js';
+import { bootstrapBinders } from './bootstrapBinders.js';
+
 
 let activeTab = null;
 const tabCache = {};
@@ -183,24 +187,31 @@ function addToCache(key, html) {
 // Главная таблица переплат в LIST_OVERPAYMENTS.HTML
 // Когда щелкаем мышкой по записям TR надо менять фильтр orderNum для TABS
 function filterByOrder(orderNum) {
-  // После клика мышкой - делаем подсветку выбранной строки
-  const rows = document.querySelectorAll('table tbody tr[data-order]');
-  rows.forEach(row => {
-      row.classList.toggle('active-row', row.dataset.order === orderNum);
-  });
+    // Установить общее поле
+    const shared = document.getElementById('sharedOrderNum');
+    if (!shared) return;
 
-  // Установить общее поле
-  const shared = document.getElementById('sharedOrderNum');
-  if (shared) shared.value = orderNum;
+    if (shared.value === orderNum) {
+        console.log('🔁 orderNum не изменился, загрузка TAB пропущена');
+        return;
+    }
 
-  const tabId = getCurrentTabId();
-  console.log('filterByOrder. sharedTabId: ' + tabId);
-  // Синхронизировать ORDER_NUM во все формы
-  // Сейчас это делает submitFormViaFetch"
-  //syncOrderNumToForms();
+    shared.value = orderNum;
 
-  console.log("filterByOrder", "sharedTabId: "+tabId, "orderNum: " + orderNum)
-  loadTabContent(tabId || 'pretrial');
+    // После клика мышкой - делаем подсветку выбранной строки
+    const rows = document.querySelectorAll('table tbody tr[data-order]');
+    rows.forEach(row => {
+        row.classList.toggle('active-row', row.dataset.order === orderNum);
+    });
+
+    const tabId = getCurrentTabId();
+    console.log('filterByOrder. sharedTabId: ' + tabId);
+    // Синхронизировать ORDER_NUM во все формы
+    // Сейчас это делает submitFormViaFetch"
+    //syncOrderNumToForms();
+
+    console.log("filterByOrder", "sharedTabId: "+tabId, "orderNum: " + orderNum)
+    loadTabContent(tabId || 'pretrial');
 }
 /////////////////////////////////////////////////////////////////////////////////////
 function syncOrderNumToForms() {
@@ -242,12 +253,13 @@ function loadTabContent(id) {
     container.innerHTML = cached.html;
 
     updateRefreshButton(id);
-      let element = document.getElementById(`${id}Timestamp`)
-      if (element)
-          element.textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
-      //document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
-    // После потери фокуса закэшированных Табов, слетают привязки, в том числе helper и их надо ставить по новой
-    UIBinder.init(document.getElementById(id));
+    let element = document.getElementById(`${id}Timestamp`)
+      if (element) {
+        element.textContent = `🕓 Загружено ${formatAge(cached.timestamp)}`;
+
+        //BinderRegistry.init(document.getElementById(id));
+        BinderRegistry.init(container);
+      }
     return;
   }
 
@@ -261,7 +273,7 @@ function loadTabContent(id) {
       setTimeout(() => {
         container.innerHTML = html;
 
-        initFragment(container, id);
+        //initFragment(container, id);
         config.onInit?.(container);
 
         //document.getElementById(`${id}Timestamp`).textContent = `🕓 Загружено ${formatAge(Date.now())}`;
@@ -273,8 +285,13 @@ function loadTabContent(id) {
 
         container.classList.remove('fade-out');
         addToCache(cacheKey, html);
-        updateRefreshButton(id);
-        UIBinder.init(container);
+          updateRefreshButton(id);
+          // По идее BinderRegistry.init(container) активирует все биндеры в container
+          BinderRegistry.init(container);
+          FragmentBinder.bindEvents(container);
+
+          //MenuBinder.attachAll(container);
+
       }, 150);
     })
     .catch(err => {
@@ -314,7 +331,7 @@ function showTab(id) {
     }
   });
 
-  loadTabContent(id);
+    loadTabContent(id);
 }
 
 // End ShowTab
@@ -340,28 +357,22 @@ function toggleForm(formName,formType) {
     fetch(`/form_fragment?form=${formType}&order_num=${getOrderNum()}`)
       .then(response => response.text())
       .then(html => {
-          container.innerHTML = html;
-          UIBinder.init();
+        container.innerHTML = html;
 
-          console.log("toggleForm " + formName, "FormType " + formType);
-
-        // привязываем к Форме вызов функции submitFormViaFetch(formName, formType)
-        // при событии submit
         const form = document.getElementById(formName);
-        if (form) {
-          form.addEventListener('submit', event => {
+          if (form) {
+            //console.log("BinderRegistry. init form:", form)
+            BinderRegistry.init(form);
+
+            form.addEventListener('submit', event => {
             event.preventDefault(); // ❗ Не даём браузеру перезагрузить страницу
             submitFormViaFetch(formName, formType, getOrderNum()); // 🔄 Отправляем асинхронно
-          });
+            });
         }
         
         const formZone = container; // или document.getElementById(formName)
-        initFragment(formZone, formType);  // ⬅️ логика конкретной вкладки
-        // Синхронизировать ORDER_NUM во все формы
-        // Сейчас это делает submitFormViaFetch"
-        // syncOrderNumToForms(); // вставить значение в форму
+        //initFragment(formZone, formType);  // ⬅️ логика конкретной вкладки
 
-        // В конце загрузки изменим название кнопки Добавить на Закрыть
         if (addBtn) {
             addBtn.textContent = addBtn.dataset.labelClose;
         }
@@ -369,6 +380,20 @@ function toggleForm(formName,formType) {
       })
       .catch(error => console.error('Error load fragment form: ${formType}:', error));
   }
+}
+
+function filterByPeriod(period_value, label, dropdown) {
+    // Фильтрация по вашему атрибуту
+    if (dropdown.getAttribute('data-track') === 'true') {
+        const url = dropdown.getAttribute('data-url')
+        console.log('handleMenuChanged. ulr: ', url)
+        if (!url) {
+            console.log('handleMenuItemDropDown without URL: ', dropdown)
+            return
+        }
+        FragmentBinder.load(url, 'tableBody', { value: period_value });
+        //updateTable(url, value);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -422,69 +447,10 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 🧩 Общая инициализация UI
-    UIBinder.init();
-
-    //// 📦 Клики по строкам. Привязываем к таблице
-    document.getElementById('tableBody').addEventListener('click', event => {
-        const row = event.target.closest('.clickable-row');
-        if (row) {
-            const orderNum = row.dataset.order;
-            API.filterByOrder(orderNum);
-        }
-    });
-
-    function handleMenuChanged(event) {
-        const dropdown = event.target;
-        // Фильтрация по вашему атрибуту
-        if (dropdown.getAttribute('data-track') === 'true') {
-            const { value } = event.detail;
-            const url = dropdown.getAttribute('data-url')
-
-            if (!url) {
-                console.log('handleMenuItemDropDown without URL: ', dropdown)
-                return
-            }
-            updateTable(url, value);
-        }
-    }
-
-    document.addEventListener('menu-changed', handleMenuChanged);
+    // 🧩 Общая инициализация UI
+    bootstrapBinders();
+    BinderRegistry.init(document);
 });
-///////////////////////////////////////////////////////////////////////
-function updateTable(url, period) {
-    fetch(`${url}?period=${encodeURIComponent(period)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error on request: ${response.status}`);
-            }
-            return response.text();
-        })
-        .then(html => {
-            const tbody = document.getElementById('tableBody');
-            if (!tbody) {
-                console.warn('tableBody not found');
-                return;
-            }
-            // Remove all rows with data-order (data)
-            const rowsToRemove = tbody.querySelectorAll('tr[data-order]');
-            rowsToRemove.forEach(row => row.remove());
-
-            // Append new string
-            const tempContainer = document.createElement('tbody');
-            tempContainer.innerHTML = html;
-
-            const newRows = tempContainer.querySelectorAll('tr');
-            newRows.forEach(row => tbody.appendChild(row));
-
-            // 🔁 Повторная привязка событий
-            // rebindTableEvents();
-        })
-        .catch(error => {
-            console.error('Error on update table:', error);
-        });
-}
-
 
 
 const globalAPI = {
@@ -497,6 +463,7 @@ const globalAPI = {
   syncOrderNumToForms,
   formatAge,
   updateRefreshButton,
+  filterByPeriod,
   // добавляй по мере необходимости
   submitFormViaFetch
 };

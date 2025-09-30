@@ -27,9 +27,12 @@
                 <td style="border: none; text-align: left">{{ res_value('SOLUTION_CIV_PART') }}:</td>
 
                 <td style="border: none; text-align: left">
-                    <div class="dropdown">
+                    <div class="dropdown" data-role="menu">
                         <input type="hidden" name="solution" id="menuValue" style="width: 220px" class="input_s_form">
-                        <button type="button" class="dropdown-button" id="menuButton"><i class="fas fa-bars"></i>{{ res_value('SELECT_SOLUTION') }}</button>
+                        <button type="button" class="dropdown-button" id="menuButton">
+                        <i class="fas fa-bars"></i>
+                        <span class="label">{{ res_value('SELECT_SOLUTION') }}</span>
+                        </button>
                         <div class="dropdown-content">
                             <!-- data-value - отправляется через submit, data-label - отображается -->
                             <a data-value="{{res_value('SOLUTION_SATISFY')}}" data-label="{{res_value('SOLUTION_SATISFY')}}"><i class="fas fa-home"></i>{{res_value('SOLUTION_SATISFY')}}</a>

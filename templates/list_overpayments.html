@@ -27,46 +27,60 @@
             <colgroup><col style="width: 80px;"><col><col><col style="width: 140px;"><col style="width: 140px;"><col><col><col><col><col><col></colgroup>
             <thead>
                 <tr>
-                    <th data-help="overpayment_id" class="has-helper">{{ res_value('ORDER_NUM') }}</th>
-                    <th data-help="region" class="has-helper">{{ res_value('FILIAL_NAME') }}</th>
+                    <th data-help="overpayment_id" data-role="helper" class="has-helper">{{ res_value('ORDER_NUM') }}</th>
+                    <th data-help="region" data-role="helper" class="has-helper">{{ res_value('FILIAL_NAME') }}</th>
                     <th>{{ res_value('FIO_OVERPAY') }}</th>
-                    <th data-help="iin" class="has-helper">{{ res_value('IIN_OVERPAY') }}</th>
-                    <th data-help="risk_date" class="has-helper">{{ res_value('RISK_DATE') }}</th>
-                    <th data-help="rfpm_id" class="has-helper">{{ res_value('RFPM_ID') }}</th>
-                    <th data-help="sum_civ_amount" class="has-helper">{{ res_value('SUM_CIV_AMOUNT') }}</th>
+                    <th data-help="iin" data-role="helper" class="has-helper">{{ res_value('IIN_OVERPAY') }}</th>
+                    <th data-help="risk_date" data-role="helper" class="has-helper">{{ res_value('RISK_DATE') }}</th>
+                    <th data-help="rfpm_id" data-role="helper" class="has-helper">{{ res_value('RFPM_ID') }}</th>
+                    <th data-help="sum_civ_amount" data-role="helper" class="has-helper">{{ res_value('SUM_CIV_AMOUNT') }}</th>
                     <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
-                    <th data-help="last_status" class="has-helper">{{ res_value('STATUS_OVERPAY') }}</th>
-                    <th data-help="court_date" class="has-helper">{{ res_value('COURT_DATE') }}</th>
-                    <th data-help="effective_date" class="has-helper">{{ res_value('EFFECTIVE_DATE') }}</th>
-                    <th data-help="last_source_solution" class="has-helper">{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
-                    <th data-help="last_solution" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
+                    <th data-help="last_status" data-role="helper" class="has-helper">{{ res_value('STATUS_OVERPAY') }}</th>
+                    <th data-help="court_date" data-role="helper" class="has-helper">{{ res_value('COURT_DATE') }}</th>
+                    <th data-help="effective_date" data-role="helper" class="has-helper">{{ res_value('EFFECTIVE_DATE') }}</th>
+                    <th data-help="last_source_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
+                    <th data-help="last_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <tr>
+            <tbody id="tableBody" data-role="row-click" data-action="filterByOrder">
+                <tr data-persistent>
                     <td>
                         <a style="text-decoration: none; font-size: 24px" href="/add_op">➕</a>
                     </td>
                     <td />
                     <td />
-                    <td style="min-width: 170px; padding: 4px 2px; text-align: left">
-                        <form method="GET" style="padding: 0px; margin: 0px; border:none" action="{{ url_for('view_list_overpayments') }}">
-                            <input class="input_s_form"
-                                   style="width: 130px; font-size: 16px; border: 1px solid #ccc; padding: 7px"
-                                   inputmode="numeric"
-                                   pattern="\d{1,12}"
-                                   maxlength="12"
-                                   type="text" name="iin_filter" placeholder="ИИН" value="{{ request.args.get('iin_filter', '') }}">
-                            <button style="margin-left: 3px" type="submit" class="tiny-btn">🔍</button>
-                        </form>
+                    <td data-role="fragment-trigger"
+                        data-url="/filter-iin-overpayments"
+                        data-target="tableBody"
+                        style="min-width: 170px; padding: 4px 2px; text-align: left">
+                        <!--<form method="GET" style="padding: 0px; margin: 0px; border:none" action="{{ url_for('filter_iin_list_op') }}">-->
+                        <input class="input_s_form"
+                               style="width: 130px; font-size: 16px; border: 1px solid #ccc; padding: 7px"
+                               inputmode="numeric"
+                               pattern="\d{1,12}"
+                               maxlength="12"
+                               type="text"
+                               name="iin_filter"
+                               id="iinInput"
+                               placeholder="ИИН">
+                        <button type="button"
+                                id="filterButton"
+                                style="margin-left: 3px" class="tiny-btn">
+                            🔍
+                        </button>
+                        <!--</form>-->
                     </td>
                     <td style="padding: 4px 0px; text-align:center">
-                        <div style="min-width: 200px" class="dropdown" data-track="true" data-url="/filter-period-overpayments">
+                        <div data-role="menu"
+                             data-track="true"
+                             data-action="filterByPeriod"
+                             data-url="/filter-period-overpayments"
+                             style="min-width: 200px" class="dropdown">
                             <input type="hidden" name="menuValuePeriod" id="menuValuePeriod">
                             <button style="display: inline-block; border: 1px solid lightgray; min-width: 160px" type="button" class="dropdown-button period-button" id="menuButton">
                                 <i class="fas fa-filter"></i>
                                 <span class="label">{{ res_value('SELECT_PERIOD') }}</span>
-                                <span style="display: inline-block; margin-left: 5px; fo" class="caret"></span>
+                                <span style="display: inline-block; margin-left: 5px;" class="caret"></span>
                             </button>
                             <div style="min-width: 160px; margin-left: 20px" class="dropdown-content">
                                 <a data-value="{{res_value('PERIOD_MONTH')}}" data-label="{{res_value('PERIOD_MONTH')}}"><i class="fas fa-home"></i>{{res_value('PERIOD_MONTH')}}</a>
@@ -77,112 +91,32 @@
                     </td>
                     <td />
                     <td />
-                    <td>
+                    <td data-help="refund_all" data-role="helper" class="has-helper">
                         <a style="text-decoration: none; font-size: 24px" href="/recalc_refunding">🔄</a>
                     </td>
-                    <td>
-                        {% if 'to-do' not in session or session['to-do'] == 'active' %}
-                        <a style="text-decoration: none; font-size: 24px" href="/to-do">🟡</a>
-                        {% else %}
-                        <a style="text-decoration: none; font-size: 24px" href="/to-do">✅</a>
-                        {% endif %}
+                    <td data-help="filter_active" data-role="helper" class="has-helper">
+                        <input type="hidden" id="activeState" value="{{ 'active' if session['active'] == 'closed' else 'active' }}">
+
+                        <a href="#"
+                           data-role="fragment-toggle"
+                           data-url="/filter-active"
+                           data-target="tableBody"
+                       data-icon-active="🟡"
+                       data-icon-closed="✅"
+                           style="font-size: 24px; text-decoration: none;">
+                            <span id="activeIcon">
+                                {{ '✅' if session['active'] == 'closed' else '🟡' }}
+                            </span>
+                        </a>
                     </td>
+
                     <td />
                     <td />
                     <td />
                     <td />
                 </tr>
-                {% for el in list_op %}
-                <tr data-order="{{ el.order_num }}" class="clickable-row">
-                    <td>
-                        <a>{{ el.order_num }}</a>
-                    </td>
-
-                    {% if g.user.top_control==0 %}
-                    <td style="text-align: left">
-                        {{ el.region }}
-                    </td>
-                    {% else %}
-                    <td style="min-width: 355px; padding: 4px 4px; text-align: left">
-                        <input style="width: 290px; text-align: left; font-size: 16px"
-                               type="text"
-                               name="region"
-                               value="{{ el.region }}"
-                               autocomplete="off"
-                               readonly
-                               class="region input_s_form" />
-
-                        <button class="edit-btn tiny-btn" data-id="{{ el.order_num }}" data-field="region">✏️</button>
-                        <button class="save-btn tiny-btn" data-id="{{ el.order_num }}" data-field="region" style="display:none;">💾</button>
-                        <button class="cancel-btn tiny-btn" data-id="{{ el.order_num }}" data-field="region" style="display:none;">❌</button>
-                    </td>
-                    {% endif %}
-
-                    <td style="text-align: left">
-                        {{ el.fio }}
-                    </td>
-                    <td>
-                        {{ el.iin }}
-                    </td>
-                    <td style="min-width: 202px; padding: 4px 4px; text-align: left ">
-                        {% set parts = el.risk_date.split('.') %}
-                        {% set html_date = parts[2] ~ '-' ~ parts[1] ~ '-' ~ parts[0] %}
-                        <input type="date" style="width: 136px;"
-                               name="risk_date"
-                               value="{{ html_date }}"
-                               readonly
-                               class="risk-input input_d" />
-
-                        <button class="edit-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date">✏️</button>
-                        <button class="save-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date" style="display:none;">💾</button>
-                        <button class="cancel-btn tiny-btn" data-id="{{ el.order_num }}" data-field="risk_date" style="display:none;">❌</button>
-                    </td>
-                    <td style="text-align: left">
-                        {{ el.rfpm_id }}
-                    </td>
-                    {% if g.user.top_control==0 %}
-                    <td style="text-align: right">
-                        {{ el.sum_civ_amount }}
-                    </td>
-                    {% else %}
-                    <td style="min-width: 180px; text-align: left; padding: 4px 4px;">
-                        <input type="text" style="width: 115px; text-align: right; font-family: monospace; font-size: 16px"
-                               name="sum_civ_amount"
-                               value="{{ el.sum_civ_amount.strip() }}"
-                               inputmode="decimal"
-                               pattern="^\d+(\.\d{1,2})?$"
-                               readonly
-                               class="sum_civ_amount input_s_form" />
-
-                        <button class="edit-btn tiny-btn" data-id="{{ el.order_num }}" data-field="sum_civ_amount">✏️</button>
-                        <button class="save-btn tiny-btn" data-id="{{ el.order_num }}" data-field="sum_civ_amount" style="display:none;">💾</button>
-                        <button class="cancel-btn tiny-btn" data-id="{{ el.order_num }}" data-field="sum_civ_amount" style="display:none;">❌</button>
-                    </td>
-                    {% endif %}
-                    <td style="text-align: right">
-                        {{ el.compensated_amount }}
-                    </td>
-                    <td style="text-align: left">
-                        {{ el.last_status }}
-                    </td>
-                    <td>
-                        {{ el.verdict_date }}
-                    </td>
-                    <td>
-                        {{ el.effective_date }}
-                    </td>
-                    <td style="text-align: left">
-                        {{ el.last_source_solution }}
-                    </td>
-                    <td style="text-align: left">
-                        {{ el.last_solution }}
-                    </td>
-
-                </tr>
-                {% endfor %}
-            <tbody>
+            </tbody>
         </table>
-
     </div>
     <!-- Нижняя область: вкладки -->
     <div class="tabs">
@@ -216,13 +150,14 @@
             <div id="pretrial" class="tab-panel">
                 <button data-form="pretrialForm" data-type="pretrial" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
-                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}"
+                        data-persistent>
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
-                <button class="refresh-btn" data-tab="pretrial" id="pretrialRefreshButton">🔄 Обновить</button>
+                <button class="refresh-btn" data-tab="pretrial" id="pretrialRefreshButton" data-persistent>🔄 Обновить</button>
 
-                <div id="pretrialFormContainer"></div>
-                <div id="pretrialContent"><!-- Here will be fragment _pretrial_items --></div>
+                <div data-persistent id="pretrialFormContainer"></div>
+                <div data-persistent id="pretrialContent" data-track="true" data-url="/pretrial_fragment"><!-- Here will be fragment _pretrial_items --></div>
                 <!--<div id="pretrialTimestamp" class="tab-timestamp"></div>-->
             </div>
 
@@ -235,86 +170,86 @@
                 <button class="refresh-btn" data-tab="scammer" id="scammerRefreshButton">🔄 Обновить</button>
                 <!--<button id="scammerRefreshButton" onclick="API.refreshTab('scammer')">🔄 Обновить</button>-->
 
-                <div id="scammerFormContainer"></div>
-                <div id="scammerContent"><!-- Here will be fragment _pretrial_items --></div>
+                <div data-persistent id="scammerFormContainer"></div>
+                <div data-persistent id="scammerContent"><!-- Here will be fragment _pretrial_items --></div>
                 <!--<div id="scammerTimestamp" class="tab-timestamp"></div>-->
             </div>
 
             <div id="law" class="tab-panel">
-                <button data-form="lawForm" data-type="law" class="add-btn"
+                <button data-persistent data-form="lawForm" data-type="law" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
-                <button class="refresh-btn" data-tab="law" id="lawRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-tab="law" id="lawRefreshButton">🔄 Обновить</button>
                 <!--<button id="lawRefreshButton" onclick="API.refreshTab('law')">🔄 Обновить</button>-->
 
-                <div id="lawFormContainer"><!-- Here will be FORM _law_items --></div>
-                <div id="lawContent"><!-- Here will be fragment _law_items --></div>
+                <div data-persistent id="lawFormContainer"><!-- Here will be FORM _law_items --></div>
+                <div data-persistent id="lawContent"><!-- Here will be fragment _law_items --></div>
                 <!--<div id="lawTimestamp" class="tab-timestamp"></div>-->
             </div>
 
             <div id="court_crime" class="tab-panel">
-                <button data-form="court_crimeForm" data-type="court_crime" class="add-btn"
+                <button data-persistent data-form="court_crimeForm" data-type="court_crime" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
                 <!--                <button id="courtRefreshButton" onclick="API.refreshTab('court_crime')">🔄 Обновить</button>-->
-                <button class="refresh-btn" data-tab="court_crime" id="court_crimeRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-tab="court_crime" id="court_crimeRefreshButton">🔄 Обновить</button>
 
-                <div id="court_crimeFormContainer"><!-- Here will be FORM _court_items --></div>
-                <div id="court_crimeContent"><!-- Here will be fragment _court_items --></div>
+                <div data-persistent id="court_crimeFormContainer"><!-- Here will be FORM _court_items --></div>
+                <div data-persistent id="court_crimeContent"><!-- Here will be fragment _court_items --></div>
                 <!--<div id="court_crimeTimestamp" class="tab-timestamp"></div>-->
             </div>
 
             <div id="court_civ" class="tab-panel">
-                <button data-form="court_civForm" data-type="court_civ" class="add-btn"
+                <button data-persistent data-form="court_civForm" data-type="court_civ" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
                 <!--                <button id="court_civRefreshButton" onclick="API.refreshTab('court_civ')">🔄 Обновить</button>-->
-                <button class="refresh-btn" data-tab="court_civ" id="court_civRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-tab="court_civ" id="court_civRefreshButton">🔄 Обновить</button>
 
 
-                <div id="court_civFormContainer"><!-- Here will be FORM _court_items --></div>
-                <div id="court_civContent"><!-- Here will be fragment _court_items --></div>
+                <div data-persistent id="court_civFormContainer"><!-- Here will be FORM _court_items --></div>
+                <div data-persistent id="court_civContent"><!-- Here will be fragment _court_items --></div>
                 <!--<div id="court_civTimestamp" class="tab-timestamp"></div>-->
             </div>
 
             <div id="appeal" class="tab-panel">
-                <button data-form="appealForm" data-type="appeal" class="add-btn"
+                <button data-persistent data-form="appealForm" data-type="appeal" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
                 <!--<button id="appealRefreshButton" onclick="API.refreshTab('appeal')">🔄 Обновить</button>-->
-                <button class="refresh-btn" data-tab="appeal" id="appealRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-tab="appeal" id="appealRefreshButton">🔄 Обновить</button>
 
-                <div id="appealFormContainer"><!-- Here will be FORM _appeal_items --></div>
-                <div id="appealContent"><!-- Here will be fragment _appeal_items --></div>
+                <div data-persistent id="appealFormContainer"><!-- Here will be FORM _appeal_items --></div>
+                <div data-persistent id="appealContent" data-track="true" data-url="/appeal_fragment"><!-- Here will be fragment _appeal_items --></div>
                 <!--<div id="appealTimestamp" class="tab-timestamp"></div>-->
             </div>
 
             <div id="execution" class="tab-panel">
-                <button data-form="executionForm" data-type="execution" class="add-btn" 
+                <button data-persistent data-form="executionForm" data-type="execution" class="add-btn" 
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"  
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">➕ {{ res_value('BUTTON_ADD') }}</button>
 <!--                <button id="executionRefreshButton" onclick="API.refreshTab('execution')">🔄 Обновить</button>-->
-                <button class="refresh-btn" data-tab="execution" id="executionRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-tab="execution" id="executionRefreshButton">🔄 Обновить</button>
 
-                <div id="executionFormContainer"><!-- Here will be FORM _execution_items --></div>
-                <div id="executionContent"><!-- Here will be fragment _execution_items --></div>
+                <div data-persistent id="executionFormContainer"><!-- Here will be FORM _execution_items --></div>
+                <div data-persistent id="executionContent"><!-- Here will be fragment _execution_items --></div>
                 <!--<div id="executionTimestamp" class="tab-timestamp"></div>-->
             </div>
 
             <div id="refunding" class="tab-panel">
                 <!--<button data-form="refundingForm" data-type="refunding" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>-->
-                <button class="refresh-btn" data-tab="refunding" id="refundingRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-tab="refunding" id="refundingRefreshButton">🔄 Обновить</button>
 
                 <!--<div id="refundingFormContainer">--><!-- Here will be FORM _execution_items --><!--</div>-->
-                <div id="refundingContent"><!-- Here will be fragment _execution_items --></div>
+                <div data-persistent id="refundingContent" data-track="true" data-url="/refunding_fragment"><!-- Here will be fragment _execution_items --></div>
                 <!--<div id="refundingTimestamp" class="tab-timestamp"></div>-->
             </div>
 
