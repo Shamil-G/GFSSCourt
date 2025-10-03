@@ -1,13 +1,17 @@
 ﻿import { BinderRegistry } from './binderRegistry.js';
+import * as TabUtil from './tabUtil.js';
 
-// Вызвается из FragmentTriggerBinder
-
+// Задумка !!! =>
 // Загрузка фрагментов, зон, табов (slave table)
 // при смене numOrder в мастер таблице
-// Для этого принимается 
+// Для этого принимается
 // URL - куда обращаемся за данными
 // TARGET - куда положим выбранные данные
 // PARAMS - данные, которые передаются по адресу URL
+
+// По факту сейчас фрагменты скачиваютя через TabRegistry !!!
+// Здесь только мастер - таблица
+
 export const FragmentBinder = {
     role: 'fragment',
 
@@ -39,40 +43,23 @@ export const FragmentBinder = {
     },
 
     init(target) {
-        //console.log("FragmentBinder. INIT check");
-        //if (target.__fragmentInitialized) return;
-        //target.__fragmentInitialized = true;
-
         BinderRegistry.init(target);
-    },
-
-    bindEvents(target) {
-        if (target.__fragmentEventsBound) {
-            //console.warn("⚠️ FragmentBinder. double bind bindEvents: ", target);
-            //console.trace(); // покажет стек вызова
-            return;
-        }
-        target.__fragmentEventsBound = true;
-        //console.log("FragmentBinder. CALL bindEvents: ", target);
-
-        target.addEventListener('fragment-reload', e => {
-            const url = target.dataset.url;
-            const params = e.detail?.params || {};
-            FragmentBinder.load(url, target.id, params);
-        });
-
     },
 
     async load(url, targetId, params = {}) {
         const target = document.getElementById(targetId);
+
         if (!target) return null;
-/*        console.log("FragmentBinder. load.");*/
-        const isJson = Object.values(params).some(v => typeof v === 'object');
-        const headers = {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': isJson ? 'application/json' : 'application/x-www-form-urlencoded'
-        };
-        const body = isJson ? JSON.stringify(params) : new URLSearchParams(params).toString();
+
+        const { headers, body } = TabUtil.serializeParams(params);
+        console.log("1. FragmentBinder. load.  headers: ", headers);
+
+        //const isJson = Object.values(params).some(v => typeof v === 'object');
+        //const headers = {
+        //    'X-Requested-With': 'XMLHttpRequest',
+        //    'Content-Type': isJson ? 'application/json' : 'application/x-www-form-urlencoded'
+        //};
+        //const body = isJson ? JSON.stringify(params) : new URLSearchParams(params).toString();
 
         try {
             const res = await fetch(url, { method: 'POST', headers, body });
@@ -80,8 +67,9 @@ export const FragmentBinder = {
 
             FragmentBinder.clear(target);
             FragmentBinder.insert(target, html);
-            FragmentBinder.bindEvents(target);
             FragmentBinder.init(target);
+
+            console.log("2. FragmentBinder. LOAD.  target: ", targetId, ", URL: ", url, ", params: ", params);
 
             return html; // ✅ теперь можно кэшировать
         } catch (err) {

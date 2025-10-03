@@ -1,4 +1,4 @@
-﻿import { FragmentBinder } from '../fragmentBinder.js';
+﻿import { FragmentBinder } from '../../fragmentBinder.js';
 
 // В первой строке мастер-таблицы есть поля-фильтры
 // изменение которых приводит к мзменению содержания
@@ -8,20 +8,20 @@
 // вызываем загрузку фрагментов:
 // FragmentBinder.load(url, targetId, { value: node_value });
 
-// Фильтруем по ИИН
+// Фильтруем по INPUT field: ИИН
 
-export const FragmentTriggerBinder = {
-    role: 'fragment-trigger',
+export const FilterIinBinder = {
+    role: 'filter-iin',
 
     attach(el) {
-        if (el.__fragmentTriggerBound) {
+        if (el.__filter_iin) {
             //console.warn('⚠️ FragmentTriggerBinder: double bind', el);
             //console.trace(); // покажет стек вызова
             return;
         }
         //console.log('FragmentTriggerBinder: FIRST bind', el);
         //console.trace(); // покажет стек вызова
-        el.__fragmentTriggerBound = true;
+        el.__filter_iin = true;
 
         const url = el.dataset.url;
         const targetId = el.dataset.target;
@@ -75,7 +75,6 @@ export const FragmentTriggerBinder = {
             }
         };
 
-
         // Привязка к самому el
         const tag = el.tagName;
         if (keydownTags.includes(tag)) bindKeydown(el);
@@ -92,7 +91,7 @@ export const FragmentTriggerBinder = {
     ,
 
     attachAll(zone = document) {
-        const triggers = zone.querySelectorAll('[data-role="fragment-trigger"]');
+        const triggers = zone.querySelectorAll(`[data-role="${this.role}"]`);
         triggers.forEach(el => this.attach(el));
     }
 };

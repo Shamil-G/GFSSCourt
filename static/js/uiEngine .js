@@ -1,4 +1,4 @@
-﻿import { showTooltipPopover } from './popoverEngine.js';
+﻿/*import { showTooltipPopover } from './popoverEngine.js';*/
 
 //////////////////////////////////////////////////////////////////////
 //function bindMutualExclusive(zone, nameA, nameB) {
@@ -20,14 +20,14 @@
 //  });
 //}
 ////////////////////////////////////////////////////////////////////
-function requireAtLeastOne(fields, errorMessage) {
-    const hasValue = fields.some(name => document.querySelector(`input[name='${name}']`)?.value.trim());
-    if (!hasValue) {
-        alert(errorMessage);
-        return false;
-    }
-    return true;
-}
+//function requireAtLeastOne(fields, errorMessage) {
+//    const hasValue = fields.some(name => document.querySelector(`input[name='${name}']`)?.value.trim());
+//    if (!hasValue) {
+//        alert(errorMessage);
+//        return false;
+//    }
+//    return true;
+//}
 ////////////////////////////////////////////////////////////////////
 function waitForElementInZone(zone, selector, callback) {
     const el = zone.querySelector(selector);

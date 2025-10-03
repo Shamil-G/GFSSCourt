@@ -1,4 +1,4 @@
-﻿import { showTooltipPopover } from '../popoverEngine.js';
+﻿import { showTooltipPopover } from '../../popoverEngine.js';
 
 export const MutualExclusiveBinder = {
     role: 'mutual-exclusive',

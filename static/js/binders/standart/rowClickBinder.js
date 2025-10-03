@@ -1,4 +1,5 @@
-﻿export const RowClickBinder = {
+﻿// Вешается на таблицу ?!
+export const RowClickBinder = {
     role: 'row-click',
 
     attach(el) {
@@ -39,7 +40,7 @@
     },
 
     attachAll(zone = document) {
-        const containers = zone.querySelectorAll('[data-role="row-click"]');
+        const containers = zone.querySelectorAll(`[data-role="${this.role}"]`);
         containers.forEach(el => this.attach(el));
     }
 };

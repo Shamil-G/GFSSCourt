@@ -10,18 +10,10 @@
             return;
         }
         this.binders[role] = binder
-        console.log(`✅ Binder registered for role: ${role}`);
+/*        console.log(`✅ Binder registered for role: ${role}`);*/
     },
     // documetn - this is default value
     init(target = document) {
-        //if (target.__binderRegistry) {
-            //console.warn('⚠️ BinderRegistry: double bind target', target);
-            //console.trace(); // покажет стек вызова
-            //return;
-        //}
-        //console.log('BinderRegistry: target', target);
-        //console.trace(); // покажет стек вызова
-        //target.__binderRegistry = true;
 
         if (!(target instanceof Element || target instanceof Document)) {
             console.warn('❌ BinderRegistry.init: target is not a DOM Element', target);

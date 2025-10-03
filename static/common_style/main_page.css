@@ -63,10 +63,6 @@ select {
     transition: opacity 200ms ease-in-out;
 }
 
-.tab-content-zone.fade-out {
-  opacity: 0;
-}
-
 .tab-panel.active {
     display: block;
 }
@@ -92,8 +88,8 @@ li {
     font-weight: bold;
 }
 .fade-out {
-    opacity: 0.3;
-    transition: opacity 150ms ease-in;
+    opacity: 0;
+    transition: opacity 300ms ease-in;
 }
 
 td.has-helper:hover .help-icon {

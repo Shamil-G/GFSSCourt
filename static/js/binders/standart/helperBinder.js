@@ -1,4 +1,4 @@
-﻿import { showHelperPopover } from '../popoverEngine.js';
+﻿import { showHelperPopover } from '../../popoverEngine.js';
 
 export const HelperBinder = {
     role: 'helper',

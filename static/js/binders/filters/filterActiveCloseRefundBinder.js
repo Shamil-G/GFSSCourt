@@ -1,4 +1,4 @@
-﻿import { FragmentBinder } from '../fragmentBinder.js';
+﻿import { FragmentBinder } from '../../fragmentBinder.js';
 
 // В первой строке мастер-таблицы есть поля-фильтры
 // изменение которых приводит к мзменению содержания
@@ -10,18 +10,18 @@
 
 // Закрытые долги и не закрытые долги
 
-export const FragmentToggleBinder = {
-    role: 'fragment-toggle',
+export const FilterActiveCloseRefundBinder = {
+    role: 'filter-active-close',
 
     attach(el) {
-        if (el.__fragmentToggleBinder) {
+        if (el.__filter_active_close) {
             //console.warn('⚠️ FragmentToggleBinder: double bind', el);
             //console.trace(); // покажет стек вызова
             return;
         }
         //console.log('FragmentToggleBinder: double bind', el);
         //console.trace(); // покажет стек вызова
-        el.__fragmentToggleBinder = true;
+        el.__filter_active_close = true;
 
         const url = el.dataset.url;
         const targetId = el.dataset.target;
@@ -60,7 +60,7 @@ export const FragmentToggleBinder = {
     },
 
     attachAll(zone = document) {
-        const toggles = zone.querySelectorAll('[data-role="fragment-toggle"]');
+        const toggles = zone.querySelectorAll(`[data-role="${this.role}"]`);
         toggles.forEach(el => this.attach(el));
     }
 };

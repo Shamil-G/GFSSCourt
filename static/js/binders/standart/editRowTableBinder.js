@@ -43,7 +43,7 @@ export const EditRowTableBinder = {
     startEdit(id, field) {
         const row = document.querySelector(`tr[data-order="${id}"]`);
         const input = row?.querySelector(`input[name="${field}"]`);
-        console.log('EditField. startEdit. id:', id, 'field:', field, 'row:', row, 'input:', input);
+        //console.log('EditField. startEdit. id:', id, 'field:', field, 'row:', row, 'input:', input);
         if (!input) return;
 
         input.removeAttribute('readonly');

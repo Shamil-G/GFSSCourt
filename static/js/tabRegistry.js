@@ -1,43 +1,121 @@
-﻿const _tabs = {};
+﻿import { BinderRegistry } from './binderRegistry.js'
+import { FragmentBinder } from './fragmentBinder.js'
+
+import * as TabUtil from './tabUtil.js';
+
+//////////////////////////////////////////////////////////////////////////////
+export function fadeInsert(contentZone, htmlString) {
+    return new Promise(resolve => {
+        contentZone.classList.add('fade-out');
+
+        setTimeout(() => {
+            const temp = document.createElement('div');
+            temp.innerHTML = htmlString;
+
+            const fragment = document.createDocumentFragment();
+            while (temp.firstChild) {
+                fragment.appendChild(temp.firstChild);
+            }
+
+            contentZone.innerHTML = '';
+            contentZone.appendChild(fragment);
+            contentZone.classList.remove('fade-out');
+
+            resolve();
+        }, 300);
+    });
+}
+
+
+export function defaultTabInit(tabId, container) {
+    // Анимация
+    container.classList.add('fade-out');
+    setTimeout(() => {
+        container.classList.remove('fade-out');
+
+        // Таймстамп
+        const tsNode = container.querySelector(`#${tabId}Timestamp`);
+        if (tsNode) {
+            tsNode.textContent = `🕓 Загружено ${TabUtil.formatAge(Date.now())}`;
+        }
+
+        // Инициализация
+        BinderRegistry.init(container);
+        // MenuBinder.attachAll(container); // если нужно
+
+    }, 150);
+}
+
+function setTimestamp(targetZone, tabId, html) {
+    //console.log("TabRegistry. tabId: ", tabId, "\n\t\ttargetZone: ", targetZone);
+    const timestampZone = TabUtil.getTimestampZone(targetZone, tabId);
+    /*                if (typeof html === 'string' && cached?.html && html !== cached.html) {*/
+    if (typeof html === 'string') {
+        if (timestampZone) {
+            //console.log("TabRegistry. Update timestampZone", Date.now());
+            timestampZone.textContent = `Загружено: ${new Date().toLocaleTimeString()}`;
+        } else {
+            console.warn("TabRegistry. timestampZone не найден в ", html);
+        }
+    }
+}
 
 export const TabRegistry = {
-  register(tabId, { url, zone, onInit }) {
-    console.log('TabRegistry. register. url: ' + url, 'zone: ' + zone, 'onInit: ' +onInit)
-    _tabs[tabId] = { url, zone, onInit };
-  },
+    _tabs: {},
 
-  get(tabId) {
-    console.log('TabRegistry. GET. tabid: ' + tabId)
-    return _tabs[tabId];
-  },
+    register(tabId, { url, zoneSelector, onInit }) {
+        this._tabs[tabId] = { url, zoneSelector, onInit };
+    },
 
-  load(tabId) {
-    const entry = _tabs[tabId];
-    if (!entry) {
-      console.warn(`Нет регистрации вкладки "${tabId}"`);
-      return;
-    }
+    get(tabId) {
+        return this._tabs[tabId];
+    },
 
-    console.log('TabRegistry. Load. tabid: ' + tabId)
-
-    const targetZone = entry.zone || document.querySelector('.fragment-zone');
-    fetch(entry.url)
-      .then(res => res.text())
-      .then(html => {
-        targetZone.innerHTML = html;
-        sharedTabId = tabId;
-        UIBinder.init(targetZone);
-        entry.onInit?.(targetZone);  // если указан доп. инициализатор
-
-        console.log('TabRegistry. Fetch. sharedTab: ' + tabId)
-
-        targetZone.dispatchEvent(new CustomEvent('tab-loaded', {
-          detail: { tabId, url: entry.url }
+    list() {
+        return Object.entries(this._tabs).map(([tabId, { url, zoneSelector }]) => ({
+            id: tabId,
+            url,
+            zoneSelector
         }));
-      })
-      .catch(err => {
-        targetZone.innerHTML = `<div class="error">Ошибка загрузки: ${err.message}</div>`;
-        console.error('🟥 Ошибка загрузки вкладки:', err);
-      });
-  }
+    },
+
+    async load(tabId, orderNum) {
+        const entry = this._tabs[tabId];
+        
+        if (!entry) {
+            console.warn(`Нет регистрации вкладки "${tabId}"`);
+            return;
+        }
+
+        const { headers, body } = TabUtil.serializeParams({ order_num: orderNum});
+        const targetZone = document.querySelector(entry.zoneSelector) || document.querySelector('.fragment-zone');
+
+        try {
+            //console.log("TabRegistry. START FETCH: ", Date.now());
+
+            const res = await fetch(entry.url, { method: 'POST', headers, body });
+            const html = await res.text();
+
+            const cacheKey = TabUtil.getCacheKey(tabId, orderNum);
+            let cached = TabUtil.tabCache[cacheKey];
+
+            if (!cached || html != cached.html) {
+
+                delete TabUtil.tabCache[cacheKey];
+                TabUtil.addToCache(cacheKey, html);
+                cached = TabUtil.tabCache[cacheKey];
+
+                await fadeInsert(targetZone, html);
+                setTimestamp(targetZone, tabId);
+
+                //console.log("TabRegistry. Finish LOAD.  target: ", tabId, ", URL: ", entry.url, ", headers: ", headers, ", body: ", body);
+            }
+            //return html; // ✅ теперь можно кэшировать
+
+        } catch (err) {
+            console.error('FragmentBinder.load error:', err, " : ", Date.now());
+            return null;
+        }
+
+    }
 };

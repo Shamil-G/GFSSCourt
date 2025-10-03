@@ -1,5 +1,5 @@
 ﻿export function loadFragment(url, targetId, params = {}) {
-    console.log('loadFragment. Params:', params);
+    console.log('function loadFragment. Params:', params);
 
     const target = document.getElementById(targetId);
     if (!target) {

@@ -3,6 +3,7 @@ from flask_login import login_required
 from main_app import app, log
 from util.i18n import get_i18n_value
 
+import json
 
 from model.overpayments import *
 
@@ -22,6 +23,31 @@ def filter_active():
     return redirect(url_for('filter_list_op'))
 
 
+def extract_payload():
+    content_type = request.headers.get('Content-Type', '')
+    print("📥 Content-Type:", content_type)
+
+    if 'application/json' in content_type:
+        data = request.get_json(silent=True)
+        if isinstance(data, dict):
+            return data
+        else:
+            print("⚠️ JSON не распарсен, пробуем вручную")
+            try:
+                return json.loads(request.data.decode('utf-8'))
+            except Exception as e:
+                print("❌ Ошибка при ручном JSON-декодировании:", e)
+                return {}
+    elif 'application/x-www-form-urlencoded' in content_type:
+        return request.form.to_dict()
+    else:
+        print("⚠️ Неизвестный Content-Type, пробуем как JSON")
+        try:
+            return json.loads(request.data.decode('utf-8'))
+        except Exception:
+            return {}
+
+
 @app.route('/filter-period-overpayments', methods=['GET','POST'])
 @login_required
 def filter_period_list_op():
@@ -36,9 +62,8 @@ def filter_period_list_op():
         case _: period = ''
 
     session['period_list_op'] = period
-    log.info(f'filter_period_list_op. PERIOD: {period}')
+    log.debug(f'filter_period_list_op. PERIOD: {period}')
 
-    rows = list_overpayments(g.user.top_control, g.user.dep_name, iin_filter='', period=period,  active='active' if 'to-do' not in session else session['to-do'] )
     return redirect(url_for('filter_list_op'))
 
 
@@ -54,7 +79,7 @@ def filter_iin_list_op():
         iin_filter = request.args.get('value','')
 
     session['iin_filter'] = iin_filter
-    log.info(f'filter_iin_list_op. IIN: {iin_filter}')
+    log.debug(f'filter_iin_list_op. IIN: {iin_filter}')
     return redirect(url_for('filter_list_op'))
 
 
@@ -74,7 +99,7 @@ def filter_list_op():
 
     rows = list_overpayments(g.user.top_control, g.user.dep_name, 
                              iin_filter=iin_filter, period=period,  active=active )
-    log.info(f"FILTER_LIST_OP. ROWS: {len(rows)}\n\tIIN\t{iin_filter}\n\tPERIOD:\t{period}\n\tACTIVE\t{active}")
+    log.debug(f"FILTER_LIST_OP. ROWS: {len(rows)}\n\tIIN\t{iin_filter}\n\tPERIOD:\t{period}\n\tACTIVE\t{active}")
     return render_template('partials/_list_op_fragment.html', rows=rows)
 
 
@@ -101,7 +126,7 @@ def view_list_overpayments():
 
     list_op = list_overpayments(g.user.top_control, g.user.dep_name, iin_filter=iin_filter, period=period,  active='active' if 'to-do' not in session else session['to-do'] )
 
-    log.info(f"LIST_OVERPAYMENTS. LEN list_op: {len(list_op)}")
+    log.debug(f"LIST_OVERPAYMENTS. LEN list_op: {len(list_op)}")
     return render_template("list_overpayments.html", list_op=list_op, selected_order=order_num)
 
 
@@ -158,7 +183,8 @@ def pretrial_form_fragment():
 @login_required
 def view_pretrial_fragment():
     if request.method=='POST':
-        order_num = request.form.get('order_num','')
+        data = extract_payload()
+        order_num = data.get('order_num', '')
     else:
         order_num = request.args.get('order_num','')
 
@@ -196,9 +222,12 @@ def view_pretrial_add():
 @login_required
 def view_scammer_fragment():
     if request.method=='POST':
-        order_num = request.form.get('order_num','')
+        data = extract_payload()
+        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
+        order_num = data.get('order_num', '')
     else:
         order_num = request.args.get('order_num','')
+
     scammer_items = get_scammer_items(order_num) if order_num else []
     log.debug(f"SCAMMER_FRAGMENT\n\tORDER_NUM: {order_num}\n\tSCAMMER_ITEMS: {scammer_items}")
     return render_template("partials/_scammer_fragment.html", scammer_items=scammer_items, selected_order=order_num)
@@ -249,9 +278,12 @@ def view_law_add():
 @login_required
 def view_law_fragment():
     if request.method=='POST':
-        order_num = request.form.get('order_num','')
+        data = extract_payload()
+        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
+        order_num = data.get('order_num', '')
     else:
         order_num = request.args.get('order_num','')
+
     law_items = get_law_items(order_num) if order_num else []
     log.debug(f"LAW_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {law_items}")
     return render_template("partials/_law_fragment.html", law_items=law_items, selected_order=order_num)
@@ -286,9 +318,12 @@ def view_court_crime_add():
 @login_required
 def view_court_crime_fragment():
     if request.method=='POST':
-        order_num = request.form.get('order_num','')
+        data = extract_payload()
+        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
+        order_num = data.get('order_num', '')
     else:
         order_num = request.args.get('order_num','')
+
     court_items = get_court_crime_items(order_num) if order_num else []
     log.debug(f"COURT_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {court_items}")
     return render_template("partials/_court_crime_fragment.html", court_crime_items=court_items, selected_order=order_num)
@@ -327,11 +362,14 @@ def view_court_civ_add():
 @login_required
 def view_court_civ_fragment():
     if request.method=='POST':
-        order_num = request.form.get('order_num','')
+        data = extract_payload()
+        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
+        order_num = data.get('order_num', '')
     else:
         order_num = request.args.get('order_num','')
+
     court_items = get_court_civ_items(order_num) if order_num else []
-    log.info(f"COURT_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {court_items}")
+    log.debug(f"COURT_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {court_items}")
     return render_template("partials/_court_civ_fragment.html", court_civ_items=court_items, selected_order=order_num)
 
 
@@ -359,9 +397,12 @@ def view_appeal_add():
 @login_required
 def view_appeal_fragment():
     if request.method=='POST':
-        order_num = request.form.get('order_num','')
+        data = extract_payload()
+        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
+        order_num = data.get('order_num', '')
     else:
         order_num = request.args.get('order_num','')
+
     appeal_items = get_appeal_items(order_num) if order_num else []
     log.debug(f"COURT_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {appeal_items}")
     return render_template("partials/_appeal_fragment.html", appeal_items=appeal_items, selected_order=order_num)
@@ -393,9 +434,12 @@ def view_execution_add():
 @login_required
 def view_execution_fragment():
     if request.method=='POST':
-        order_num = request.form.get('order_num','')
+        data = extract_payload()
+        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
+        order_num = data.get('order_num', '')
     else:
         order_num = request.args.get('order_num','')
+
     execution_items = get_execution_items(order_num) if order_num else []
     log.debug(f"EXECUTION_FRAGMENT\n\tORDER_NUM: {order_num}\n\tEXECUTION_ITEMS: {execution_items}")
     return render_template("partials/_execution_fragment.html", execution_items=execution_items, selected_order=order_num)
@@ -414,14 +458,14 @@ def view_recalc_refunding():
 @login_required
 def view_refunding_fragment():
     if request.method=='POST':
-        log.info(f"REFUNDING_FRAGMENT\n\t{request.form}")
-        order_num = request.form.get('order_num','')
+        data = extract_payload()
+        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
+        order_num = data.get('order_num', '')
     else:
-        log.info(f"REFUNDING_FRAGMENT\n\t{request.args}")
         order_num = request.args.get('order_num','')
-    log.info(f"REFUNDING_FRAGMENT\n\tORDER_NUM: {order_num}\n{request}")
+
     refunding_items = get_refunding_items(order_num) if order_num else []
-    log.info(f"REFUNDING_FRAGMENT\n\tORDER_NUM: {order_num}\n\tREFUNDING_ITEMS: {refunding_items}")
+    log.info(f"REFUNDING_FRAGMENT. ORDER_NUM: {order_num}\n\tREFUNDING_ITEMS: {refunding_items}")
     return render_template("partials/_refunding_fragment.html", refunding_items=refunding_items, selected_order=order_num)
 
 

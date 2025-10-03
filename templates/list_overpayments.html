@@ -49,7 +49,7 @@
                     </td>
                     <td />
                     <td />
-                    <td data-role="fragment-trigger"
+                    <td data-role="filter-iin"
                         data-url="/filter-iin-overpayments"
                         data-target="tableBody"
                         style="min-width: 170px; padding: 4px 2px; text-align: left">
@@ -64,6 +64,9 @@
                                id="iinInput"
                                placeholder="ИИН">
                         <button type="button"
+                                data-role="filter-iin"
+                                data-url="/filter-iin-overpayments"
+                                data-target="tableBody"
                                 id="filterButton"
                                 style="margin-left: 3px" class="tiny-btn">
                             🔍
@@ -98,7 +101,7 @@
                         <input type="hidden" id="activeState" value="{{ 'active' if session['active'] == 'closed' else 'active' }}">
 
                         <a href="#"
-                           data-role="fragment-toggle"
+                           data-role="filter-active-close"
                            data-url="/filter-active"
                            data-target="tableBody"
                        data-icon-active="🟡"

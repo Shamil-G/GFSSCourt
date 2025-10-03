@@ -60,7 +60,7 @@
     },
 
     attachAll(handler = null, zone = document) {
-        const dropdowns = zone.querySelectorAll('[data-role="menu"]');
+        const dropdowns = zone.querySelectorAll(`[data-role="${this.role}"]`);
         dropdowns.forEach(dropdown => this.attach(dropdown, handler));
     }
 };
