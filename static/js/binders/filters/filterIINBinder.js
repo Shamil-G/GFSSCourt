@@ -1,4 +1,4 @@
-﻿import { FragmentBinder } from '../../fragmentBinder.js';
+﻿import { TableLoader } from '/static/js/core/TableLoad.js';
 
 // В первой строке мастер-таблицы есть поля-фильтры
 // изменение которых приводит к мзменению содержания
@@ -12,86 +12,73 @@
 
 export const FilterIinBinder = {
     role: 'filter-iin',
+    massive: true,
 
     attach(el) {
-        if (el.__filter_iin) {
-            //console.warn('⚠️ FragmentTriggerBinder: double bind', el);
-            //console.trace(); // покажет стек вызова
-            return;
-        }
-        //console.log('FragmentTriggerBinder: FIRST bind', el);
-        //console.trace(); // покажет стек вызова
+        if(!el) return;
+        if (el.__filter_iin) return;
         el.__filter_iin = true;
 
-        const url = el.dataset.url;
-        const targetId = el.dataset.target;
+        const tag = el.tagName;
+        //console.log(`${this.role}: tag =`, el.tagName);
 
-        if (!url || !targetId) {
-            console.warn('❌ FragmentTriggerBinder: missing URL or targetId', el);
-            return;
-        }
+        // Привязка keydown к INPUT
+        if (tag === 'INPUT') {
+            const url = el.dataset.url;
+            const targetId = el.dataset.target;
 
-        const keydownTags = ['INPUT'];
-        const clickTags = ['BUTTON', 'A'];
+            if (!url || !targetId) {
+                console.warn('❌ FilterIinBinder: missing url or targetId on INPUT', el);
+                return;
+            }
 
-        const bindKeydown = (node) => {
-            if (!node.__fragmentKeydownBound) {
-                node.__fragmentKeydownBound = true;
-                node.addEventListener('keydown', (event) => {
+            if (!el.__fragmentKeydownBound) {
+                //console.log('filter-iin. binding to keyDown');
+                el.__fragmentKeydownBound = true;
+                el.addEventListener('keydown', (event) => {
+                    //console.log('filter-iin. keyDown event!');
                     if (event.key === 'Enter') {
                         event.preventDefault();
-
-                        const node_value = node.value;
-                        if (node.__lastValue === node_value) {
-                            console.log(`⚠️ FragmentTriggerBinder: повторное значение (${node_value}) — вызов пропущен`);
-                            return;
-                        }
-                        node.__lastValue = node_value;
-                        FragmentBinder.load(url, targetId, { value: node_value });
-                        //console.log("FragmentTriggerBinder. KEYDOWN_VALUE: ", node.value);
+                        const value = el.value.trim();
+                        if (value === el.__lastValue) return;
+                        el.__lastValue = value;
+                        TableLoader.load(url, targetId, { value });
                     }
                 });
             }
-        };
 
-        const bindClick = (node) => {
-            if (!node.__fragmentClickBound) {
-                node.__fragmentClickBound = true;
-                node.addEventListener('click', (event) => {
-                    event.preventDefault();
+            return; // завершить, не привязываем click
+        }
 
-                    const input = el.querySelector('input');
-                    const click_value = input?.value ?? null;
+        // Привязка click к BUTTON или A
+        const isInteractive = ['BUTTON', 'A'].includes(tag);
+        if (isInteractive) {
+            const url = el.dataset.url;
+            const targetId = el.dataset.target;
+            const input = el.closest('td')?.querySelector('input');
 
-                    if (input && input.__lastValue === click_value) {
-                        console.log(`⚠️ FragmentTriggerBinder: повторное значение (${click_value}) — вызов пропущен`);
-                        return;
-                    }
-
-                    if (input) input.__lastValue = click_value;
-                    FragmentBinder.load(url, targetId, { value: click_value });
-                    //console.log("FragmentTriggerBinder. CLICK_VALUE: ", click_value);
-                });
+            if (!url || !targetId || !input) {
+                console.warn('❌ FilterIinBinder: missing url, targetId, or input', el);
+                return;
             }
-        };
 
-        // Привязка к самому el
-        const tag = el.tagName;
-        if (keydownTags.includes(tag)) bindKeydown(el);
-        if (clickTags.includes(tag)) bindClick(el);
-
-        // Привязка ко вложенным элементам
-        const all = el.querySelectorAll('*');
-        all.forEach(child => {
-            const childTag = child.tagName;
-            if (keydownTags.includes(childTag)) bindKeydown(child);
-            if (clickTags.includes(childTag)) bindClick(child);
-        });
-    }
-    ,
+            el.addEventListener('click', (event) => {
+                event.preventDefault();
+                const value = input.value.trim();
+                if (value === input.__lastValue) return;
+                input.__lastValue = value;
+                //console.log('filter-iin. addEventListener to ', input);
+                TableLoader.load(url, targetId, { value });
+            });
+        }
+    },
 
     attachAll(zone = document) {
         const triggers = zone.querySelectorAll(`[data-role="${this.role}"]`);
-        triggers.forEach(el => this.attach(el));
+        triggers.forEach(el => {
+/*            console.log(`FilterIinBinder.attachAll: tag = ${el.tagName}`);*/
+            this.attach(el);
+        });
     }
+
 };

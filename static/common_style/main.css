@@ -111,3 +111,11 @@ footer > footer-c, header > header-c {
 nav > a {
     font-size: 18px;
 }
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}

@@ -1,7 +1,7 @@
-﻿import { BinderRegistry } from './binderRegistry.js'
-import { FragmentBinder } from './fragmentBinder.js'
+﻿//import { BinderRegistry } from '/static/js/core/binderRegistry.js'
+//import { FragmentBinder } from './fragmentBinder.js'
 
-import * as TabUtil from './tabUtil.js';
+import * as TabUtil from '/static/js/aux/tabUtil.js';
 
 //////////////////////////////////////////////////////////////////////////////
 export function fadeInsert(contentZone, htmlString) {
@@ -113,7 +113,7 @@ export const TabRegistry = {
             //return html; // ✅ теперь можно кэшировать
 
         } catch (err) {
-            console.error('FragmentBinder.load error:', err, " : ", Date.now());
+            console.error('TabRegistry.load error:', err, " : ", Date.now());
             return null;
         }
 

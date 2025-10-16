@@ -23,7 +23,7 @@
 <div class="container">
     <!-- Верхняя область: список документов -->
     <div class="documents">
-        <table>
+        <table id="court_mainTable">
             <colgroup><col style="width: 80px;"><col><col><col style="width: 140px;"><col style="width: 140px;"><col><col><col><col><col><col></colgroup>
             <thead>
                 <tr>
@@ -42,17 +42,14 @@
                     <th data-help="last_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
                 </tr>
             </thead>
-            <tbody id="tableBody" data-role="row-click" data-action="filterByOrder">
-                <tr data-persistent>
+            <tbody id="court_filterZone">
+                <tr data-persistent id="court_filterRow">
                     <td>
                         <a style="text-decoration: none; font-size: 24px" href="/add_op">➕</a>
                     </td>
                     <td />
                     <td />
-                    <td data-role="filter-iin"
-                        data-url="/filter-iin-overpayments"
-                        data-target="tableBody"
-                        style="min-width: 170px; padding: 4px 2px; text-align: left">
+                    <td style="min-width: 170px; padding: 4px 2px; text-align: left">
                         <!--<form method="GET" style="padding: 0px; margin: 0px; border:none" action="{{ url_for('filter_iin_list_op') }}">-->
                         <input class="input_s_form"
                                style="width: 130px; font-size: 16px; border: 1px solid #ccc; padding: 7px"
@@ -62,11 +59,15 @@
                                type="text"
                                name="iin_filter"
                                id="iinInput"
-                               placeholder="ИИН">
+                               placeholder="ИИН"
+                               data-role="filter-iin"
+                               data-url="/filter-iin-overpayments"
+                               data-target="court_mainBody"
+                               >
                         <button type="button"
                                 data-role="filter-iin"
                                 data-url="/filter-iin-overpayments"
-                                data-target="tableBody"
+                                data-target="court_mainBody"
                                 id="filterButton"
                                 style="margin-left: 3px" class="tiny-btn">
                             🔍
@@ -76,8 +77,8 @@
                     <td style="padding: 4px 0px; text-align:center">
                         <div data-role="menu"
                              data-track="true"
-                             data-action="filterByPeriod"
                              data-url="/filter-period-overpayments"
+                             data-target="court_mainBody"
                              style="min-width: 200px" class="dropdown">
                             <input type="hidden" name="menuValuePeriod" id="menuValuePeriod">
                             <button style="display: inline-block; border: 1px solid lightgray; min-width: 160px" type="button" class="dropdown-button period-button" id="menuButton">
@@ -99,14 +100,13 @@
                     </td>
                     <td data-help="filter_active" data-role="helper" class="has-helper">
                         <input type="hidden" id="activeState" value="{{ 'active' if session['active'] == 'closed' else 'active' }}">
-
-                        <a href="#"
-                           data-role="filter-active-close"
-                           data-url="/filter-active"
-                           data-target="tableBody"
-                       data-icon-active="🟡"
-                       data-icon-closed="✅"
-                           style="font-size: 24px; text-decoration: none;">
+                        <a  href="#"
+                            data-role="filter-active-close"
+                            data-url="/filter-active"
+                            data-target="court_mainBody"
+                            data-icon-active="🟡"
+                            data-icon-closed="✅"
+                            style="font-size: 24px; text-decoration: none;">
                             <span id="activeIcon">
                                 {{ '✅' if session['active'] == 'closed' else '🟡' }}
                             </span>
@@ -118,6 +118,8 @@
                     <td />
                     <td />
                 </tr>
+            </tbody>
+            <tbody id="court_mainBody"  data-role="edit-row row-click" data-action="filterByOrder">
             </tbody>
         </table>
     </div>
@@ -138,39 +140,47 @@
         <input type="hidden" name="order_num" form="refundingOrderNum">-->
 
 
-        <div class="tab-buttons">
-            <button class="tab active" onclick="API.showTab('pretrial')">{{ res_value('TAB_PRETRIAL') }}</button>
-            <button class="tab" onclick="API.showTab('scammer')">{{ res_value('TAB_SCAMMERS') }}</button>
-            <button class="tab" onclick="API.showTab('law')">{{ res_value('TAB_LAW') }}</button>
-            <button class="tab" onclick="API.showTab('court_crime')">{{ res_value('TAB_COURT_CRIME') }}</button>
-            <button class="tab" onclick="API.showTab('court_civ')">{{ res_value('TAB_COURT_CIV') }}</button>
-            <button class="tab" onclick="API.showTab('appeal')">{{ res_value('TAB_APPEAL') }}</button>
-            <button class="tab" onclick="API.showTab('execution')">{{ res_value('TAB_EXECUTION') }}</button>
-            <button class="tab" onclick="API.showTab('refunding')">{{ res_value('TAB_REFUNDING') }}</button>
+        <div id="court_tabs" class="tab-buttons" data-role="tab-switch" >
+            <button class="tab active" data-tab="pretrial">{{ res_value('TAB_PRETRIAL') }}</button>
+            <button class="tab" data-tab="scammer">{{ res_value('TAB_SCAMMERS') }}</button>
+            <button class="tab" data-tab="law">{{ res_value('TAB_LAW') }}</button>
+            <button class="tab" data-tab="crime">{{ res_value('TAB_COURT_CRIME') }}</button>
+            <button class="tab" data-tab="civ">{{ res_value('TAB_COURT_CIV') }}</button>
+            <button class="tab" data-tab="appeal">{{ res_value('TAB_APPEAL') }}</button>
+            <button class="tab" data-tab="execution">{{ res_value('TAB_EXECUTION') }}</button>
+            <button class="tab" data-tab="refunding">{{ res_value('TAB_REFUNDING') }}</button>
         </div>
-        <div class="tab-content active">
+        <div id="court_tabs_content" class="tab-content active">
 
-            <div id="pretrial" class="tab-panel">
-                <button data-form="pretrialForm" data-type="pretrial" class="add-btn"
+            <div data-tab="pretrial" class="tab-panel">
+                <button data-form="pretrialForm" 
+                        id="pretrialVisibleButton"
+                        data-tab="pretrial" 
+                        data-role="toggle-visible-form"
+                        data-type="pretrial" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}"
                         data-persistent>
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
-                <button class="refresh-btn" data-tab="pretrial" id="pretrialRefreshButton" data-persistent>🔄 Обновить</button>
+                <button id="pretrialRefreshButton" class="refresh-btn" data-tab="pretrial" data-role="refresh-content" data-persistent>🔄 Обновить</button>
 
                 <div data-persistent id="pretrialFormContainer"></div>
                 <div data-persistent id="pretrialContent" data-track="true" data-url="/pretrial_fragment"><!-- Here will be fragment _pretrial_items --></div>
                 <!--<div id="pretrialTimestamp" class="tab-timestamp"></div>-->
             </div>
 
-            <div id="scammer" class="tab-panel">
-                <button data-form="scammerForm" data-type="scammer" class="add-btn"
+            <div data-tab="scammer" class="tab-panel">
+                <button data-form="scammerForm" 
+                        id="scammerVisibleButton"
+                        data-role="toggle-visible-form"
+                        data-tab="scammer" 
+                        class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
-                <button class="refresh-btn" data-tab="scammer" id="scammerRefreshButton">🔄 Обновить</button>
+                <button class="refresh-btn" data-role="refresh-content" data-tab="scammer" id="scammerRefreshButton">🔄 Обновить</button>
                 <!--<button id="scammerRefreshButton" onclick="API.refreshTab('scammer')">🔄 Обновить</button>-->
 
                 <div data-persistent id="scammerFormContainer"></div>
@@ -178,13 +188,18 @@
                 <!--<div id="scammerTimestamp" class="tab-timestamp"></div>-->
             </div>
 
-            <div id="law" class="tab-panel">
-                <button data-persistent data-form="lawForm" data-type="law" class="add-btn"
+            <div data-tab="law" class="tab-panel">
+                <button data-persistent 
+                        data-form="lawForm" 
+                        id="lawVisibleButton"
+                        data-role="toggle-visible-form"
+                        data-tab="law" 
+                        class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
-                <button data-persistent class="refresh-btn" data-tab="law" id="lawRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-role="refresh-content" data-tab="law" id="lawRefreshButton">🔄 Обновить</button>
                 <!--<button id="lawRefreshButton" onclick="API.refreshTab('law')">🔄 Обновить</button>-->
 
                 <div data-persistent id="lawFormContainer"><!-- Here will be FORM _law_items --></div>
@@ -192,64 +207,82 @@
                 <!--<div id="lawTimestamp" class="tab-timestamp"></div>-->
             </div>
 
-            <div id="court_crime" class="tab-panel">
-                <button data-persistent data-form="court_crimeForm" data-type="court_crime" class="add-btn"
+            <div data-tab="crime" class="tab-panel">
+                <button data-persistent 
+                        data-form="crimeForm" 
+                        id="crimeVisibleButton"
+                        data-role="toggle-visible-form"
+                        data-tab="crime" 
+                        class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
                 <!--                <button id="courtRefreshButton" onclick="API.refreshTab('court_crime')">🔄 Обновить</button>-->
-                <button data-persistent class="refresh-btn" data-tab="court_crime" id="court_crimeRefreshButton">🔄 Обновить</button>
+                <button data-persistent id="crimeRefreshButton" data-tab="crime" class="refresh-btn" data-role="refresh-content">🔄 Обновить</button>
 
-                <div data-persistent id="court_crimeFormContainer"><!-- Here will be FORM _court_items --></div>
-                <div data-persistent id="court_crimeContent"><!-- Here will be fragment _court_items --></div>
+                <div data-persistent id="crimeFormContainer"><!-- Here will be FORM _court_items --></div>
+                <div data-persistent id="crimeContent"><!-- Here will be fragment _court_items --></div>
                 <!--<div id="court_crimeTimestamp" class="tab-timestamp"></div>-->
             </div>
 
-            <div id="court_civ" class="tab-panel">
-                <button data-persistent data-form="court_civForm" data-type="court_civ" class="add-btn"
+            <div data-tab="civ" class="tab-panel">
+                <button data-persistent 
+                        data-form="civForm" 
+                        id="civVisibleButton"
+                        data-role="toggle-visible-form"
+                        data-tab="civ" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
                 <!--                <button id="court_civRefreshButton" onclick="API.refreshTab('court_civ')">🔄 Обновить</button>-->
-                <button data-persistent class="refresh-btn" data-tab="court_civ" id="court_civRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" id="civRefreshButton" data-tab="civ" data-role="refresh-content">🔄 Обновить</button>
 
 
-                <div data-persistent id="court_civFormContainer"><!-- Here will be FORM _court_items --></div>
-                <div data-persistent id="court_civContent"><!-- Here will be fragment _court_items --></div>
+                <div data-persistent id="civFormContainer"><!-- Here will be FORM _court_items --></div>
+                <div data-persistent id="civContent"><!-- Here will be fragment _court_items --></div>
                 <!--<div id="court_civTimestamp" class="tab-timestamp"></div>-->
             </div>
 
-            <div id="appeal" class="tab-panel">
-                <button data-persistent data-form="appealForm" data-type="appeal" class="add-btn"
+            <div data-tab="appeal" class="tab-panel">
+                <button data-persistent 
+                        data-form="appealForm" 
+                        id="appealVisibleButton"
+                        data-role="toggle-visible-form"
+                        data-tab="appeal" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
                 <!--<button id="appealRefreshButton" onclick="API.refreshTab('appeal')">🔄 Обновить</button>-->
-                <button data-persistent class="refresh-btn" data-tab="appeal" id="appealRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-tab="appeal" data-role="refresh-content" id="appealRefreshButton">🔄 Обновить</button>
 
                 <div data-persistent id="appealFormContainer"><!-- Here will be FORM _appeal_items --></div>
                 <div data-persistent id="appealContent" data-track="true" data-url="/appeal_fragment"><!-- Here will be fragment _appeal_items --></div>
                 <!--<div id="appealTimestamp" class="tab-timestamp"></div>-->
             </div>
 
-            <div id="execution" class="tab-panel">
-                <button data-persistent data-form="executionForm" data-type="execution" class="add-btn" 
+            <div data-tab="execution" class="tab-panel">
+                <button data-persistent 
+                        data-form="executionForm" 
+                        id="executionVisibleButton"
+                        data-role="toggle-visible-form"
+                        data-tab="execution" 
+                        class="add-btn" 
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"  
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">➕ {{ res_value('BUTTON_ADD') }}</button>
 <!--                <button id="executionRefreshButton" onclick="API.refreshTab('execution')">🔄 Обновить</button>-->
-                <button data-persistent class="refresh-btn" data-tab="execution" id="executionRefreshButton">🔄 Обновить</button>
+                <button data-persistent class="refresh-btn" data-tab="execution" data-role="refresh-content" id="executionRefreshButton">🔄 Обновить</button>
 
                 <div data-persistent id="executionFormContainer"><!-- Here will be FORM _execution_items --></div>
                 <div data-persistent id="executionContent"><!-- Here will be fragment _execution_items --></div>
                 <!--<div id="executionTimestamp" class="tab-timestamp"></div>-->
             </div>
 
-            <div id="refunding" class="tab-panel">
+            <div data-tab="refunding" class="tab-panel">
                 <!--<button data-form="refundingForm" data-type="refunding" class="add-btn">➕ {{ res_value('BUTTON_ADD') }}</button>-->
-                <button data-persistent class="refresh-btn" data-tab="refunding" id="refundingRefreshButton">🔄 Обновить</button>
+                <button data-persistent id="refundingRefreshButton" class="refresh-btn" data-tab="refunding" data-role="refresh-content">🔄 Обновить</button>
 
                 <!--<div id="refundingFormContainer">--><!-- Here will be FORM _execution_items --><!--</div>-->
                 <div data-persistent id="refundingContent" data-track="true" data-url="/refunding_fragment"><!-- Here will be fragment _execution_items --></div>
@@ -260,5 +293,6 @@
         </div>
     </div>
 </div>
-<script type="module" src="static/js/list_op.js"></script>
+<!--<script type="module" src="static/js/list_op.js"></script>-->
+<script type="module" id="pageScript" data-page="court" src="static/js/test.js"></script>
 {% endblock %}

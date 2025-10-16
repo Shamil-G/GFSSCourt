@@ -75,6 +75,7 @@ def get_pretrial_items(order_num):
         from pt_agreements pt
         where pt.op_id=:op_id
     """
+    log.info(f'+++++++ get_pretrial_items. order_num: {order_num}')
     if not order_num:
         log.info(f'------ GET PRETRIAL ITEMS\n\tORDER_NUM is EMPTY')
         return []

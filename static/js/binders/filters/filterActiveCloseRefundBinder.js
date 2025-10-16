@@ -1,4 +1,4 @@
-﻿import { FragmentBinder } from '../../fragmentBinder.js';
+﻿import { TableLoader } from '/static/js/core/TableLoad.js';
 
 // В первой строке мастер-таблицы есть поля-фильтры
 // изменение которых приводит к мзменению содержания
@@ -6,28 +6,33 @@
 // Здесь мы привязываемся ко всем INPUT-BUTTON элементам
 // вложенным в помеченные зоны и в обработчике событий
 // вызываем загрузку фрагментов:
-// FragmentBinder.load(url, targetId, { value: node_value });
-
+//
+// TableLoader.load(url, targetId, { value: node_value });
+//
 // Закрытые долги и не закрытые долги
 
 export const FilterActiveCloseRefundBinder = {
     role: 'filter-active-close',
+    massive: true,
 
     attach(el) {
-        if (el.__filter_active_close) {
-            //console.warn('⚠️ FragmentToggleBinder: double bind', el);
-            //console.trace(); // покажет стек вызова
-            return;
-        }
+        if (!el) return; // Передана пустая зона ?!
+        if (el.__filter_active_close) return;
+        el.__filter_active_close = true;
+
         //console.log('FragmentToggleBinder: double bind', el);
         //console.trace(); // покажет стек вызова
-        el.__filter_active_close = true;
+
+        const tag = el.tagName;
+        console.log(`${this.role}: tag =`, el.tagName);
 
         const url = el.dataset.url;
         const targetId = el.dataset.target;
 
         if (!url || !targetId) {
-            console.warn('❌ FragmentToggleBinder: missing URL or targetId', el);
+            console.warn('❌ filter-active-close: missing URL or targetId. URL: ', url);
+            console.warn('❌ filter-active-close: missing URL or targetId. targetId: ', targetId);
+            console.warn('❌ filter-active-close: missing URL or targetId. el: ', el);
             return;
         }
 
@@ -38,7 +43,7 @@ export const FilterActiveCloseRefundBinder = {
         const iconClosed = el.dataset.iconClosed || '✅';
 
         if (!input || !icon) {
-            console.warn('❌ FragmentToggleBinder: missing input or icon', el);
+            console.warn('❌ filter-active-close: missing input or icon', el);
             return;
         }
 
@@ -54,8 +59,8 @@ export const FilterActiveCloseRefundBinder = {
             input.value = next;
             icon.textContent = next === 'active' ? iconActive : iconClosed;
 
-            FragmentBinder.load(url, targetId, { value: next });
-            console.log("TOGGLE →", next);
+            TableLoader.load(url, targetId, { value: next });
+            console.log("ADDED CLICK LISTENER. TOGGLE →", next);
         });
     },
 

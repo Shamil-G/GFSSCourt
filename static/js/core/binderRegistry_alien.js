@@ -1,6 +1,6 @@
 ﻿export const BinderRegistry = {
     binders: {},
-    register(role, binder) {
+    register(role, binder, options = {}) {
         if (!role || typeof role !== 'string') {
             console.warn('❗️ Miss role on registering:', role);
             return;
@@ -9,7 +9,10 @@
             console.warn('❗️ Miss BINDER for role:', role);
             return;
         }
-        this.binders[role] = binder
+        this.binders[role] = {
+            ...binder,
+            massive: options.massive === true
+        }
 /*        console.log(`✅ Binder registered for role: ${role}`);*/
     },
     // documetn - this is default value
@@ -29,13 +32,18 @@
             }
         });
     },
+    getBindersForZone(zoneKey) {
+        return Object.entries(this.binders)
+            .filter(([_, binder]) => binder.zone === zoneKey)
+            .map(([_, binder]) => binder);
+    },
 
     get(role) {
-        return binders[role];
+        return this.binders[role];
     },
 
     listRoles() {
-        return Object.keys(binders);
+        return Object.keys(this.binders);
     }
 };
 

@@ -1,14 +1,11 @@
-﻿export const MenuBinder = {
+﻿import { TableLoader } from '/static/js/core/TableLoad.js';
+
+export const MenuBinder = {
     role: 'menu',
+    massive: true,
 
     attach(dropdown, handler = null) {
-        if (dropdown.__menuBound) {
-            //console.warn('⚠️ MenuBinder: double bind', dropdown);
-            //console.trace(); // покажет стек вызова
-            return;
-        }
-        //console.log('MenuBinder: FIRST CALL', dropdown);
-        //console.trace(); // покажет стек вызова
+        if (dropdown.__menuBound) return;
         dropdown.__menuBound = true;
 
         const button = dropdown.querySelector('.dropdown-button');
@@ -18,6 +15,8 @@
         if (!button || !hiddenInput || items.length === 0) return;
 
         const labelSpan = button.querySelector('.label');
+        const url = dropdown.dataset.url;
+        const targetId = dropdown.dataset.target;
         const actionName = dropdown.dataset.action;
 
         items.forEach(item => {
@@ -44,23 +43,43 @@
                 }
                 dropdown.__lastValue = value;
 
-                // 🔹 Приоритет: handler → data-action
-                if (typeof handler === 'function') {
-                    handler(value, label, dropdown);
-                } else if (actionName) {
+                console.log(`MenuBinder. Dropdown: ${value}`);
+
+                if (actionName) {
+                    console.log("MenuBinder. actionName: ", actionName);
                     const fn = window[actionName] || API?.[actionName];
+                    //console.log("MenuBinder. FN: ", fn);
                     if (typeof fn === 'function') {
                         fn(value, label, dropdown);
+                        //console.log('MenuBinder. run function: ', value, label, dropdown);
+                        //return;
                     } else {
                         console.warn(`❌ MenuBinder: handler '${actionName}' not found`);
                     }
                 }
+
+                // Не всегда при изменении пункта меню надо что то обновлять
+                if (targetId && url) {
+                    console.log('MenuBinder. CALL FragmentBinder. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
+                    TableLoader.load(url, targetId, { value });
+                }
+                else
+                    console.log('MenuBinder. SKIP FragmentBinder. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
             });
         });
     },
 
     attachAll(handler = null, zone = document) {
         const dropdowns = zone.querySelectorAll(`[data-role="${this.role}"]`);
-        dropdowns.forEach(dropdown => this.attach(dropdown, handler));
+        dropdowns.forEach(dropdown => {
+            const tag = dropdown.tagName;
+            //console.log('MenuBinder: TAG_NAME:', tag);
+            const allowedTags = ['DIV', 'SECTION'];
+            if (!allowedTags.includes(tag)) {
+                console.warn(`⚠️ MenuBinder: skipping non-DIV element <${tag}>`, dropdown);
+                return;
+            }
+            this.attach(dropdown);
+        });
     }
 };

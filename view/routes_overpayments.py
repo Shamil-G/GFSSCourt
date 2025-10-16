@@ -154,29 +154,29 @@ def view_add_op():
 @app.route('/form_fragment')
 def pretrial_form_fragment():
     form_type = request.args.get('form')
-    order_num = request.args.get('order_num')
+    # order_num = request.args.get('order_num')
 
-    log.info(f'PRETRIAL_FORM_FRAGMENT\n\tFORM_TYPE: {form_type}\n\tORDER_NUM: {order_num}')
+    log.info(f'PRETRIAL_FORM_FRAGMENT\n\tFORM_TYPE: {form_type}')
 
     match form_type:
         case 'pretrial':
-            return render_template('partial_forms/_pretrial_form.html', order_num=order_num)
+            return render_template('partial_forms/_pretrial_form.html')
         case 'scammer':
-            return render_template('partial_forms/_scammer_form.html', order_num=order_num)
+            return render_template('partial_forms/_scammer_form.html')
         case 'law':
-            return render_template('partial_forms/_law_form.html', order_num=order_num)
-        case 'court_crime':
-            return render_template('partial_forms/_court_crime_form.html', order_num=order_num)
-        case 'court_civ':
-            return render_template('partial_forms/_court_civ_form.html', order_num=order_num)
+            return render_template('partial_forms/_law_form.html')
+        case 'crime':
+            return render_template('partial_forms/_court_crime_form.html')
+        case 'civ':
+            return render_template('partial_forms/_court_civ_form.html')
         case 'appeal':
-            return render_template('partial_forms/_appeal_form.html', order_num=order_num)
+            return render_template('partial_forms/_appeal_form.html')
         case 'execution':
-            return render_template('partial_forms/_execution_form.html', order_num=order_num)
+            return render_template('partial_forms/_execution_form.html')
         case 'refunding':
-            return render_template('partial_forms/_refunding_form.html', order_num=order_num)
+            return render_template('partial_forms/_refunding_form.html')
         case _:
-            return render_template('partial_forms/_pretrial_form.html', order_num=order_num)
+            return render_template('partial_forms/_pretrial_form.html')
 
 
 @app.route('/pretrial_fragment', methods=['GET','POST'])
@@ -197,15 +197,16 @@ def view_pretrial_fragment():
 @login_required
 def view_pretrial_add():
     if request.method=='POST':
-        order_num = request.form.get('order_num','')
-        date_pretrial = request.form('agreement_date','')
+        log.info(f"ADD_PRETRIAL. request.form: {request.form}")
+        date_pretrial = request.form.get('agreement_date','')
         until_day = request.form.get('until_day', '')
         maturity_date = request.form.get('execution_date', '')
+        order_num = request.form.get('order_num','')
     else:
-        order_num = request.args.get('order_num','')
         date_pretrial = request.args.get('agreement_date','')
         until_day = request.args.get('until_day', '')
         maturity_date = request.args.get('execution_date', '')
+        order_num = request.args.get('order_num','')
 
     log.debug(f'-------------->>>\n\tADD PRETRIAL. ORDER_NUM: {order_num}\n\tUNTIL_DAY: {until_day}\n\tMATURITY_date: {maturity_date}\n\tUSER: {g.user.full_name}')
     if date_pretrial=='' or (until_day=='' and maturity_date==''):

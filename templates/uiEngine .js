@@ -105,10 +105,10 @@ export function initFragment(zone, tabId) {
               initLawLogic(zone);
           });
       break;
-    case 'court_crime':
+    case 'courtCrime':
       initCourtCrimeLogic(zone);
       break;
-    case 'court_civ':
+    case 'courtCiv':
       initCourtCivLogic(zone);
       break;
     case 'appeal':

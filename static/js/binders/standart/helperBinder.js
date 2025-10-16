@@ -1,35 +1,36 @@
-﻿import { showHelperPopover } from '../../popoverEngine.js';
+﻿import { showHelperPopover } from '/static/js/aux/popoverEngine.js';
 
 export const HelperBinder = {
     role: 'helper',
 
-    attachAll(zone = document) {
-        if (zone.__helperBinder) {
-            //console.warn('⚠️ HelperBinder: double bind', zone);
-            //console.trace(); // покажет стек вызова
-            return;
-        }
-        zone.__helperBinder = true;
+    attach(cell) {
+        if (!cell || cell.__helperBinder) return;
+        cell.__helperBinder = true;
 
-        zone.querySelectorAll('[data-role="helper"][data-help]').forEach(cell => {
-            if (cell.querySelector('.help-icon')) return;
+        if (cell.querySelector('.help-icon')) return;
 
-            const icon = document.createElement('span');
-            icon.className = 'help-icon';
-            icon.textContent = 'ℹ️';
-            icon.title = 'Нажмите для справки';
+        const icon = document.createElement('span');
+        icon.className = 'help-icon';
+        icon.textContent = 'ℹ️';
+        icon.title = 'Нажмите для справки';
 
-            icon.addEventListener('click', () => {
-                const topic = cell.dataset.help;
-                fetch(`/help_fragment?topic=${topic}`)
-                    .then(res => res.text())
-                    .then(html => {
-                        const cleaned = html.trim();
-                        showHelperPopover(icon, cleaned || '<em>Нет информации по этой подсказке</em>');
-                    });
-            });
-
-            cell.appendChild(icon);
+        icon.addEventListener('click', () => {
+            const topic = cell.dataset.help;
+            fetch(`/help_fragment?topic=${topic}`)
+                .then(res => res.text())
+                .then(html => {
+                    const cleaned = html.trim();
+                    showHelperPopover(icon, cleaned || '<em>Нет информации по этой подсказке</em>');
+                });
         });
+
+        cell.appendChild(icon);
+    },
+
+    attachAll(zone = document) {
+        const cells = zone.querySelectorAll('[data-role="helper"][data-help]');
+        //console.log(`[HelperBinder] attachAll: zone =`, zone, `\n\tcells =`, cells);
+
+        cells.forEach(cell => this.attach(cell));
     }
 };

@@ -22,7 +22,7 @@
 </div>
     <form class="form_login" method="POST">
         <table>
-            <tbody>
+            <tbody id="court_mainHelper">
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none; width: 240px">* {{res_value('IIN')}}</td>
                     <td style="text-align: left; border:none;"><input style="margin: 4px 0px; width: 144px; border-color: lightgray" class="input_s" name="iin" pattern="[0-9]{12}" type="text" maxlength="12" autocomplete="off" required></td>
@@ -35,7 +35,7 @@
                     <td style="text-align: left; border:none;">{{res_value('RFPM_ID')}}</td>
                     <td style="text-align: left; border: none;">
 
-                        <div class="dropdown" data-role="menu">
+                        <div id="court_MenuZone" class="dropdown" data-role="menu">
                             <input type="hidden" name="rfpm_id" id="menuValue">
                             <button style="min-width: 194px; border: 1px solid lightgray; padding: 4px 0px" type="button" class="dropdown-button  period-button" id="menuButton">
                                 <i class="fas fa-bars"></i>
@@ -87,5 +87,5 @@
         <button style="margin-top: 16px" type="submit">{{ res_value('BUTTON_SAVE') }}</button>
     </form>
     <a>{{ mess }}</a>
-    <script type="module" src="/static/js/list_op.js"></script>
+    <script type="module" id="pageScript" data-page="new_court" src="static/js/test.js"></script>
 {% endblock %}

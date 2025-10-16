@@ -1,4 +1,4 @@
-﻿import { showTooltipPopover } from '../../popoverEngine.js';
+﻿import { showTooltipPopover } from '/static/js/aux//popoverEngine.js';
 
 export const TooltipBinder = {
   role: 'tooltip',

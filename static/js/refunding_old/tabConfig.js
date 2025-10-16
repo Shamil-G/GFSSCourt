@@ -11,11 +11,11 @@ export const TabConfig = {
     url: orderNum => `/law_fragment?order_num=${orderNum}`,
     zoneSelector: '#lawContent'
   },
-  court_crime: {
+  courtCrime: {
     url: orderNum => `/court_crime_fragment?order_num=${orderNum}`,
     zoneSelector: '#court_crimeContent'
   },
-  court_civ: {
+  courtCiv: {
     url: orderNum => `/court_civ_fragment?order_num=${orderNum}`,
     zoneSelector: '#court_civContent'
   },

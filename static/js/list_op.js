@@ -1,12 +1,12 @@
 ﻿//import { submitFormViaFetch } from './uiEngine.js';
 //import { TabConfig } from './tabConfig.js';
 
-import  * as TabUtil from './tabUtil.js';
+//import  * as TabUtil from './tabUtil.js';
 
-import { TabRegistry, defaultTabInit } from './tabRegistry.js';
-import { FragmentBinder } from './fragmentBinder.js';
-import { BinderRegistry } from './binderRegistry.js';
-import { bootstrapBinders } from './bootstrapBinders.js';
+//import { TabRegistry, defaultTabInit } from './tabRegistry.js';
+//import { FragmentBinder } from './fragmentBinder.js';
+//import { BinderRegistry } from './binderRegistry.js';
+//import { bootstrapBinders } from './bootstrapBinders.js';
 
 
 let activeTab = null;
@@ -34,20 +34,6 @@ function loadTabContent(tabName, orderNum) {
     });
 }
 ///////////////////////////////////////////////////////////////
-// Обновляем таблицу в ТАБ (фрагменте) 
-// нажатием кнопки "Обновить" в ТАБ-ах
-function refreshTabDirect(tabName) {
-    const orderNum = TabUtil.getOrderNum();
-    if (!orderNum) return;
-
-    const contentZone = TabUtil.getTargetZone(tabName);
-    const cacheKey = TabUtil.getCacheKey(tabName, orderNum);
-
-    delete TabUtil.tabCache[cacheKey];
-
-    loadTabContent(tabName, orderNum);
-}
-///////////////////////////////////////////////////////////////
 // Главная таблица переплат в LIST_OVERPAYMENTS.HTML
 // Когда щелкаем мышкой по записям TR надо менять фильтр orderNum для TABS
 function filterByOrder(orderNum) {
@@ -68,6 +54,20 @@ function filterByOrder(orderNum) {
     if (!TabUtil.loadFromCache(tabName, orderNum)) {
         loadTabContent(tabName, orderNum);
     }
+}
+///////////////////////////////////////////////////////////////
+// Обновляем таблицу в ТАБ (фрагменте) 
+// нажатием кнопки "Обновить" в ТАБ-ах
+function refreshTabDirect(tabName) {
+    const orderNum = TabUtil.getOrderNum();
+    if (!orderNum) return;
+
+    const contentZone = TabUtil.getTargetZone(tabName);
+    const cacheKey = TabUtil.getCacheKey(tabName, orderNum);
+
+    delete TabUtil.tabCache[cacheKey];
+
+    loadTabContent(tabName, orderNum);
 }
 /////////////////////////////////////////////////////////////////////////////////
 // Переходим с одного tab на другой и должны показываться соответствующие панели
@@ -153,7 +153,7 @@ function toggleForm(formName,formType) {
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
-function filterByPeriod(period_value, label, dropdown) {
+export function filterByPeriod(period_value, label, dropdown) {
     // Фильтрация по вашему атрибуту
     if (dropdown.getAttribute('data-track') === 'true') {
         const url = dropdown.getAttribute('data-url')
@@ -190,8 +190,10 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
     // 🧩 Общая инициализация UI
-    bootstrapBinders();
-    BinderRegistry.init(document);
+    //    bootstrapBinders();
+    //    BinderRegistry.init(document);
+//    import { bootstrapBinders } from './bootstrapBinders.js';
+//    bootstrapBinders();
 });
 
 
