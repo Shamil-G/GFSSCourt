@@ -5,7 +5,7 @@
 //  loadCustomZone	Ручная загрузка конкретной зоны по URL	    передаётся напрямую	    attachZoneBinders(tabName, zoneKey)
 //  loadZone	    Загрузка зоны по конфигу request	        из getRequest(...)	    attachBinders(tabName)(можно фильтровать)
 //  load	        Загрузка основной зоны fragment	            из getRequest(...)	    attachBinders(tabName)
-import { getCacheKey, loadFromCache, addToCache } from '/static/js/_aux/tabUtil.js';
+import { getCacheKey, loadFromCache, addToCache, fadeInsert } from '/static/js/_aux/tabUtil.js';
 
 export class TabLoader {
     constructor(tabContext) {
@@ -73,7 +73,8 @@ export class TabLoader {
             }
             const html = await response.text();
 
-            zone.innerHTML = html;
+            fadeInsert(zone, html);
+            //zone.innerHTML = html;
 
             const cacheKey = getCacheKey(tabName, orderNum, zoneKey);
             addToCache(cacheKey, html);

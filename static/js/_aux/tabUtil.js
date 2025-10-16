@@ -5,7 +5,7 @@ const tabCacheOrder = [];
 
 // Предлагаем обновить данные, если прошло 20 минут
 // 20 минут = 20 * кол-во секунд * кол-во миллисекунд
-const REFRESH_RECOMMENDED_THRESHOLD = 20 * 60 * 1000; 
+const REFRESH_RECOMMENDED_THRESHOLD = 30 * 60 * 1000; 
 // Удаляем из кэша принудительно, если прошло 2 часа
 const CACHE_LIFETIME = 2 * 60 * 60 * 1000; // 2 часа в мс
 // В кэше храним 512 документов
@@ -78,29 +78,25 @@ export function addToCache(key, html) {
     tabCacheOrder.push(key);
 }
 //////////////////////////////////////////////////////////////////////////////
-export function updateRefreshButton(id) {
+export function updateRefreshButton(tabName, cached_timestamp) {
+    const age = Date.now() - cached_timestamp;
 
-    const orderNum = getOrderNum();
-    if (!orderNum) return;
+    const refreshTarget = document.getElementById(`${tabName}RefreshButton`);
 
-    const cacheKey = `${id}_${orderNum}`;
-    const cached = tabCache[cacheKey];
-    if (!cached) return;
-
-    const age = Date.now() - cached.timestamp;
-
-    const refreshTarget = document.getElementById(`${id}RefreshButton`);
+    //console.log("updateRefreshButton. refreshTarget: ", refreshTarget);
 
     if (!refreshTarget) return;
+
+    //console.log("updateRefreshButton. age: ", age, " : ", REFRESH_RECOMMENDED_THRESHOLD);
 
     if (age > REFRESH_RECOMMENDED_THRESHOLD) {
         refreshTarget.textContent = '🔁 Рекомендуем обновить';
         refreshTarget.classList.add('recommend');
-        refreshTarget.title = `Загружено ${formatAge(cached.timestamp)} назад`;
+        refreshTarget.title = `Загружено ${formatAge(cached_timestamp)} назад`;
     } else {
         refreshTarget.textContent = '🔄 Обновить';
         refreshTarget.classList.remove('recommend');
-        refreshTarget.title = `Обновлено ${formatAge(cached.timestamp)} назад`;
+        refreshTarget.title = `Обновлено ${formatAge(cached_timestamp)} назад`;
     }
 }
 export function showLoadedAge(targetZone, tabName) {
@@ -130,7 +126,7 @@ export function loadFromCache(tabName, orderNum, zoneKey = 'content') {
         }
         targetZone.innerHTML = cached.html;
 
-        updateRefreshButton(tabName);
+        updateRefreshButton(tabName, cached.timestamp);
         showLoadedAge(targetZone, tabName);
 
         console.log("LOADED from CACHE ", cacheKey);
@@ -182,4 +178,26 @@ export function serializeParams(params) {
         : new URLSearchParams(params).toString();
 
     return { headers, body };
+}
+//////////////////////////////////////////////////////////////////////////////
+export function fadeInsert(contentZone, htmlString) {
+    return new Promise(resolve => {
+        contentZone.classList.add('fade-out');
+
+        setTimeout(() => {
+            const temp = document.createElement('div');
+            temp.innerHTML = htmlString;
+
+            const fragment = document.createDocumentFragment();
+            while (temp.firstChild) {
+                fragment.appendChild(temp.firstChild);
+            }
+
+            contentZone.innerHTML = '';
+            contentZone.appendChild(fragment);
+            contentZone.classList.remove('fade-out');
+
+            resolve();
+        }, 300);
+    });
 }

@@ -3,30 +3,6 @@
 
 import * as TabUtil from '/static/js/_aux/tabUtil.js';
 
-//////////////////////////////////////////////////////////////////////////////
-export function fadeInsert(contentZone, htmlString) {
-    return new Promise(resolve => {
-        contentZone.classList.add('fade-out');
-
-        setTimeout(() => {
-            const temp = document.createElement('div');
-            temp.innerHTML = htmlString;
-
-            const fragment = document.createDocumentFragment();
-            while (temp.firstChild) {
-                fragment.appendChild(temp.firstChild);
-            }
-
-            contentZone.innerHTML = '';
-            contentZone.appendChild(fragment);
-            contentZone.classList.remove('fade-out');
-
-            resolve();
-        }, 300);
-    });
-}
-
-
 export function defaultTabInit(tabId, container) {
     // Анимация
     container.classList.add('fade-out');
@@ -105,7 +81,7 @@ export const TabRegistry = {
                 TabUtil.addToCache(cacheKey, html);
                 cached = TabUtil.tabCache[cacheKey];
 
-                await fadeInsert(targetZone, html);
+                tabUtil.fadeInsert(targetZone, html);
                 setTimestamp(targetZone, tabId);
 
                 //console.log("TabRegistry. Finish LOAD.  target: ", tabId, ", URL: ", entry.url, ", headers: ", headers, ", body: ", body);

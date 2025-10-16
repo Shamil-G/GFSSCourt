@@ -253,17 +253,4 @@ export class PageContext {
         // 🔹 Активация контекста
         //TabContext.activate(tabName, targetPanel);
     }
-
-//    loadTabContent(tabName, zone, orderNum) {
-//        // реализация загрузки контента
-//        //console.log("Грузим ТАБ:\t", tabName, "\n\t\t\tв\t", zone, "\n\t\t\torderNum:\t", orderNum);
-
-//        //const tbContext = new TabContext(); // или TabContext.getInstance()
-
-//        console.log("this.tabContext: ", orderNum);
-
-//        const loader = new TabLoader(this.tabContext);
-//        loader.loadZone(tabName, 'content', TabUtil.getOrderNum());
-
-//    }
 }
