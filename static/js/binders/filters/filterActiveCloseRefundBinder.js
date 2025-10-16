@@ -24,7 +24,7 @@ export const FilterActiveCloseRefundBinder = {
         //console.trace(); // покажет стек вызова
 
         const tag = el.tagName;
-        console.log(`${this.role}: tag =`, el.tagName);
+        //console.log(`${this.role}: tag =`, el.tagName);
 
         const url = el.dataset.url;
         const targetId = el.dataset.target;

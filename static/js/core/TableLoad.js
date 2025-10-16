@@ -1,5 +1,5 @@
 ﻿//import { BinderRegistry } from './binderRegistry.js';
-import * as TabUtil from '/static/js/aux/tabUtil.js';
+import * as TabUtil from '/static/js/_aux/tabUtil.js';
 
 // Фрагменты скачиваютя через TabLoader !!!
 // Здесь только мастер - таблица:
@@ -25,7 +25,7 @@ export const TableLoader = {
 
             target.innerHTML = html;
 
-            console.log("TableLoad. LOAD.  target: ", targetId, ", URL: ", url, ", params: ", params);
+            //console.log("TableLoad. LOAD.  target: ", targetId, ", URL: ", url, ", params: ", params);
 
             return html; // ✅ теперь можно кэшировать
         } catch (err) {

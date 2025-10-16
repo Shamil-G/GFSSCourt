@@ -1,7 +1,7 @@
 ﻿import { TabContext } from './TabContext.js';
 import { TabLoader } from './TabLoader.js';
 //import { TabTreeRegistry } from '../tabTreeRegistry.js';
-import * as TabUtil from '/static/js/aux/tabUtil.js';
+import * as TabUtil from '/static/js/_aux/tabUtil.js';
 
 //Метод	Назначение
 //initialize()	Загружает tabTree, инициализирует TabContext, создаёт TabLoader
@@ -241,7 +241,7 @@ export class PageContext {
         //console.log("targetPanel: ", targetPanel);
         if (!TabUtil.loadFromCache(tabName, orderNum)) {
 
-            console.log("this.tabContext: ", orderNum);
+            //console.log("this.tabContext: ", orderNum);
 
             //
             const loader = new TabLoader(this.tabContext);

@@ -1,4 +1,4 @@
-﻿import * as TabUtil from '/static/js/aux/tabUtil.js';
+﻿import * as TabUtil from '/static/js/_aux/tabUtil.js';
 import { PageManager } from '/static/js/core/PageContext.js';
 
 export const RefreshDirectContentTabBinder = {

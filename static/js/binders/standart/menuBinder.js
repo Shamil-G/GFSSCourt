@@ -60,7 +60,7 @@ export const MenuBinder = {
 
                 // Не всегда при изменении пункта меню надо что то обновлять
                 if (targetId && url) {
-                    console.log('MenuBinder. CALL FragmentBinder. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
+                    console.log('MenuBinder. CALL TableLoader.load. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
                     TableLoader.load(url, targetId, { value });
                 }
                 else

@@ -2,7 +2,7 @@
 import { TabContext } from './core/TabContext.js';
 import { PageManager, PageContext } from './core/PageContext.js';
 
-import * as TabUtil from '/static/js/aux/tabUtil.js';
+import * as TabUtil from '/static/js/_aux/tabUtil.js';
 
 
 ///////////////////////////////////////////////////////////////
