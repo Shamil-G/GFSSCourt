@@ -1,4 +1,7 @@
-﻿// Вешается на таблицу ?!
+﻿// Вешается на второе tbody в основной таблице
+// Первое tbody - шапка с фильтрами
+// Второе tbody - данные
+
 export const RowClickBinder = {
     role: 'row-click',
 

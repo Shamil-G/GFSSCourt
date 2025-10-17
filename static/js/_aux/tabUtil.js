@@ -28,11 +28,8 @@ export function getCurrentTabId() {
     return document.getElementById('sharedTabId')?.value || 'pretrial';
 }
 export function getTimestampZone(targetZone, tabName) {
-    //const selector = `#${tabName}Timestamp`;
-    //const result = targetZone.querySelector(selector);
-    //console.log("Selector: ", selector, "\n\t\tresult: ", result, "\n\t\ttargetZone: ", targetZone);
-    //return result;
-    return targetZone.querySelector(`#${tabName}Timestamp`);
+    //return targetZone.querySelector(`#${tabName}Timestamp`);
+    return targetZone.querySelector(`#footTimestamp`);
 }
 export function getCacheKey(tabName, orderNum, zoneKey = 'content') {
     const cacheKey = `${PageManager.get().pageName}_${tabName}_${zoneKey}_${orderNum}`;
@@ -102,6 +99,7 @@ export function updateRefreshButton(tabName, cached_timestamp) {
 export function showLoadedAge(targetZone, tabName) {
     //let timestampZone = document.getElementById(`${tabName}Timestamp`)
     let timestampZone = getTimestampZone(targetZone, tabName);
+    //console.log("showLoadedAge. targetZone: ", targetZone, "tabName: ", tabName);
     if (timestampZone) {
         const key_cache = getCacheKey(tabName, getOrderNum())
         if (key_cache) {
@@ -129,7 +127,7 @@ export function loadFromCache(tabName, orderNum, zoneKey = 'content') {
         updateRefreshButton(tabName, cached.timestamp);
         showLoadedAge(targetZone, tabName);
 
-        console.log("LOADED from CACHE ", cacheKey);
+        //console.log("LOADED from CACHE ", cacheKey);
         return true;
     }
     return false;
@@ -140,7 +138,7 @@ export function showTabLoader(tableFragment, start) {
     if (!tableFragment) return;
 
     let tfoot = tableFragment.querySelector('tfoot');
-    // Еслиданных еще нет, то фрагмент пустой, без tfoot
+    // Если данных еще нет, то фрагмент пустой, без tfoot
     if (tfoot) {
         const centerSpan = tfoot.querySelector(`#footer-center`);
         if (centerSpan) {

@@ -43,7 +43,7 @@ export const MenuBinder = {
                 }
                 dropdown.__lastValue = value;
 
-                console.log(`MenuBinder. Dropdown: ${value}`);
+                //console.log(`MenuBinder. Dropdown: ${value}`);
 
                 if (actionName) {
                     console.log("MenuBinder. actionName: ", actionName);
@@ -60,11 +60,10 @@ export const MenuBinder = {
 
                 // Не всегда при изменении пункта меню надо что то обновлять
                 if (targetId && url) {
-                    console.log('MenuBinder. CALL TableLoader.load. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
+                    //console.log('MenuBinder. CALL TableLoader.load. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
                     TableLoader.load(url, targetId, { value });
                 }
-                else
-                    console.log('MenuBinder. SKIP FragmentBinder. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
+                //else console.log('MenuBinder. SKIP  TableLoader.load. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
             });
         });
     },

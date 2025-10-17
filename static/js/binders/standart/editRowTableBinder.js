@@ -69,7 +69,7 @@ export const EditRowTableBinder = {
     ,
 
     startEdit(id, field) {
-        console.log('EditField. startEdit. id:', id, 'field:', field);
+        //console.log('EditField. startEdit. id:', id, 'field:', field);
         const row = document.querySelector(`tr[data-order="${id}"]`);
         const input = row?.querySelector(`input[name="${field}"]`);
         //console.log('EditField. startEdit. id:', id, 'field:', field, 'row:', row, 'input:', input);
@@ -84,7 +84,7 @@ export const EditRowTableBinder = {
     },
 
     cancelEdit(id, field) {
-        console.log('EditField. cancelEdit. id:', id, 'field:', field);
+        //console.log('EditField. cancelEdit. id:', id, 'field:', field);
         const row = document.querySelector(`tr[data-order="${id}"]`);
         const input = row?.querySelector(`input[name="${field}"]`);
         if (!input) return;
@@ -98,7 +98,7 @@ export const EditRowTableBinder = {
     },
 
     async save(id, field) {
-        console.log('EditField. save. id:', id, 'field:', field);
+        //console.log('EditField. save. id:', id, 'field:', field);
         const row = document.querySelector(`tr[data-order="${id}"]`);
         const input = row?.querySelector(`input[name="${field}"]`);
         if (!input) return;
@@ -118,12 +118,19 @@ export const EditRowTableBinder = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, field, value })
             });
+            if (!res.ok) {
+                console.error(`❌ Failed to save ${field} for ${id}:`, res.status, await res.text());
+                throw new Error(`Request failed with status ${res.status}`);
+            }
+
             const result = await res.json();
-            console.log(`✅ ${field} saved for ${id}:`, result);
+            console.log(`✅ ${field} saved sum: ${value} for orderNum: ${id}:`, result);
+
+            // Закроем видимость кнопок edit & cancel
             this.cancelEdit(id, field);
         } catch (err) {
             console.error(`❌ Failed to save ${field} for ${id}:`, err);
-            alert('Ошибка при сохранении поля ' + field);
+            alert('Error on saving ' + field);
         }
     }
 };

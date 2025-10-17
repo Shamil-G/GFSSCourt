@@ -53,7 +53,7 @@ export class TabLoader {
 
         const req = this.tabContext.getRequest(tabName, zoneKey, orderNum);
 
-        console.log("TabLoader: loadZone, REQ: ", req);
+        //console.log("TabLoader: loadZone, REQ: ", req);
         
         if (!req || !req.url) {
             console.warn(`TabLoader: invalid request config for "${tabName}" zone "${zoneKey}"`);
