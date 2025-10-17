@@ -1,5 +1,4 @@
 ﻿import { MenuBinder } from '/static/js/binders/standart/menuBinder.js';
-import { EditRowTableBinder } from '/static/js/binders/standart/EditRowTableBinder.js';
 import { HelperBinder } from '/static/js/binders/standart/helperBinder.js';
 
 export const courtTabContext = {

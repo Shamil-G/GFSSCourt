@@ -3,8 +3,8 @@ import { FilterActiveCloseRefundBinder } from '/static/js/binders/filters/filter
 
 import { MenuBinder } from '/static/js/binders/standart/menuBinder.js';
 import { MutualExclusiveBinder } from '/static/js/binders/standart/mutualExclusiveBinder.js';
-import { RowClickBinder } from '/static/js/binders/standart/RowClickBinder.js';
-import { EditRowTableBinder } from '/static/js/binders/standart/EditRowTableBinder.js';
+import { RowClickBinder } from '/static/js/binders/standart/rowClickBinder.js';
+import { EditRowTableBinder } from '/static/js/binders/standart/editRowTableBinder.js';
 
 import { TabSwitchBinder } from '/static/js/core/TabSwitchBinder.js';
 
