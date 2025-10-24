@@ -25,7 +25,7 @@
     <div class="documents">
         <table id="court_mainTable">
             <colgroup><col style="width: 80px;"><col><col><col style="width: 140px;"><col style="width: 140px;"><col><col><col><col><col><col></colgroup>
-            <thead>
+            <thead class="my_stick_head">
                 <tr>
                     <th data-help="overpayment_id" data-role="helper" class="has-helper">{{ res_value('ORDER_NUM') }}</th>
                     <th data-help="region" data-role="helper" class="has-helper">{{ res_value('FILIAL_NAME') }}</th>
@@ -42,7 +42,7 @@
                     <th data-help="last_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
                 </tr>
             </thead>
-            <tbody id="court_filterZone">
+            <tbody class="my_stick" id="court_filterZone">
                 <tr data-persistent id="court_filterRow">
                     <td>
                         <a style="text-decoration: none; font-size: 24px" href="/add_op">➕</a>
@@ -294,5 +294,5 @@
     </div>
 </div>
 <!--<script type="module" src="static/js/list_op.js"></script>-->
-<script type="module" id="pageScript" data-page="court" src="static/js/test.js"></script>
+<script type="module" id="pageScript" data-page="court" src="static/js/main.js"></script>
 {% endblock %}

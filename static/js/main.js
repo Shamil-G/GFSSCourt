@@ -8,29 +8,39 @@ import * as TabUtil from '/static/js/_aux/tabUtil.js';
 ///////////////////////////////////////////////////////////////
 // По выбранному TAB загружаем его содержимое
 // id - это имя зоны - Таб, например, "pretrial"
+/**
+* Загружаем закладку по имени и уникальому номеру строки в мастер таблице.
+* @param {string} tabName  - Имя закладки
+* @param {string} orderNum - Уникальный номер строки 
+*/
 function loadTabContent(tabName, orderNum) {
     if (!orderNum) return;
 
     const contentZone = TabUtil.getTargetZone(tabName);
-
-
     if (!contentZone) {
         console.error(`❌ Зона "${config.zoneSelector}" не найдена`);
         return;
     }
+
+    // Проверка: если уже загружено для этого orderNum, не загружать повторно
+    if (contentZone.dataset.loadedOrderNum === orderNum) return;
 
     // ⏳ Загрузка...
     TabUtil.showLoadingMessage(tabName);
 
     //TabUtil.showTabLoader(contentZone, 1);
     TabRegistry.load(tabName, orderNum).then(() => {
-        //TabUtil.showTabLoader(contentZone, 0);
         TabUtil.showLoadedAge(contentZone, tabName);
+        contentZone.dataset.loadedOrderNum = orderNum;
     });
 }
 ///////////////////////////////////////////////////////////////
 // Главная таблица переплат в LIST_OVERPAYMENTS.HTML
 // Когда щелкаем мышкой по записям TR надо менять фильтр orderNum для TABS
+/**
+* Фильтр для закладок.
+* @param {string} orderNum - Уникальный номер строки 
+*/
 function filterByOrder(orderNum) {
     // Установить общее поле
     if(!TabUtil.setSharedOrderNum(orderNum)) return;
@@ -54,7 +64,7 @@ function filterByOrder(orderNum) {
 // 
 // Теперь меню вызывается data-role="menu", которое по завершениии
 // Вызывает загрузку таблицы по data-url=""
-function filterByPeriod(period_value, label, dropdown) {
+function filterByPeriod_alien(period_value, label, dropdown) {
     // Фильтрация по вашему атрибуту
     if (dropdown.getAttribute('data-track') === 'true') {
         const url = dropdown.getAttribute('data-url')
@@ -68,6 +78,10 @@ function filterByPeriod(period_value, label, dropdown) {
 // Переходим с одного tab на другой и должны показываться соответствующие панели
 // Функция переключения между вкладками с выборкой его содержимого
 // Функция привязывается в list_overpayments.html 
+/**
+* Переключает активную вкладку.
+* @param {string} tabName - Имя вкладки
+*/
 function showTab(tabName) {
     const sharedTab = document.getElementById('sharedTabId');
     if (sharedTab) sharedTab.value = tabName;
@@ -124,7 +138,6 @@ function showTab(tabName) {
 })();
 
 const globalAPI = {
-    filterByPeriod,
     filterByOrder,
     showTab,
     PageManager
