@@ -83,7 +83,17 @@
             {{ el.last_source_solution }}
         </td>
         <td style="text-align: left">
-            {{ el.last_solution }}
+            <input style="width: 290px; text-align: left; font-size: 16px"
+                   type="text"
+                   name="last_solution"
+                   value="{{ el.last_solution }}"
+                   autocomplete="off"
+                   readonly
+                   class="region input_s_form" />
+
+            <button class="edit-btn tiny-btn" data-id="{{ el.order_num }}" data-field="last_solution">✏️</button>
+            <button class="save-btn tiny-btn" data-id="{{ el.order_num }}" data-field="last_solution" style="display:none;">💾</button>
+            <button class="cancel-btn tiny-btn" data-id="{{ el.order_num }}" data-field="last_solution" style="display:none;">❌</button>
         </td>
 
     </tr>

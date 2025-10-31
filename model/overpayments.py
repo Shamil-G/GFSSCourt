@@ -422,3 +422,12 @@ def update_region(op_id, region, employee):
                 cursor.execute("begin op.update_region(:op_id, :region, :employee); end;", op_id=op_id, region=region, employee=employee)
             finally:
                 log.info(f'UPDATE REGION\n\tOP_ID: {op_id}\n\tREGION: {region}')
+
+
+def update_last_solution(op_id, last_solution, employee):
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute("begin op.update_last_solution(:op_id, :last_solution, :employee); end;", op_id=op_id, last_solution=last_solution, employee=employee)
+            finally:
+                log.info(f'UPDATE REGION\n\tOP_ID: {op_id}\n\LAST_SOLUTION: {last_solution}')

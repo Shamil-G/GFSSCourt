@@ -485,5 +485,8 @@ def view_update_field():
             update_sum_civ(op_id, value, g.user.full_name)
         case 'region':
             update_region(op_id, value, g.user.full_name)
+        case 'last_solution':
+            update_last_solution(op_id, value, g.user.full_name)
+        case _: log.info(f"Обновление {value} не предусмотрено")
 
     return { "success": True }, 200
