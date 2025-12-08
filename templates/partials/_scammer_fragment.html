@@ -4,13 +4,15 @@
         <col style="width: 160px">
         <col style="width: 360px">
         <col />
-        <col style="width: 360px">
+        <col style="width: 120px">
     </colgroup>
     <thead>
         <tr>
             <th>{{ res_value('SCAMMER_IIN') }}</th>
             <th>{{ res_value('SCAMMER_FIO') }}</th>
             <th>{{ res_value('SCAMMER_ORG_NAME') }}</th>
+            <th>{{ res_value('SCAMMER_DATE_NOTIFICATION') }}</th>
+            <th>{{ res_value('SCAMMER_NOTIFICATION') }}</th>
             <th>{{ res_value('EMPLOYEE') }}</th>
         </tr>
     </thead>
@@ -20,6 +22,8 @@
             <td>{{ item.iin }}</td>
             <td style="text-align: left">{{ item.scammer_fio}}</td>
             <td style="text-align: left">{{ item.scammer_org_name}}</td>
+            <td style="text-align: center">{{ item.date_notification}}</td>
+            <td style="text-align: left">{{ item.notification}}</td>
             <td style="text-align: left">{{ item.employee}}</td>
         </tr>
         {% endfor %}

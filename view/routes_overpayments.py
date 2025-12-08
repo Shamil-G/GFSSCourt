@@ -239,16 +239,19 @@ def view_scammer_fragment():
 def view_scammer_add():
     order_num = request.form['order_num']
     iin = request.form.get('iin', '')
-    scammer_org_name = request.form.get('scammer_org_name', '')
+    scammer_org_name = request.form.get('org_name', '')
+    date_notification = request.form.get('date_notification', '')
+    notification = request.form.get('notification', '')
 
-    log.debug(f'-------------->>>\n\tADD SCAMMER. ORDER_NUM: {order_num}\n\tIIN: {iin}\n\tSCAMMER_ORG_NAME: {scammer_org_name}')
-    if iin=='' or scammer_org_name=='':
-        return { "success":  False, "message": "Не все поля заполнены:\nИИН, Организация-мошенник?" }, 200
+    log.info(f'----->\n\tVIEW ADD SCAMMER. ORDER_NUM: {order_num}\n\tIIN: {iin}\n\tDATE NOTIFICATION: {date_notification}\n\tNOTIFICATION: {notification}')
+    log.info(f'----->\n\tVIEW ADD SCAMMER. ORDER_NUM: {order_num}\n\tIIN: {iin}\n\tSCAMMER_ORG_NAME: {scammer_org_name}<------')
+    if iin=='':
+        return { "success":  False, "message": "Не все поля заполнены:\nИИН ?" }, 200
     if order_num and g.user.full_name:
-        add_scammer(order_num, iin, scammer_org_name, g.user.full_name)      
+        add_scammer(order_num, iin, scammer_org_name, date_notification, notification, g.user.full_name)      
         return { "success":  True }, 200
     # Сохраняем в БД или обрабатываем
-    return { "success":  False, "message": "ADD PRETRIAL. ORDER NUM is empty?" }, 200
+    return { "success":  False, "message": "VIEW ADD SCAMMER. ORDER NUM or IIN is empty?" }, 200
     # return redirect(url_for('view_list_overpayments', order_num=order_num, tab=active_tab))
 
 

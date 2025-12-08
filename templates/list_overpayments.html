@@ -130,19 +130,10 @@
         <input type="hidden" name="active_tab" id="sharedTabId">
         <input type="hidden" name="order_num" id="sharedOrderNum">
 
-        <!--<input type="hidden" name="order_num" form="pretrialForm">-->
-        <!--<input type="hidden" name="order_num" form="scammerForm">
-        <input type="hidden" name="order_num" form="lawForm">
-        <input type="hidden" name="order_num" form="court_civOrderNum">
-        <input type="hidden" name="order_num" form="court_crimeOrderNum">
-        <input type="hidden" name="order_num" form="appealOrderNum">
-        <input type="hidden" name="order_num" form="executionOrderNum">
-        <input type="hidden" name="order_num" form="refundingOrderNum">-->
 
-
-        <div id="court_tabs" class="tab-buttons" data-role="tab-switch" >
-            <button class="tab active" data-tab="pretrial">{{ res_value('TAB_PRETRIAL') }}</button>
-            <button class="tab" data-tab="scammer">{{ res_value('TAB_SCAMMERS') }}</button>
+        <div id="court_tabs" class="tab-buttons" data-role="tab-switch">
+            <button class="tab  active" data-tab="scammer">{{ res_value('TAB_SCAMMERS') }}</button>
+            <button class="tab" data-tab="pretrial">{{ res_value('TAB_PRETRIAL') }}</button>
             <button class="tab" data-tab="law">{{ res_value('TAB_LAW') }}</button>
             <button class="tab" data-tab="crime">{{ res_value('TAB_COURT_CRIME') }}</button>
             <button class="tab" data-tab="civ">{{ res_value('TAB_COURT_CIV') }}</button>
@@ -152,10 +143,28 @@
         </div>
         <div id="court_tabs_content" class="tab-content active">
 
+            <div data-tab="scammer" class="tab-panel">
+                <button data-form="scammerForm"
+                        id="scammerVisibleButton"
+                        data-role="toggle-visible-form"
+                        data-tab="scammer"
+                        class="add-btn"
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                    ➕ {{ res_value('BUTTON_ADD') }}
+                </button>
+                <button class="refresh-btn" data-role="refresh-content" data-tab="scammer" id="scammerRefreshButton">🔄 Обновить</button>
+                <!--<button id="scammerRefreshButton" onclick="API.refreshTab('scammer')">🔄 Обновить</button>-->
+
+                <div data-persistent id="scammerFormContainer"></div>
+                <div data-persistent id="scammerContent"><!-- Here will be fragment _pretrial_items --></div>
+                <!--<div id="scammerTimestamp" class="tab-timestamp"></div>-->
+            </div>
+
             <div data-tab="pretrial" class="tab-panel">
-                <button data-form="pretrialForm" 
+                <button data-form="pretrialForm"
                         id="pretrialVisibleButton"
-                        data-tab="pretrial" 
+                        data-tab="pretrial"
                         data-role="toggle-visible-form"
                         data-type="pretrial" class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
@@ -170,30 +179,12 @@
                 <!--<div id="pretrialTimestamp" class="tab-timestamp"></div>-->
             </div>
 
-            <div data-tab="scammer" class="tab-panel">
-                <button data-form="scammerForm" 
-                        id="scammerVisibleButton"
-                        data-role="toggle-visible-form"
-                        data-tab="scammer" 
-                        class="add-btn"
-                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
-                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
-                    ➕ {{ res_value('BUTTON_ADD') }}
-                </button>
-                <button class="refresh-btn" data-role="refresh-content" data-tab="scammer" id="scammerRefreshButton">🔄 Обновить</button>
-                <!--<button id="scammerRefreshButton" onclick="API.refreshTab('scammer')">🔄 Обновить</button>-->
-
-                <div data-persistent id="scammerFormContainer"></div>
-                <div data-persistent id="scammerContent"><!-- Here will be fragment _pretrial_items --></div>
-                <!--<div id="scammerTimestamp" class="tab-timestamp"></div>-->
-            </div>
-
             <div data-tab="law" class="tab-panel">
-                <button data-persistent 
-                        data-form="lawForm" 
+                <button data-persistent
+                        data-form="lawForm"
                         id="lawVisibleButton"
                         data-role="toggle-visible-form"
-                        data-tab="law" 
+                        data-tab="law"
                         class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
@@ -208,11 +199,11 @@
             </div>
 
             <div data-tab="crime" class="tab-panel">
-                <button data-persistent 
-                        data-form="crimeForm" 
+                <button data-persistent
+                        data-form="crimeForm"
                         id="crimeVisibleButton"
                         data-role="toggle-visible-form"
-                        data-tab="crime" 
+                        data-tab="crime"
                         class="add-btn"
                         data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
@@ -227,8 +218,8 @@
             </div>
 
             <div data-tab="civ" class="tab-panel">
-                <button data-persistent 
-                        data-form="civForm" 
+                <button data-persistent
+                        data-form="civForm"
                         id="civVisibleButton"
                         data-role="toggle-visible-form"
                         data-tab="civ" class="add-btn"
@@ -246,8 +237,8 @@
             </div>
 
             <div data-tab="appeal" class="tab-panel">
-                <button data-persistent 
-                        data-form="appealForm" 
+                <button data-persistent
+                        data-form="appealForm"
                         id="appealVisibleButton"
                         data-role="toggle-visible-form"
                         data-tab="appeal" class="add-btn"
@@ -264,15 +255,17 @@
             </div>
 
             <div data-tab="execution" class="tab-panel">
-                <button data-persistent 
-                        data-form="executionForm" 
+                <button data-persistent
+                        data-form="executionForm"
                         id="executionVisibleButton"
                         data-role="toggle-visible-form"
-                        data-tab="execution" 
-                        class="add-btn" 
-                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"  
-                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">➕ {{ res_value('BUTTON_ADD') }}</button>
-<!--                <button id="executionRefreshButton" onclick="API.refreshTab('execution')">🔄 Обновить</button>-->
+                        data-tab="execution"
+                        class="add-btn"
+                        data-label-add="➕ {{ res_value('BUTTON_ADD') }}"
+                        data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
+                    ➕ {{ res_value('BUTTON_ADD') }}
+                </button>
+                <!--                <button id="executionRefreshButton" onclick="API.refreshTab('execution')">🔄 Обновить</button>-->
                 <button data-persistent class="refresh-btn" data-tab="execution" data-role="refresh-content" id="executionRefreshButton">🔄 Обновить</button>
 
                 <div data-persistent id="executionFormContainer"><!-- Here will be FORM _execution_items --></div>

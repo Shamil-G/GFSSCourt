@@ -97,7 +97,10 @@ def get_scammer_items(order_num):
         select op_id, 
             pt.iin, 
             p.lastname||' '||p.firstname||' '||p.middlename as fio,
-            scammer_org_name, employee
+            scammer_org_name, 
+            to_char(date_notification,'dd.mm.yyyy') date_notification,
+            notification,
+            employee
         from scammers pt, loader.person p
         where pt.op_id=:op_id
         and   pt.iin=p.iin(+)
@@ -112,7 +115,8 @@ def get_scammer_items(order_num):
             result = []
             records = cursor.fetchall()
             for rec in records:
-                res = {'op_id': rec[0], 'iin': rec[1], 'scammer_fio': rec[2] or 'Нет в таблице LOADER.PERSON', 'scammer_org_name': rec[3], 'employee': rec[4] }
+                res = {'op_id': rec[0], 'iin': rec[1], 'scammer_fio': rec[2] or 'Нет в таблице LOADER.PERSON', 'scammer_org_name': rec[3] or '', 
+                       'date_notification': rec[4] or '', 'notification': rec[5] or '', 'employee': rec[6] }
                 result.append(res)
             log.debug(f'------ GET SCAMMER ITEMS. RESULT:\n\t{result}')
             return result
@@ -314,14 +318,16 @@ def add_pta(op_id, date_pretrial, until_day, maturity_date, employee):
                 log.info(f'ADD_PRETRIAL\n\tDATE_PRETRIAL: {date_pretrial}\n\tOP_ID: {op_id}\n\tmaturity_date: {maturity_date}\n\temployee: {employee}')
 
 
-def add_scammer(op_id, iin, scammer_org_name, employee):
+def add_scammer(op_id, iin, scammer_org_name, date_notification, notification, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
-                cursor.execute('begin op.add_scammer(:op_id, :iin, :scammer_org_name, :employee); end;', 
-                               op_id=op_id, iin=iin, scammer_org_name=scammer_org_name, employee=employee)
+                cursor.execute('begin op.add_scammer(:op_id, :iin, :scammer_org_name, :date_notification, :notification, :employee); end;', 
+                               op_id=op_id, iin=iin, scammer_org_name=scammer_org_name, date_notification=date_notification, 
+                               notification=notification, employee=employee)
             finally:
-                log.info(f'ADD_SCAMMER\n\tOP_ID: {op_id}\n\tIIN: {iin}\n\tSCAMMER_ORG_NAME: {scammer_org_name}\n\temployee: {employee}')
+                log.info(f'ADD_SCAMMER\n\tOP_ID: {op_id}\n\tIIN: {iin}\n\tSCAMMER_ORG_NAME: {scammer_org_name}' \
+                         f'\n\tDATE_NOTIFICATION: {date_notification}\n\tNOTIFICATION: {notification}\n\temployee: {employee}')
 
 
 def add_law(op_id, submission_date, decision_date, effective_date, submission_doc, decision, orgname, employee):

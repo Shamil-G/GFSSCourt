@@ -25,7 +25,7 @@ export function setSharedOrderNum(orderNum) {
     }
 }
 export function getCurrentTabId() {
-    return document.getElementById('sharedTabId')?.value || 'pretrial';
+    return document.getElementById('sharedTabId')?.value || 'scammer';
 }
 export function getTimestampZone(targetZone, tabName) {
     //return targetZone.querySelector(`#${tabName}Timestamp`);
