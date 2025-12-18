@@ -3,58 +3,29 @@ from flask_login import login_required
 from main_app import app, log
 from util.i18n import get_i18n_value
 
-import json
-
+from util.functions import *
 from model.overpayments import *
+from regions import *
+
 
 log.info("Routes-OverPayments стартовал...")
 
 @app.route('/filter-active', methods=['GET','POST'])
 @login_required
 def filter_active():
-    active=''
-    if request.method=='POST':
-        active = request.form.get('value','')
-    else:
-        active = request.args.get('value','')
+    data = extract_payload()
+    active = data.get('value','')
 
     session['active'] = active
 
     return redirect(url_for('filter_list_op'))
 
 
-def extract_payload():
-    content_type = request.headers.get('Content-Type', '')
-    print("📥 Content-Type:", content_type)
-
-    if 'application/json' in content_type:
-        data = request.get_json(silent=True)
-        if isinstance(data, dict):
-            return data
-        else:
-            print("⚠️ JSON не распарсен, пробуем вручную")
-            try:
-                return json.loads(request.data.decode('utf-8'))
-            except Exception as e:
-                print("❌ Ошибка при ручном JSON-декодировании:", e)
-                return {}
-    elif 'application/x-www-form-urlencoded' in content_type:
-        return request.form.to_dict()
-    else:
-        print("⚠️ Неизвестный Content-Type, пробуем как JSON")
-        try:
-            return json.loads(request.data.decode('utf-8'))
-        except Exception:
-            return {}
-
-
 @app.route('/filter-period-overpayments', methods=['GET','POST'])
 @login_required
 def filter_period_list_op():
-    if request.method=='POST':
-        period_src = request.form.get('value','')
-    else:
-        period_src = request.args.get('value','')
+    data = extract_payload()
+    period_src = data.get('value','')
 
     match period_src:
         case 'За месяц': period = "trunc(sysdate,'MM')"
@@ -62,7 +33,7 @@ def filter_period_list_op():
         case _: period = ''
 
     session['period_list_op'] = period
-    log.debug(f'filter_period_list_op. PERIOD: {period}')
+    log.info(f'filter_period_list_op. PERIOD: {period}')
 
     return redirect(url_for('filter_list_op'))
 
@@ -70,16 +41,11 @@ def filter_period_list_op():
 @app.route('/filter-iin-overpayments', methods=['GET','POST'])
 @login_required
 def filter_iin_list_op():
-    iin_filter=''
-    if request.method=='POST':
-        log.info(f'POST. {request.form}')
-        iin_filter = request.form.get('value','')
-    else:
-        log.info(f'GET. {request.args}')
-        iin_filter = request.args.get('value','')
+    data = extract_payload()
+    iin_filter = data.get('value','')
 
     session['iin_filter'] = iin_filter
-    log.debug(f'filter_iin_list_op. IIN: {iin_filter}')
+    log.info(f'filter_iin_list_op. IIN: {iin_filter}')
     return redirect(url_for('filter_list_op'))
 
 
@@ -97,9 +63,12 @@ def filter_list_op():
 
     active='active' if 'active' not in session else session['active']
 
-    rows = list_overpayments(g.user.top_control, g.user.dep_name, 
-                             iin_filter=iin_filter, period=period,  active=active )
-    log.debug(f"FILTER_LIST_OP. ROWS: {len(rows)}\n\tIIN\t{iin_filter}\n\tPERIOD:\t{period}\n\tACTIVE\t{active}")
+    params = {'user_top_control': g.user.top_control, 'user_dep_name': g.user.dep_name, 
+              'user_rfbn': g.user.rfbn_id, 'iin_filter': iin_filter, 'user_period': period, 'user_active': active
+               }
+
+    rows = list_overpayments(params)
+    log.info(f"---> FILTER_LIST_OP. Rows: {len(rows)}\n\tPARAMS {params}")
     return render_template('partials/_list_op_fragment.html', rows=rows)
 
 
@@ -108,45 +77,48 @@ def filter_list_op():
 def view_list_overpayments():
     list_op=[]
     iin_filter=''
-    if request.method=='POST':
-        log.info(f'POST. {request.form}')
-        iin_filter = request.form.get('iin_filter','')
-    else:
-        log.info(f'GET. {request.args}')
-        iin_filter = request.args.get('iin_filter','')
+
+    data = extract_payload()
+
+    iin_filter  = data.get('iin_filter','')
+    order_num = data.get('order_num','')
 
     if 'period_list_op' not in session:
         period = " trunc(sysdate, 'MM')"
     else:
         period = f'{session['period_list_op']}'
 
-    order_num = request.form.get('order_num','')
+    active='active' if 'to-do' not in session else session['to-do']
 
-    log.info(f"LIST_OVERPAYMENTS. ORDER_NUM: {order_num}\n\tUSER: {g.user.full_name}\n\tTOP_CONTROL: {g.user.top_control}\n\tFILTER: {iin_filter}\n\tDEPNAME: {g.user.dep_name}")
+    params = {'user_top_control': g.user.top_control, 'user_dep_name': g.user.dep_name, 'user_rfbn': g.user.rfbn_id, 'iin_filter': iin_filter, 'user_period': period, 'user_active': active}
 
-    list_op = list_overpayments(g.user.top_control, g.user.dep_name, iin_filter=iin_filter, period=period,  active='active' if 'to-do' not in session else session['to-do'] )
+    log.info(f"LIST_OVERPAYMENTS. PARAMS: {params}")
 
-    log.debug(f"LIST_OVERPAYMENTS. LEN list_op: {len(list_op)}")
-    return render_template("list_overpayments.html", list_op=list_op, selected_order=order_num)
+    list_region = [(key, data["ldap_name"]) for key, data in regions.items()]
+
+    log.info(f"LIST_OVERPAYMENTS. LEN list_op: {len(list_op)}\n\tREGIONS: {list_region}")
+    return render_template("list_overpayments.html", list_op=list_op, selected_order=order_num, list_region=list_region)
 
 
 @app.route('/add_op', methods=['POST', 'GET'])
 @login_required
 def view_add_op():
     mess=''
-    if request.method == 'POST':
-        region = request.form.get('region','')
-        log.info(f'ADD_OP. CONTENT FORM: {request.form}')
+    data = extract_payload()
 
-        iin = request.form.get('iin', '')
-        risk_date = request.form.get('risk_date','')
-        rfpm_id = request.form.get('rfpm_id', '')
-        sum_civ_amount = request.form.get('sum_civ_amount','')
-        if iin and region:
-            add_op(region, iin, risk_date, rfpm_id, sum_civ_amount)      
-            return redirect(url_for('view_list_overpayments'))            
-        else:
-            mess = 'Не все обязательные поля заполнены'
+    region = data.get('region','')
+    log.info(f'ADD_OP. CONTENT FORM: {request.form}')
+
+    iin = data.get('iin', '')
+    risk_date = data.get('risk_date','')
+    rfpm_id = data.get('rfpm_id', '')
+    sum_civ_amount = data.get('sum_civ_amount','')
+
+    if iin and region:
+        add_op(region, iin, risk_date, rfpm_id, sum_civ_amount)      
+        return redirect(url_for('view_list_overpayments'))            
+    else:
+        mess = 'Не все обязательные поля заполнены'
     log.debug(f"ADD OP. REGION: {g.user.dep_name}, TTOP_CONTROL: {g.user.top_control}")
     return render_template("add_op.html", region=g.user.dep_name, top_control=g.user.top_control, mess=mess)
 
@@ -492,4 +464,11 @@ def view_update_field():
             update_last_solution(op_id, value, g.user.full_name)
         case _: log.info(f"Обновление {value} не предусмотрено")
 
+    return { "success": True }, 200
+
+
+@app.route('/change-region', methods=['POST'])
+def view_change_region():
+    data = extract_payload()
+    log.info(f'CHANGE REGION: {data}')
     return { "success": True }, 200

@@ -62,8 +62,7 @@
                                placeholder="ИИН"
                                data-role="filter-iin"
                                data-url="/filter-iin-overpayments"
-                               data-target="court_mainBody"
-                               >
+                               data-target="court_mainBody">
                         <button type="button"
                                 data-role="filter-iin"
                                 data-url="/filter-iin-overpayments"
@@ -100,13 +99,13 @@
                     </td>
                     <td data-help="filter_active" data-role="helper" class="has-helper">
                         <input type="hidden" id="activeState" value="{{ 'active' if session['active'] == 'closed' else 'active' }}">
-                        <a  href="#"
-                            data-role="filter-active-close"
-                            data-url="/filter-active"
-                            data-target="court_mainBody"
-                            data-icon-active="🟡"
-                            data-icon-closed="✅"
-                            style="font-size: 24px; text-decoration: none;">
+                        <a href="#"
+                           data-role="filter-active-close"
+                           data-url="/filter-active"
+                           data-target="court_mainBody"
+                           data-icon-active="🟡"
+                           data-icon-closed="✅"
+                           style="font-size: 24px; text-decoration: none;">
                             <span id="activeIcon">
                                 {{ '✅' if session['active'] == 'closed' else '🟡' }}
                             </span>
@@ -119,9 +118,17 @@
                     <td />
                 </tr>
             </tbody>
-            <tbody id="court_mainBody"  data-role="edit-row row-click" data-action="filterByOrder">
+            <!--<tbody id="court_mainBody" data-action="filterByOrder">-->
+            <tbody id="court_mainBody" data-role="edit-row row-click menu-region-edit" data-action="filterByOrder">
             </tbody>
         </table>
+        <div id="region-template" style="display:none;">
+            {% for code, name in list_region %}
+            <a data-value="{{ code }}" data-label="{{ name }}">
+                <i class="fas fa-home"></i>{{ name }}
+            </a>
+            {% endfor %}
+        </div>
     </div>
     <!-- Нижняя область: вкладки -->
     <div class="tabs">
@@ -144,6 +151,7 @@
         <div id="court_tabs_content" class="tab-content active">
 
             <div data-tab="scammer" class="tab-panel">
+                {% if 'top_control' in session and session['top_control'] == 1 %}
                 <button data-form="scammerForm"
                         id="scammerVisibleButton"
                         data-role="toggle-visible-form"
@@ -153,6 +161,7 @@
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
+                {% endif %}
                 <button class="refresh-btn" data-role="refresh-content" data-tab="scammer" id="scammerRefreshButton">🔄 Обновить</button>
                 <!--<button id="scammerRefreshButton" onclick="API.refreshTab('scammer')">🔄 Обновить</button>-->
 

@@ -34,6 +34,11 @@
     transition: background 0.5s, color 0.8s;
 }
 
+/* при наличии класса show — показать */
+.dropdown-content.show {
+  display: block;
+}
+
 .dropdown:hover .dropdown-content {
     display: block;
 }

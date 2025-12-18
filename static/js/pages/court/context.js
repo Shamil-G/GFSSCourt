@@ -1,10 +1,12 @@
-﻿import { FilterIinBinder } from '/static/js/binders/filters/filterIINBinder.js';
-import { FilterActiveCloseRefundBinder } from '/static/js/binders/filters/filterActiveCloseRefundBinder.js';
+﻿import { MenuBinder } from '/static/js/pages/court/binders/menuBinder.js';
+import { FilterActiveCloseRefundBinder } from '/static/js/pages/court/binders/filterActiveCloseRefundBinder.js';
+import { FilterIinBinder } from '/static/js/pages/court/binders/filterIINBinder.js';
+import { MenuRegionBinder } from '/static/js/pages/court/binders/menuRegionBinder.js';
+import { MenuRegionEditBinder } from '/static/js/pages/court/binders/menuRegionEditBinder.js';
+import { EditRowTableBinder } from '/static/js/pages/court/binders/editRowTableBinder.js';
 
-import { MenuBinder } from '/static/js/binders/standart/menuBinder.js';
 import { MutualExclusiveBinder } from '/static/js/binders/standart/mutualExclusiveBinder.js';
 import { RowClickBinder } from '/static/js/binders/standart/rowClickBinder.js';
-import { EditRowTableBinder } from '/static/js/binders/standart/editRowTableBinder.js';
 
 import { TabSwitchBinder } from '/static/js/core/TabSwitchBinder.js';
 
@@ -23,7 +25,7 @@ export const courtTabContext = {
     
     binders: {
         mainTableHelper: [HelperBinder],
-        fragment: [EditRowTableBinder, RowClickBinder], //RowClickBinder, 
+        fragment: [EditRowTableBinder, RowClickBinder, MenuRegionEditBinder], //RowClickBinder, 
         filters: [FilterIinBinder, FilterActiveCloseRefundBinder, MenuBinder],
         tabs: [ TabSwitchBinder ],
         tabs_content: [MenuBinder, MutualExclusiveBinder]

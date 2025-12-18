@@ -122,3 +122,4 @@ KUI_DATE=Дата регистрации в КУИ
 EXCITEMENT_DATE=Дата возбуждения УД
 RESOLUTION_DATE=Дата постановления
 RECIEPT_DATE=Дата поступления
+SELECT_REGION=Выберите область

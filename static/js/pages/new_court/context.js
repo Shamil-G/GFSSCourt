@@ -1,4 +1,4 @@
-﻿import { MenuBinder } from '/static/js/binders/standart/menuBinder.js';
+﻿import { MenuBinder } from '/static/js/pages/new_court/binders/menuBinder.js';
 import { HelperBinder } from '/static/js/binders/standart/helperBinder.js';
 
 export const courtTabContext = {

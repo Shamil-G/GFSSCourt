@@ -6,8 +6,14 @@ export const EditRowTableBinder = {
         if (row.__EditRowTableBinder) return;
         row.__EditRowTableBinder = true;
 
+        console.log('EditRowTableBinder. Attach. row: ', row)
         row.addEventListener('click', (e) => {
-            //console.log("edit-row. listener edit ...");
+            const skip = e.target.closest('div[data-role~="menu-region-edit"]');
+            if (skip) {
+                //console.log("edit-row. Skip Listener menu-region-edit ...", skip);
+                return; // игнорируем клики внутри меню
+            }
+            console.log("edit-row. Add Listener EDIT ...", e.target);
             const edit_btn = e.target.closest('.edit-btn');
             if (!edit_btn || !row.contains(edit_btn)) return;
 
@@ -62,7 +68,7 @@ export const EditRowTableBinder = {
         const containers = zone.matches?.(`[data-role~="${this.role}"]`)
             ? [zone]
             : Array.from(zone.querySelectorAll(`[data-role~="${this.role}"]`));
-
+        console.log('EditRowTableBinder. AttachAll. containers: ', containers)
         //console.log("EditRowTableBinder\n\t\t\tzone:\t", zone, "\n\t\t\tcontainers:\t", containers);
         containers.forEach(container => this.attach(container));
     }

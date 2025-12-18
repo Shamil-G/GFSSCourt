@@ -4,7 +4,7 @@ from decimal import Decimal
 
 stmt_list_op = ""
 
-def list_overpayments(top_control, user_region, period, iin_filter, active):
+def list_overpayments(args: dict):
     global stmt_list_op
     stmt_list_op = """
         select op.op_id,
@@ -25,18 +25,25 @@ def list_overpayments(top_control, user_region, period, iin_filter, active):
         where op.iin=p.iin(+)
         """
 
-    log.info(f'PERIOD: {period}')
+    user_region = args.get('user_region', None)
+    user_period = args.get('user_period', None)
+    user_top_control = args.get('user_top_control', None)
+    iin_filter = args.get('iin_filter', None)
+    user_active = args.get('user_filter', None)
+    user_rfbn = args.get('user_rfbn', None)
+
+    log.info(f'---> LIST_OVERPAYMENTS\nPARAMS: {args}\n<---')
     # Для филиалов
-    if not top_control:   
+    if not user_top_control:   
         stmt_list_op = stmt_list_op + ' and op.region=:region'
-    if period:
-        stmt_list_op = stmt_list_op + f' and op.risk_date>={period}';
+    if user_period:
+        stmt_list_op = stmt_list_op + f' and op.risk_date>={user_period}';
     
     # Для поиска по ИИН
     if iin_filter:
         stmt_list_op = stmt_list_op + ' and op.iin like :iin_filter'
     # Для поиска по активным судебным искам
-    if active=='active':
+    if user_active=='active':
         stmt_list_op = stmt_list_op + ' and op.sum_civ_amount>coalesce(op.compensated_amount,0)'
     # Для поиска по завершенным судебным искам
     else:
@@ -44,7 +51,8 @@ def list_overpayments(top_control, user_region, period, iin_filter, active):
 
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            if top_control:
+            log.debug(f"---> LIST_OVERPAYMENTS\n{stmt_list_op}\n")
+            if user_top_control:
                 if not iin_filter:
                     cursor.execute(stmt_list_op)
                 else:
@@ -437,3 +445,4 @@ def update_last_solution(op_id, last_solution, employee):
                 cursor.execute("begin op.update_last_solution(:op_id, :last_solution, :employee); end;", op_id=op_id, last_solution=last_solution, employee=employee)
             finally:
                 log.info(f'UPDATE REGION\n\tOP_ID: {op_id}\n\LAST_SOLUTION: {last_solution}')
+

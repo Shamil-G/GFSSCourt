@@ -1,4 +1,4 @@
-import { MenuBinder } from '/static/js/binders/standart/menuBinder.js';
+import { MenuBinder } from '/static/js/pages/court/appeal/binders/menuBinder.js';
 import { RefreshDirectContentTabBinder } from '/static/js/binders/standart/refreshDirectContentTabBinder.js';
 import { ToggleVisibleFormBinder } from '/static/js/binders/standart/toggleVisibleFormBinder.js';
 import { HelperBinder } from '/static/js/binders/standart/helperBinder.js';
