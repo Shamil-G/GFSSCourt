@@ -11,7 +11,7 @@
                 {{ el.region }}
             </a>
             {% if g.user.top_control == 1 %}
-                <input type="hidden" name="regionName" id="regionName">
+                <input type="hidden" name="regionInput" id="regionInput">
 
                 <div style="min-width: 160px; position: absolute; z-index: 5; top: 100%; left: 0; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); padding-top: 8px" 
                      class="dropdown-content"></div>
@@ -24,9 +24,9 @@
                         <i class="fas fa-filter"></i>
                         <span style="display: inline-block;" class="caret"></span>
                     </button>
-                    <button data-id="{{ el.order_num }}" type="button" class="region-edit edit-btn tiny-btn" data-field="regionName">✏️</button>
-                    <button data-id="{{ el.order_num }}" type="button" class="region-save edit-btn tiny-btn" style="display:none;" data-field="regionName" data-url="/change-region">💾</button>
-                    <button data-id="{{ el.order_num }}" type="button" class="region-cancel edit-btn tiny-btn" style="display:none;" data-field="regionName">❌</button>
+                    <button data-id="{{ el.order_num }}" type="button" class="region-edit edit-btn tiny-btn" data-field="region">✏️</button>
+                    <button data-id="{{ el.order_num }}" type="button" class="region-save edit-btn tiny-btn" style="display:none;" data-field="region" data-url="/update-field">💾</button>
+                    <button data-id="{{ el.order_num }}" type="button" class="region-cancel edit-btn tiny-btn" style="display:none;" data-field="region">❌</button>
                 </div>
             {% endif %}
         </div>

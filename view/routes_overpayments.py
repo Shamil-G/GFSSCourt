@@ -114,13 +114,15 @@ def view_add_op():
     rfpm_id = data.get('rfpm_id', '')
     sum_civ_amount = data.get('sum_civ_amount','')
 
+
     if iin and region:
         add_op(region, iin, risk_date, rfpm_id, sum_civ_amount)      
         return redirect(url_for('view_list_overpayments'))            
     else:
         mess = 'Не все обязательные поля заполнены'
     log.debug(f"ADD OP. REGION: {g.user.dep_name}, TTOP_CONTROL: {g.user.top_control}")
-    return render_template("add_op.html", region=g.user.dep_name, top_control=g.user.top_control, mess=mess)
+    list_region = [(key, data["ldap_name"]) for key, data in regions.items()]
+    return render_template("add_op.html", region=g.user.dep_name, list_region=list_region, top_control=g.user.top_control, mess=mess)
 
 
 @app.route('/form_fragment')
@@ -459,16 +461,10 @@ def view_update_field():
         case 'sum_civ_amount':
             update_sum_civ(op_id, value, g.user.full_name)
         case 'region':
-            update_region(op_id, value, g.user.full_name)
+            region_name = regions[value]['ldap_name']
+            update_region(op_id, value, region_name, g.user.full_name)
         case 'last_solution':
             update_last_solution(op_id, value, g.user.full_name)
         case _: log.info(f"Обновление {value} не предусмотрено")
 
-    return { "success": True }, 200
-
-
-@app.route('/change-region', methods=['POST'])
-def view_change_region():
-    data = extract_payload()
-    log.info(f'CHANGE REGION: {data}')
     return { "success": True }, 200

@@ -429,13 +429,13 @@ def update_sum_civ(op_id, sum_civ_amount, employee):
                 log.info(f'UPDATE SUM_CIV_AMOUNT\n\tOP_ID: {op_id}\n\tSUM_CIV_AMOUNT: {sum_civ_amount}')
 
 
-def update_region(op_id, region, employee):
+def update_region(op_id, rfbn_id, region, employee):
     with get_connection() as connection:
         with connection.cursor() as cursor:
             try:
-                cursor.execute("begin op.update_region(:op_id, :region, :employee); end;", op_id=op_id, region=region, employee=employee)
+                cursor.execute("begin op.update_region(:op_id, :rfbn_id, :region, :employee); end;", op_id=op_id, rfbn_id=rfbn_id, region=region, employee=employee)
             finally:
-                log.info(f'UPDATE REGION\n\tOP_ID: {op_id}\n\tREGION: {region}')
+                log.info(f'UPDATE REGION\n\tOP_ID: {op_id}\n\tREGION: {rfbn_id} : {region}')
 
 
 def update_last_solution(op_id, last_solution, employee):
