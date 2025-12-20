@@ -26,11 +26,11 @@
             <tbody id="court_mainHelper">
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none; width: 240px">* {{res_value('IIN')}}</td>
-                    <td style="text-align: left; border:none;"><input style="margin: 4px 0px; width: 144px; border-color: lightgray" class="input_s" name="iin" pattern="[0-9]{12}" type="text" maxlength="12" autocomplete="off" required></td>
+                    <td style="text-align: left; border:none;"><input style="margin: 4px 0px; width: 148px; border-color: lightgray" class="input_s" name="iin" pattern="[0-9]{12}" type="text" maxlength="12" autocomplete="off" required></td>
                 </tr>
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none; width: 240px">* {{res_value('RISK_DATE')}}</td>
-                    <td style="text-align: left; border:none; padding: 4px 0px"><input style="margin: 5px 0px 4px 4px; width: 150px; font-size: 18px" class="input_d" name="risk_date" pattern="[0-9]{12}" type="date" autocomplete="off" required></td>
+                    <td style="text-align: left; border:none; padding: 4px 0px"><input style="margin: 5px 0px 4px 4px; width: 148px; font-size: 18px" class="input_d" name="risk_date" pattern="[0-9]{12}" type="date" autocomplete="off" required></td>
                 </tr>
                 <tr class="disabled-row">
                     <td style="text-align: left; border:none;">{{res_value('RFPM_ID')}}</td>
@@ -57,11 +57,11 @@
                 </tr>
                 <tr class="disabled-row">
                     <td style="text-align: left; border: none;">{{res_value('SUM_CIV_AMOUNT')}}</td>
-                    <td style="text-align: left; border: none;"><input style="margin: 4px 0px; border-color: lightgray" class="input_s" type="number" min="0.00" name="sum_civ_amount" autocomplete="off"></td>
+                    <td style="text-align: left; border: none;"><input style="margin: 4px 0px; border-color: lightgray; max-width: 148px" class="input_s" type="number" min="0.00" name="sum_civ_amount" autocomplete="off"></td>
                 </tr>
                 <tr class="disabled-row">
-                    <td style="text-align: left; border: none; margin-bottom: 16px">* {{res_value('FILIAL_NAME')}}</td>
-                    <td style="text-align: left; border: none;">
+                    <td style="text-align: left; border: none; padding-bottom: 24px">* {{res_value('FILIAL_NAME')}}</td>
+                    <td style="text-align: left; border: none; padding-bottom: 24px">
                         {% if top_control==1 %}
                         <div id="court_MenuZone" class="dropdown" data-role="menu">
 
@@ -102,8 +102,8 @@
                 </tr>-->
             </tfoot>
         </table>
-        <button style="margin-top: 16px" type="submit">{{ res_value('BUTTON_SAVE') }}</button>
+        <button style="margin-top: 24px" type="submit">{{ res_value('BUTTON_SAVE') }}</button>
     </form>
-    <a>{{ mess }}</a>
+    <a style="margin: 12px 0px 0px 24px">{{ mess }}</a>
     <script type="module" id="pageScript" data-page="new_court" src="static/js/main.js"></script>
 {% endblock %}
