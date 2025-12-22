@@ -15,9 +15,9 @@ error_log_format = '%({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s
 errorlog = "logs/court-gunicorn-error.log"
 proc_name = 'COURT-GFSS'
 # Перезапуск после N кол-во запросов
-max_requests = 100
+max_requests = 10000
 # Перезапуск, если ответа не было более 60 сек
-timeout = 180
+timeout = 30
 # umask or -m 007
 umask = 0x007
 # Проверка IP адресов, с которых разрешено обрабатывать набор безопасных заголовков
