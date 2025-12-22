@@ -78,17 +78,17 @@
                              data-track="true"
                              data-url="/filter-period-overpayments"
                              data-target="court_mainBody"
-                             style="min-width: 200px" class="dropdown">
+                             style="min-width: 216px" class="dropdown">
                             <input type="hidden" name="menuValuePeriod" id="menuValuePeriod">
                             <button style="display: inline-block; border: 1px solid lightgray; min-width: 160px" type="button" class="dropdown-button period-button" id="menuButton">
-                                <i class="fas fa-filter"></i>
+                                <i class="fas fa-filter" style="color: green;"></i>
                                 <span class="label">{{ res_value('SELECT_PERIOD') }}</span>
                                 <span style="display: inline-block; margin-left: 5px;" class="caret"></span>
                             </button>
-                            <div style="min-width: 160px; margin-left: 20px" class="dropdown-content">
-                                <a data-value="{{res_value('PERIOD_MONTH')}}" data-label="{{res_value('PERIOD_MONTH')}}"><i class="fas fa-home"></i>{{res_value('PERIOD_MONTH')}}</a>
-                                <a data-value="{{res_value('PERIOD_YEAR')}}" data-label="{{res_value('PERIOD_YEAR')}}"><i class="fas fa-envelope"></i>{{res_value('PERIOD_YEAR')}}</a>
-                                <a data-value="{{res_value('PERIOD_ALL')}}" data-label="{{res_value('PERIOD_ALL')}}"><i class="fas fa-envelope"></i>{{res_value('PERIOD_ALL')}}</a>
+                            <div style="min-width: 180px; margin-left: 20px" class="dropdown-content">
+                                <a data-value="{{res_value('PERIOD_MONTH')}}" data-label="{{res_value('PERIOD_MONTH')}}"><i class="fas fa-hourglass-start" style="color: green;"></i>{{res_value('PERIOD_MONTH')}}</a>
+                                <a data-value="{{res_value('PERIOD_YEAR')}}" data-label="{{res_value('PERIOD_YEAR')}}"><i class="fas fa-hourglass-half" style="color: green;"></i>{{res_value('PERIOD_YEAR')}}</a>
+                                <a data-value="{{res_value('PERIOD_ALL')}}" data-label="{{res_value('PERIOD_ALL')}}"><i class="fas fa-hourglass-end" style="color: green;"></i>{{res_value('PERIOD_ALL')}}</a>
                             </div>
                         </div>
                     </td>
@@ -125,7 +125,7 @@
         <div id="region-template" style="display:none;">
             {% for code, name in list_region %}
             <a data-value="{{ code }}" data-label="{{ name }}">
-                <i class="fas fa-home"></i>{{ name }}
+                <i class="fas fa-globe" style="color: green;"></i>{{ name }}
             </a>
             {% endfor %}
         </div>
