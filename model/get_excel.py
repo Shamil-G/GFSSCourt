@@ -127,7 +127,6 @@ def export_to_excel(df_pivot, columns, args, filename=f"rep_{report_code}.xlsx")
 
 	log.info(f'REPORT: {report_code}. Формирование отчета {filename} завершено ({s_date} - {stop_time}). Строк в отчете: {row_num+1}')
 
-	filename = "отчет.xlsx"
 	safe_filename = urllib.parse.quote(filename)
 
 	excel_bytes = output.getvalue()
@@ -194,4 +193,4 @@ def get_excel(args: dict):
 			df = pd.DataFrame(rows, columns=columns)
 			log.debug(f"GET_EXCEL. COLUMNS: {columns} : {type(columns)}")
 			
-			return export_to_excel(df, columns, args, f"rep_{user_rfbn}_{dep_name}.xlsx")
+			return export_to_excel(df, columns, args, f"REP_{report_code}_{user_rfbn}_{dep_name}.xlsx")
