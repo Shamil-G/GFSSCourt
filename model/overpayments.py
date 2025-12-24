@@ -2,37 +2,36 @@ from    util.logger import log
 from    db.connect import get_connection
 from decimal import Decimal
 
-stmt_list_op = ""
+stmt_list_op_orig = """
+    select op.op_id "Номер",
+            op.region "Регион", 
+            p.lastname||' '||p.firstname||' '||p.middlename as "ФИО",
+            op.iin "ИИН",  
+            to_char(op.risk_date,'dd.mm.yyyy') as "Дата задолженности",  
+            to_char(op.sum_civ_amount,'999999990.99') "Сумма задолженности",
+            to_char(coalesce(op.compensated_amount,0),'9999990.99') "Возвращенная сумма",
+            op.rfpm_id "Код выплаты",
+            op.last_status "Текущий статус",
+            to_char(op.verdict_date,'dd.mm.yyyy') "Дата принятия решения",
+            to_char(op.effective_date,'dd.mm.yyyy') "Дата вступления в силу",
+            op.last_source_solution "Орган принятия последнего решения",
+            op.last_solution "Последнее решение",
+            op.employee "Сотрудник Фонда"
+    from overpayments op, loader.person p
+    where op.iin=p.iin(+)
+    """
 
 def list_overpayments(args: dict):
-    global stmt_list_op
-    stmt_list_op = """
-        select op.op_id,
-                op.region, 
-                p.lastname||' '||p.firstname||' '||p.middlename as fio,
-                op.iin,  
-                to_char(op.risk_date,'dd.mm.yyyy') as verdict_date,  
-                to_char(op.sum_civ_amount,'999999990.99'),
-                to_char(coalesce(op.compensated_amount,0),'9999990.99'),
-                op.rfpm_id,
-                op.last_status,
-                to_char(op.verdict_date,'dd.mm.yyyy'),
-                to_char(op.effective_date,'dd.mm.yyyy'),
-                op.last_source_solution,
-                op.last_solution,
-                op.employee
-        from overpayments op, loader.person p
-        where op.iin=p.iin(+)
-        """
+    stmt_list_op=stmt_list_op_orig
 
     user_region = args.get('user_region', None)
     user_period = args.get('user_period', None)
     user_top_control = args.get('user_top_control', None)
     iin_filter = args.get('iin_filter', None)
-    user_active = args.get('user_filter', None)
+    user_active = args.get('user_active', None)
     user_rfbn = args.get('user_rfbn', None)
 
-    log.info(f'---> LIST_OVERPAYMENTS\nPARAMS: {args}\n<---')
+    log.debug(f'---> LIST_OVERPAYMENTS\n\tuser_active: {user_active}\nPARAMS: {args}\n<---')
     # Для филиалов
     if not user_top_control:   
         stmt_list_op = stmt_list_op + ' and op.region=:region'
@@ -51,7 +50,7 @@ def list_overpayments(args: dict):
 
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            log.debug(f"---> LIST_OVERPAYMENTS\n{stmt_list_op}\n")
+            log.debug(f"---> LIST_OVERPAYMENTS. STMT:\n{stmt_list_op}\n<---")
             if user_top_control:
                 if not iin_filter:
                     cursor.execute(stmt_list_op)

@@ -6,6 +6,7 @@ from util.i18n import get_i18n_value
 from util.functions import *
 from model.overpayments import *
 from regions import *
+from model.get_excel import get_excel
 
 
 log.info("Routes-OverPayments стартовал...")
@@ -61,14 +62,15 @@ def filter_list_op():
     if 'iin_filter' in session:
         iin_filter=session['iin_filter']
 
-    active='active' if 'active' not in session else session['active']
+    if 'active' not in session:
+        session['active']='active'
+    active=session['active']
 
-    params = {'user_top_control': g.user.top_control, 'user_dep_name': g.user.dep_name, 
+    params = {'user_top_control': g.user.top_control, 'user_region`': g.user.dep_name, 
               'user_rfbn': g.user.rfbn_id, 'iin_filter': iin_filter, 'user_period': period, 'user_active': active
-               }
-
+             }
     rows = list_overpayments(params)
-    log.info(f"---> FILTER_LIST_OP. Rows: {len(rows)}\n\tPARAMS {params}")
+    log.debug(f"---> FILTER_LIST_OP. Rows: {len(rows)}\n\tPARAMS {params}")
     return render_template('partials/_list_op_fragment.html', rows=rows)
 
 
@@ -88,16 +90,33 @@ def view_list_overpayments():
     else:
         period = f'{session['period_list_op']}'
 
-    active='active' if 'to-do' not in session else session['to-do']
+    if 'active' not in session:
+        session['active']='active'
+    active=session['active']
 
     params = {'user_top_control': g.user.top_control, 'user_dep_name': g.user.dep_name, 'user_rfbn': g.user.rfbn_id, 'iin_filter': iin_filter, 'user_period': period, 'user_active': active}
 
-    log.info(f"LIST_OVERPAYMENTS. PARAMS: {params}")
+    log.debug(f"LIST_OVERPAYMENTS. PARAMS: {params}")
 
     list_region = [(key, data["ldap_name"]) for key, data in regions.items()]
 
-    log.info(f"LIST_OVERPAYMENTS. LEN list_op: {len(list_op)}\n\tREGIONS: {list_region}")
+    log.debug(f"LIST_OVERPAYMENTS. LEN list_op: {len(list_op)}\n\tREGIONS: {list_region}")
     return render_template("list_overpayments.html", list_op=list_op, selected_order=order_num, list_region=list_region)
+
+
+@app.route('/get_excel', methods=['GET'])
+@login_required
+def view_get_excel():
+    if 'period_list_op' not in session:
+        period = ""
+    else:
+        period = f'{session['period_list_op']}'
+
+    params = {'user_top_control': g.user.top_control, 'user_dep_name': g.user.dep_name, 'user_rfbn': g.user.rfbn_id, 'user_period': period}
+
+    log.info(f"--->\n\tVIEW GET EXCEL\n\tPARAMS: {params}\n<---")
+
+    return get_excel(params)
 
 
 @app.route('/add_op', methods=['POST', 'GET'])

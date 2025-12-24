@@ -59,6 +59,7 @@ export const FilterActiveCloseRefundBinder = {
             input.value = next;
             icon.textContent = next === 'active' ? iconActive : iconClosed;
 
+            console.log("NOW WILL BE TableLoader. URL: ", url, 'targetId: ', targetId, 'value: ', next);
             TableLoader.load(url, targetId, { value: next });
             console.log("ADDED CLICK LISTENER. TOGGLE →", next);
         });

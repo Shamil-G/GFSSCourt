@@ -72,7 +72,7 @@ class SSO_User:
             session['full_name'] = self.fio
 
             self.ip_addr = ip
-            log.info(f"---> SSO SUCCESS\n\tUSERNAME: {self.username}\n\tIP_ADDR: {self.ip_addr}\n\tFIO: {self.fio}\n\tROLES: {self.roles}, POST: {self.post}\n\tDEP_NAME: {self.dep_name}\n<---")
+            log.info(f"--->\n\tSSO SUCCESS\n\tUSERNAME: {self.username}\n\tIP_ADDR: {self.ip_addr}\n\tFIO: {self.fio}\n\tROLES: {self.roles}, POST: {self.post}\n\tDEP_NAME: {self.dep_name}\n<---")
             return self
         log.info(f"---> SSO FAIL. USERNAME: {src_user}\n\tip_addr: {ip}, password: {session['password']}\n<---")
         return None
