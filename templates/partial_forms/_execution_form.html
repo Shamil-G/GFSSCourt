@@ -1,31 +1,22 @@
-﻿<form class="form_op" id="executionForm" style="margin-top: 3px;" method="POST" action="/add_execution">
-    <table style="width: 960px; margin:4px 0px 4px 0px; box-shadow: none">
-        <colgroup>
-            <col style="width: 180px">
-        </colgroup>
-        <tbody>
-            <tr class="disabled-row">
-                <td style="border: none; text-align: left" data-help="transfer_date" data-role="helper" class="has-helper">📅 * {{ res_value('EXECUTION_TRANSFER_DATE') }}:</td>
-                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="transfer_date" required></td>
-            </tr>
+﻿<form class="form_op" id="executionForm" style="display: grid; grid-template-columns: 222px 1fr; row-gap: 8px; column-gap: 12px; align-items: center; max-width:640px" method="POST" action="/add_execution">
+            <div class="form-row">
+                <label for="transfer_date" style="border: none; text-align: left" data-help="transfer_date" data-role="helper" class="has-helper">📅 * {{ res_value('EXECUTION_TRANSFER_DATE') }}:</label>
+                <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="transfer_date" id="transfer_date" required>
+            </div>
 
-            <tr class="disabled-row">
-                <td style="border: none; text-align: left" data-help="start_date" data-role="helper" class="has-helper">📅 {{ res_value('EXECUTION_START_DATE') }}:</td>
-                <td style="border: none; text-align: left"><input class="input_d" style="font-size: 18px;" type="date" name="start_date"></td>
-            </tr>
+            <div class="form-row">
+                <label fro="start_date" style="border: none; text-align: left" data-help="start_date" data-role="helper" class="has-helper">📅 {{ res_value('EXECUTION_START_DATE') }}:</label>
+                <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="start_date" id="start_date">
+            </div>
 
-            <tr class="disabled-row">
-                <td style="border: none; text-align: left">{{ res_value('EXECUTION_PHONE') }}:</td>
-                <td style="border: none; text-align: left"><input class="input_s_form" style="width: 230px;" type="text" maxlength="16" name="phone"></td>
-            </tr>
+            <div class="form-row">
+                <label for="phone" style="border: none; text-align: left">{{ res_value('EXECUTION_PHONE') }}:</label>
+                <input class="input_s_form" style="width: 230px;" type="text" maxlength="16" name="phone" id="phone">
+            </div>
 
-            <tr class="disabled-row">
-                <td style="border: none; width: 230px; text-align: left">{{ res_value('EXECUTION_COURT_EXECUTOR') }}:</td>
-                <td style="border: none; text-align: left"><input class="input_s_form" style="width: 75%;" type="text" name="court_executor"></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <hr>
+            <div class="form-row">
+                <label for="court_executor" style="border: none; width: 230px; text-align: left">{{ res_value('EXECUTION_COURT_EXECUTOR') }}:</label>
+                <input class="input_s_form" style="min-width: 95%;" type="text" name="court_executor" id="court_executor">
+            </div>
     <button type="submit">💾 {{ res_value('BUTTON_SAVE') }}</button>
 </form>
