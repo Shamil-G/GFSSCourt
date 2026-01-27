@@ -1,16 +1,16 @@
 ﻿<form class="form_op" id="appealForm" style="display: grid; grid-template-columns: 196px 1fr; row-gap: 8px; column-gap: 12px; align-items: center; max-width: 940px" method="POST" action="/add_appeal">
         <div class="form-row">
             <label for="appeal_date" style="border: none; text-align: left">📅 * {{ res_value('APPEAL_DATE') }}:</label>
-            <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="appeal_date" required>
+            <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="appeal_date" id="appeal_date" required>
         </div>
         <div class="form-row">
             <label for="effective_date" style="border: none; text-align: left">📅 {{ res_value('EFFECTIVE_DATE') }}:</label>
-            <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="effective_date">
+            <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="effective_date" id="effective_date">
         </div>
 
         <div class="form-row">
-            <label style="border: none; text-align: left">{{ res_value('APPEAL_SOLUTION') }}:</label>
-            <div class="dropdown" data-role="menu">
+            <label for="menu-appeal-solution" style="border: none; text-align: left">{{ res_value('APPEAL_SOLUTION') }}:</label>
+            <div class="dropdown" data-role="menu" id="menu-appeal-solution">
                 <input class="input_s_form" type="hidden" name="appeal_solution" id="menuValue">
                 <button type="button" class="dropdown-button" id="menuButton">
                 <i class="fas fa-bars"></i>
@@ -26,9 +26,9 @@
         </div>
 
         <div class="form-row">
-            <label style="border: none; text-align: left">{{ res_value('APPEAL_CASSATION_SOLUTION') }}:</label>
+            <label for="menu-cassation-solution" style="border: none; text-align: left">{{ res_value('APPEAL_CASSATION_SOLUTION') }}:</label>
 
-            <div class="dropdown" data-role="menu">
+            <div class="dropdown" data-role="menu" id="menu-cassation-solution">
                 <input class="input_s_form" type="hidden" name="cassation_appeal_solution" id="menuValue">
                 <button type="button" class="dropdown-button" id="menuButton">
                 <i class="fas fa-bars"></i>
@@ -44,7 +44,7 @@
 
         <div class="form-row">
             <label for="court_name" style="border: none; text-align: left">{{ res_value('COURT_NAME') }}:</label>
-            <input class="input_s_form" style="width: 95%; max-width: 95%" type="text" name="court_name" required>
+            <input class="input_s_form" style="width: 95%; max-width: 95%" type="text" name="court_name" id="court_name" required>
         </div>
     <button type="submit">💾 {{ res_value('BUTTON_SAVE') }}</button>
 </form>

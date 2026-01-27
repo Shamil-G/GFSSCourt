@@ -1,7 +1,7 @@
 ﻿<form class="form_op" id="civForm" style="display: grid; grid-template-columns: 220px 1fr; row-gap: 8px; column-gap: 12px; align-items: center; max-width: 940px" method="POST" action="/add_court_civ">
         <div class="form-row">
             <label for ="submission_date" style="border: none; width: 220px; text-align: left">📅 * {{ res_value('SUBMISSION_DATE') }}:</label>
-            <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="submission_date" required>
+            <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="submission_date" id="submission_date" required>
         </div>
         <div class="form-row">
             <label for="solution_date" style="border: none; text-align: left">📆 {{ res_value('SOLUTION_DATE') }}:</label>
@@ -9,19 +9,19 @@
         </div>
         <div class="form-row">
             <label for="effective_date" style="border: none; text-align: left">📅 {{ res_value('EFFECTIVE_DATE') }}:</label>
-            <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="effective_date">
+            <input class="input_d" style="font-size: 18px; max-width: 150px" type="date" name="effective_date" id="effective_date">
         </div>
 
 
         <div class="form-row">
             <label for="num_solution" style="border: none; text-align: left">{{ res_value('NUM_SOLUTION') }}:</label>
-            <input style="width: 252px" class="input_s_form" type="text" name="num_solution">
+            <input style="width: 252px" class="input_s_form" type="text" name="num_solution" id="num_solution">
         </div>
 
         <div class="form-row">
-            <label for="dropdown-menu" style="border: none; text-align: left">{{ res_value('SOLUTION_CIV_PART') }}:</label>
+            <label for="dropdown-menu-civ-part" style="border: none; text-align: left">{{ res_value('SOLUTION_CIV_PART') }}:</label>
 
-            <div class="dropdown" data-role="menu" id="dropdown-menu">
+            <div class="dropdown" data-role="menu" id="dropdown-menu-civ-part">
                 <input type="hidden" name="solution" id="menuValue" style="width: 220px" class="input_s_form">
                 <button type="button" class="dropdown-button" id="menuButton">
                 <i class="fas fa-bars"></i>

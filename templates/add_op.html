@@ -24,11 +24,11 @@
     <form style="display: grid; grid-template-columns: 260px 1fr; row-gap: 8px; column-gap: 12px; align-items: center;" method="POST" enctype="multipart/form-data">
                 <div class="form-row">
                     <label for="iin" style="text-align: left; border:none; width: 240px">* {{res_value('IIN')}}</label>
-                    <input style="margin: 4px 0px; width: 148px; border-color: lightgray" class="input_s" name="iin" pattern="[0-9]{12}" type="text" maxlength="12" autocomplete="off" required>
+                    <input style="margin: 4px 0px; width: 148px; border-color: lightgray" class="input_s" name="iin" id="iin" pattern="[0-9]{12}" type="text" maxlength="12" autocomplete="off" required>
                 </div>
                 <div class="form-row">
                     <label for="risk_date" style="text-align: left; border:none; width: 240px">* {{res_value('RISK_DATE')}}</label>
-                    <input style="margin: 5px 0px 4px 4px; width: 148px; font-size: 18px" class="input_d" name="risk_date" pattern="[0-9]{12}" type="date" autocomplete="off" required>
+                    <input style="margin: 5px 0px 4px 4px; width: 148px; font-size: 18px" class="input_d" name="risk_date" id="risk_date" pattern="[0-9]{12}" type="date" autocomplete="off" required>
                 </div>
                 <div class="form-row">
                     <label style="text-align: left; border:none;">{{res_value('RFPM_ID')}}</label>
@@ -51,7 +51,7 @@
                 </div>
                 <div class="form-row">
                     <label for="sum_civ_amount" style="text-align: left; border: none;">{{res_value('SUM_CIV_AMOUNT')}}</label>
-                    <input style="margin: 4px 0px; border-color: lightgray; max-width: 148px" class="input_s" type="number" min="0.00" name="sum_civ_amount" autocomplete="off">
+                    <input style="margin: 4px 0px; border-color: lightgray; max-width: 148px" class="input_s" type="number" min="0.00" name="sum_civ_amount" id="sum_civ_amount" autocomplete="off">
                 </div>
                 <div class="form-row">
                     <label style="text-align: left; border: none; padding-bottom: 24px">* {{res_value('FILIAL_NAME')}}</label>
