@@ -199,3 +199,96 @@ export function fadeInsert(contentZone, htmlString) {
         }, 300);
     });
 }
+///////////////////////////////////////////////////////////////////////////////
+export function setTheme() {
+    const html = document.documentElement;
+    const icon = document.getElementById("theme-icon");
+    if (!icon) return;
+
+    function updateIcon() {
+        icon.src =
+            html.dataset.theme === "dark"
+                ? "/static/img/color-icon.png"
+                : "/static/img/dark-icon.png";
+    }
+
+    updateIcon();
+
+    window.toggleTheme = function () {
+        const newTheme = html.dataset.theme === "dark" ? "color" : "dark";
+        html.dataset.theme = newTheme;
+        localStorage.setItem("theme", newTheme);
+        updateIcon();
+    };
+}
+///////////////////////////////////////////////////////////////////////////////
+ export async function getZoneData(tabName, zoneName, params = {}) {
+    const zone_request = PageManager.get().tabContext.getEntry(tabName).request[zoneName];
+    //console.log('GET ZONE DATA. zone_request: ', zone_request)
+
+    const url = zone_request?.url || '/get_form';
+    const method = zone_request?.method || 'GET';
+    const parms = params || zone_request?.params;
+
+    const req = { url, method, body: parms };
+
+    //console.log('GET ZONE DATA. URL: ', url, '\n\tmethod: ', method, '\n\tparams:', params, 'parms:', parms, '\n\treq: ', req);
+
+    const response = await fetch(
+        method === 'GET' ? `${req.url}?form=${tabName}` : req.url,
+        {
+            method: req.method,
+            headers: req.method === 'POST' ? { 'Content-Type': 'application/json' } : {},
+            body: req.method === 'POST' ? JSON.stringify(req.body) : null
+        }
+    );
+
+    if (!response.ok) {
+        console.error(`GET ZONE DATA. failed fetch "${tabName}" — ${response}`);
+        return '';
+    }
+    return await response.text();
+}
+//////////////////////////////////////////////////////////////////////////////////
+export const GlobalDropdown = (() => {
+    let current = null;
+
+    function open(anchorEl, html) {
+        close();
+
+        const rect = anchorEl.getBoundingClientRect();
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'global-dropdown';
+        dropdown.innerHTML = html;
+
+        dropdown.style.position = 'absolute';
+        dropdown.style.left = rect.left + 'px';
+        dropdown.style.top = rect.bottom + 'px';
+        dropdown.style.zIndex = 99999;
+
+        document.body.appendChild(dropdown);
+        current = dropdown;
+
+        // Закрытие по клику вне
+        setTimeout(() => {
+            document.addEventListener('click', onClickOutside);
+        }, 0);
+    }
+
+    function onClickOutside(e) {
+        if (current && !current.contains(e.target)) {
+            close();
+        }
+    }
+
+    function close() {
+        if (current) {
+            current.remove();
+            current = null;
+            document.removeEventListener('click', onClickOutside);
+        }
+    }
+
+    return { open, close };
+})();

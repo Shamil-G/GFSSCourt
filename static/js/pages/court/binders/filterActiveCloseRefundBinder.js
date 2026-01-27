@@ -36,14 +36,19 @@ export const FilterActiveCloseRefundBinder = {
             return;
         }
 
-        const input = el.querySelector('input[type="hidden"]') || el.closest('td')?.querySelector('input[type="hidden"]');
-        const icon = el.querySelector('.icon') || el.querySelector('span') || el;
+        const show = el.querySelector('span[data-show="show"]') || el.closest('DIV')?.querySelector('span[data-show="show"]');
+        const icon = el.querySelector('#activeIcon'); // || el.querySelector('span') || el;
 
         const iconActive = el.dataset.iconActive || '🟡';
         const iconClosed = el.dataset.iconClosed || '✅';
 
-        if (!input || !icon) {
-            console.warn('❌ filter-active-close: missing input or icon', el);
+        if (!icon) {
+            console.warn('❌ filter-active-close: missing icon', el);
+            return;
+        }
+
+        if (!show) {
+            console.warn('❌ filter-active-close: missing span show', '\n\tel: ', el);
             return;
         }
 
@@ -53,11 +58,14 @@ export const FilterActiveCloseRefundBinder = {
         el.addEventListener('click', (event) => {
             event.preventDefault();
 
-            const current = input.value;
+            const current = icon.dataset.value;
             const next = current === 'active' ? 'closed' : 'active';
 
-            input.value = next;
-            icon.textContent = next === 'active' ? iconActive : iconClosed;
+            console.log('current: ', current, );
+            //input.value = next;
+            icon.dataset.value = next;
+            show.textContent = next === 'active' ? 'К завершенным делам' : 'К незавершенным делам';
+            icon.textContent = current === 'active' ? iconActive : iconClosed;
 
             console.log("NOW WILL BE TableLoader. URL: ", url, 'targetId: ', targetId, 'value: ', next);
             TableLoader.load(url, targetId, { value: next });

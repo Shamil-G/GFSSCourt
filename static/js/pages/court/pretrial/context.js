@@ -19,8 +19,13 @@ export const pretrialTabContext = {
     request: {
         content: {
             method: 'POST',
-            url: '/pretrial_fragment',
+            url: '/get_fragment',
             params: orderNum => ({ order_num: orderNum })
+        },
+        form: {
+            method: 'POST',
+            url: '/get_form',
+            params: orderNum => ({ form: 'pretrial', order_num: orderNum })
         }
     },
     bindScope: {

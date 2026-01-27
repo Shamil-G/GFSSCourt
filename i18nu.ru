@@ -123,3 +123,7 @@ EXCITEMENT_DATE=Дата возбуждения УД
 RESOLUTION_DATE=Дата постановления
 RECIEPT_DATE=Дата поступления
 SELECT_REGION=Выберите область
+FILTER_PERIOD=Фильтр по периоду
+RECALC_REFUND=Пересчитать возвраты
+ACTIVE_REFUND=Незавершенные возвраты
+CLOSE_REFUND=Завершенные возвраты

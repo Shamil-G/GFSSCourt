@@ -12,3 +12,4 @@
 /__pycache__
 /logs/gfsscourt.log
 /logs/court.log
+/logs/model/__pycache__

@@ -1,4 +1,4 @@
-import { MenuBinder } from '/static/js/pages/court/crime/binders/menuBinder.js';
+import { MenuBinder } from '/static/js/binders/standart/menuBinder.js';
 import { RefreshDirectContentTabBinder } from '/static/js/binders/standart/refreshDirectContentTabBinder.js';
 import { ToggleVisibleFormBinder } from '/static/js/binders/standart/toggleVisibleFormBinder.js';
 import { HelperBinder } from '/static/js/binders/standart/helperBinder.js';
@@ -19,8 +19,13 @@ export const courtCrimeTabContext = {
     request: {
         content: {
             method: 'POST',
-            url: '/court_crime_fragment',
+            url: '/get_fragment',
             params: orderNum => ({ order_num: orderNum })
+        },
+        form: {
+            method: 'POST',
+            url: '/get_form',
+            params: orderNum => ({ form: 'crime', order_num: orderNum })
         }
     },
     bindScope: {

@@ -96,39 +96,40 @@ export class PageContext {
         return { method, url, body };
     }
 
-    async loadTab(tabName, orderNum, zoneKey = 'fragment') {
+    async loadTab(tabName, zoneKey = 'fragment', orderNum) {
         const entry = this.tabContext.getEntry(tabName);
         if (!entry?.zones?.[zoneKey]) return;
         await this.loader.loadZone(tabName, zoneKey, orderNum);
     }
 
-    async loadCustom(tabName, zoneKey, url, body = null, method = 'POST') {
-        const zone = this.getZone(tabName, zoneKey);
-        if (!zone) {
-            console.warn(`PageContext: zone "${zoneKey}" not found for tab "${tabName}"`);
-            return;
-        }
+    // 08.01.2026
+    //async loadCustom(tabName, zoneKey, url, body = null, method = 'POST') {
+    //    const zone = this.getZone(tabName, zoneKey);
+    //    if (!zone) {
+    //        console.warn(`PageContext: zone "${zoneKey}" not found for tab "${tabName}"`);
+    //        return;
+    //    }
 
-        try {
-            const response = await fetch(url, {
-                method,
-                headers: method === 'POST' ? { 'Content-Type': 'application/json' } : {},
-                body: method === 'POST' ? JSON.stringify(body) : null
-            });
+    //    try {
+    //        const response = await fetch(url, {
+    //            method,
+    //            headers: method === 'POST' ? { 'Content-Type': 'application/json' } : {},
+    //            body: method === 'POST' ? JSON.stringify(body) : null
+    //        });
 
-            if (!response.ok) {
-                console.error(`PageContext: failed to load "${tabName}" zone "${zoneKey}" — ${response.status}`);
-                return;
-            }
+    //        if (!response.ok) {
+    //            console.error(`PageContext: failed to load "${tabName}" zone "${zoneKey}" — ${response.status}`);
+    //            return;
+    //        }
 
-            const html = await response.text();
-            zone.innerHTML = html;
+    //        const html = await response.text();
+    //        zone.innerHTML = html;
 
-            this.tabContext.attachZoneBinders(tabName, zoneKey);
-        } catch (err) {
-            console.error(`PageContext: error loading "${tabName}" zone "${zoneKey}"`, err);
-        }
-    }
+    //        this.tabContext.attachZoneBinders(tabName, zoneKey);
+    //    } catch (err) {
+    //        console.error(`PageContext: error loading "${tabName}" zone "${zoneKey}"`, err);
+    //    }
+    //}
 
     list({ strategy = 'all', zoneKey = null } = {}) {
         const prefix = this.pageName + '.';
@@ -240,13 +241,8 @@ export class PageContext {
         const orderNum = TabUtil.getOrderNum();
         //console.log("targetPanel: ", targetPanel);
         if (!TabUtil.loadFromCache(tabName, orderNum)) {
-
             //console.log("this.tabContext: ", orderNum);
-
-            //
-            const loader = new TabLoader(this.tabContext);
-            loader.loadZone(tabName, 'content', TabUtil.getOrderNum());
-
+            this.loadTab(tabName, 'content', orderNum);
             //this.loadTabContent?.(tabName, targetPanel, orderNum);
         }
 

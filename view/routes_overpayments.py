@@ -18,6 +18,7 @@ def filter_active():
     active = data.get('value','')
 
     session['active'] = active
+    log.info(f'FILTER-ACTIVE. active: {active}')
 
     return redirect(url_for('filter_list_op'))
 
@@ -66,11 +67,11 @@ def filter_list_op():
         session['active']='active'
     active=session['active']
 
-    params = {'user_top_control': g.user.top_control, 'user_region`': g.user.dep_name, 
+    params = {'user_top_control': g.user.top_control, 'user_region': g.user.dep_name, 
               'user_rfbn': g.user.rfbn_id, 'iin_filter': iin_filter, 'user_period': period, 'user_active': active
              }
     rows = list_overpayments(params)
-    log.debug(f"---> FILTER_LIST_OP. Rows: {len(rows)}\n\tPARAMS {params}")
+    log.info(f"---> FILTER_LIST_OP. Rows: {len(rows)}\n\tPARAMS {params}")
     return render_template('partials/_list_op_fragment.html', rows=rows)
 
 
@@ -119,6 +120,112 @@ def view_get_excel():
     return get_excel(params)
 
 
+@app.route('/get_fragment', methods=['GET','POST'])
+@login_required
+def view_get_fragment():
+    data = extract_payload()
+    log.info(f'GET FRAGMENT. DATA {data}')
+    order_num=data.get('order_num','')
+    fragment = data.get('fragment','')
+
+    match fragment:
+        case 'scammer':
+            scammer_items = get_scammer_items(order_num) if order_num else []
+            log.debug(f"SCAMMER_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {scammer_items}")
+            return render_template("partials/_scammer_fragment.html", scammer_items=scammer_items, selected_order=order_num)
+        case 'pretrial':
+            pretrial_items = get_pretrial_items(order_num) if order_num else []
+            log.debug(f"PRETRIAL_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {pretrial_items}")
+            return render_template("partials/_pretrial_fragment.html", pretrial_items=pretrial_items, selected_order=order_num)
+        case 'law':
+            law_items = get_law_items(order_num) if order_num else []
+            log.debug(f"LAW_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {law_items}")
+            return render_template("partials/_law_fragment.html", law_items=law_items, selected_order=order_num)
+        case 'crime':
+            court_items = get_court_crime_items(order_num) if order_num else []
+            log.debug(f"COURT_CRIME_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {court_items}")
+            return render_template("partials/_court_crime_fragment.html", court_crime_items=court_items, selected_order=order_num)
+        case 'civ':
+            court_items = get_court_civ_items(order_num) if order_num else []
+            log.debug(f"COURT_CIV_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {court_items}")
+            return render_template("partials/_court_civ_fragment.html", court_civ_items=court_items, selected_order=order_num)
+        case 'appeal':
+            appeal_items = get_appeal_items(order_num) if order_num else []
+            log.debug(f"APPEAL\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {appeal_items}")
+            return render_template("partials/_appeal_fragment.html", appeal_items=appeal_items, selected_order=order_num)
+        case 'execution':
+            execution_items = get_execution_items(order_num) if order_num else []
+            log.debug(f"EXECUTION_FRAGMENT\n\tORDER_NUM: {order_num}\n\tEXECUTION_ITEMS: {execution_items}")
+            return render_template("partials/_execution_fragment.html", execution_items=execution_items, selected_order=order_num)
+        case 'refunding':
+            refunding_items = get_refunding_items(order_num) if order_num else []
+            log.debug(f"REFUNDING_FRAGMENT. ORDER_NUM: {order_num}\n\tREFUNDING_ITEMS: {refunding_items}")
+            return render_template("partials/_refunding_fragment.html", refunding_items=refunding_items, selected_order=order_num)
+        case _:
+            return "", 200
+
+
+@app.route('/get_form', methods=['GET','POST'])
+def pretrial_form_fragment():
+    data = extract_payload()
+    log.debug(f'GET FORM. DATA: {data}')
+    form = data.get('form','')
+    order_num = data.get('order_num','')
+
+    log.debug(f'GET FORM\n\tFORM: {form}\n\tORDER_NUM: {order_num}')
+
+    match form:
+        case 'pretrial':
+            return render_template('partial_forms/_pretrial_form.html')
+        case 'scammer':
+            return render_template('partial_forms/_scammer_form.html')
+        case 'law':
+            return render_template('partial_forms/_law_form.html')
+        case 'crime':
+            return render_template('partial_forms/_court_crime_form.html')
+        case 'civ':
+            return render_template('partial_forms/_court_civ_form.html')
+        case 'appeal':
+            return render_template('partial_forms/_appeal_form.html')
+        case 'execution':
+            return render_template('partial_forms/_execution_form.html')
+        case 'refunding':
+            return render_template('partial_forms/_refunding_form.html')
+        case _:
+            return "", 200
+
+
+@app.route('/recalc_refunding')
+@login_required
+def view_recalc_refunding():
+    log.info(f'----->\n\tRECALC REFUNDING\n\tUSER: {g.user.full_name}')
+    if g.user.top_control and g.user.full_name:
+        recalc_refunding()
+    return redirect(url_for('view_list_overpayments'))
+
+
+@app.route('/update-field', methods=['POST'])
+@login_required
+def view_update_field():
+    data = request.get_json()
+    field = data.get('field')
+    value = data.get('value')
+    op_id = data.get('id')
+
+    match field:
+        case 'risk_date':
+            update_risk_date(op_id, value, g.user.full_name)
+        case 'sum_civ_amount':
+            update_sum_civ(op_id, value, g.user.full_name)
+        case 'region':
+            region_name = regions[value]['ldap_name']
+            update_region(op_id, value, region_name, g.user.full_name)
+        case 'last_solution':
+            update_last_solution(op_id, value, g.user.full_name)
+        case _: log.info(f"Обновление {value} не предусмотрено")
+
+    return { "success": True }, 200
+
 @app.route('/add_op', methods=['POST', 'GET'])
 @login_required
 def view_add_op():
@@ -142,48 +249,6 @@ def view_add_op():
     log.debug(f"ADD OP. REGION: {g.user.dep_name}, TTOP_CONTROL: {g.user.top_control}")
     list_region = [(key, data["ldap_name"]) for key, data in regions.items()]
     return render_template("add_op.html", region=g.user.dep_name, list_region=list_region, top_control=g.user.top_control, mess=mess)
-
-
-@app.route('/form_fragment')
-def pretrial_form_fragment():
-    form_type = request.args.get('form')
-    # order_num = request.args.get('order_num')
-
-    log.info(f'PRETRIAL_FORM_FRAGMENT\n\tFORM_TYPE: {form_type}')
-
-    match form_type:
-        case 'pretrial':
-            return render_template('partial_forms/_pretrial_form.html')
-        case 'scammer':
-            return render_template('partial_forms/_scammer_form.html')
-        case 'law':
-            return render_template('partial_forms/_law_form.html')
-        case 'crime':
-            return render_template('partial_forms/_court_crime_form.html')
-        case 'civ':
-            return render_template('partial_forms/_court_civ_form.html')
-        case 'appeal':
-            return render_template('partial_forms/_appeal_form.html')
-        case 'execution':
-            return render_template('partial_forms/_execution_form.html')
-        case 'refunding':
-            return render_template('partial_forms/_refunding_form.html')
-        case _:
-            return render_template('partial_forms/_pretrial_form.html')
-
-
-@app.route('/pretrial_fragment', methods=['GET','POST'])
-@login_required
-def view_pretrial_fragment():
-    if request.method=='POST':
-        data = extract_payload()
-        order_num = data.get('order_num', '')
-    else:
-        order_num = request.args.get('order_num','')
-
-    pretrial_items = get_pretrial_items(order_num) if order_num else []
-    log.debug(f"PRETRIAL_FRAGMENT\n\tORDER_NUM: {order_num}\n\tPRETRIAL_ITEMS: {pretrial_items}")
-    return render_template("partials/_pretrial_fragment.html", pretrial_items=pretrial_items, selected_order=order_num)
 
 
 @app.route('/add_pretrial', methods=['GET','POST'])
@@ -210,21 +275,6 @@ def view_pretrial_add():
     # Сохраняем в БД или обрабатываем
     return { "success":  False, "message": "ADD PRETRIAL. ORDER NUM is empty?" }, 200
     # return redirect(url_for('view_list_overpayments', order_num=order_num))
-
-
-@app.route('/scammer_fragment', methods=['GET','POST'])
-@login_required
-def view_scammer_fragment():
-    if request.method=='POST':
-        data = extract_payload()
-        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
-        order_num = data.get('order_num', '')
-    else:
-        order_num = request.args.get('order_num','')
-
-    scammer_items = get_scammer_items(order_num) if order_num else []
-    log.debug(f"SCAMMER_FRAGMENT\n\tORDER_NUM: {order_num}\n\tSCAMMER_ITEMS: {scammer_items}")
-    return render_template("partials/_scammer_fragment.html", scammer_items=scammer_items, selected_order=order_num)
 
 
 @app.route('/add_scammer', methods=['POST'])
@@ -271,20 +321,6 @@ def view_law_add():
     return { "success":  False, "message": "Не все поля заполнены\n'Решение ПО' или 'Правоохранительный орган'?" }, 200
 
 
-@app.route('/law_fragment', methods=['GET','POST'])
-@login_required
-def view_law_fragment():
-    if request.method=='POST':
-        data = extract_payload()
-        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
-        order_num = data.get('order_num', '')
-    else:
-        order_num = request.args.get('order_num','')
-
-    law_items = get_law_items(order_num) if order_num else []
-    log.debug(f"LAW_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {law_items}")
-    return render_template("partials/_law_fragment.html", law_items=law_items, selected_order=order_num)
-
 
 @app.route('/add_court_crime', methods=['POST'])
 @login_required
@@ -309,21 +345,6 @@ def view_court_crime_add():
         return jsonify({ "success": True }), 200
     # Сохраняем в БД или обрабатываем
     return { "success":  False, "message": "ADD CRIME. ⚠️ Не все поля заполнены" }, 200
-
-
-@app.route('/court_crime_fragment', methods=['GET','POST'])
-@login_required
-def view_court_crime_fragment():
-    if request.method=='POST':
-        data = extract_payload()
-        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
-        order_num = data.get('order_num', '')
-    else:
-        order_num = request.args.get('order_num','')
-
-    court_items = get_court_crime_items(order_num) if order_num else []
-    log.debug(f"COURT_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {court_items}")
-    return render_template("partials/_court_crime_fragment.html", court_crime_items=court_items, selected_order=order_num)
 
 
 @app.route('/add_court_civ', methods=['POST'])
@@ -355,21 +376,6 @@ def view_court_civ_add():
     return { "success":  False, "message": "ADD CIV. ⚠️ Не все поля заполнены" }, 200
 
 
-@app.route('/court_civ_fragment', methods=['GET','POST'])
-@login_required
-def view_court_civ_fragment():
-    if request.method=='POST':
-        data = extract_payload()
-        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
-        order_num = data.get('order_num', '')
-    else:
-        order_num = request.args.get('order_num','')
-
-    court_items = get_court_civ_items(order_num) if order_num else []
-    log.debug(f"COURT_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {court_items}")
-    return render_template("partials/_court_civ_fragment.html", court_civ_items=court_items, selected_order=order_num)
-
-
 @app.route('/add_appeal', methods=['POST'])
 @login_required
 def view_appeal_add():
@@ -388,21 +394,6 @@ def view_appeal_add():
     # Сохраняем в БД или обрабатываем
     return jsonify({ "success": False, "message": "Поле ORDER_NUM is empty?" }), 200
     # return redirect(url_for('view_list_overpayments', order_num=order_num, tab='appeal'))
-
-
-@app.route('/appeal_fragment', methods=['GET','POST'])
-@login_required
-def view_appeal_fragment():
-    if request.method=='POST':
-        data = extract_payload()
-        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
-        order_num = data.get('order_num', '')
-    else:
-        order_num = request.args.get('order_num','')
-
-    appeal_items = get_appeal_items(order_num) if order_num else []
-    log.debug(f"COURT_FRAGMENT\n\tORDER_NUM: {order_num}\n\tLAW_ITEMS: {appeal_items}")
-    return render_template("partials/_appeal_fragment.html", appeal_items=appeal_items, selected_order=order_num)
 
 
 @app.route('/add_execution', methods=['POST'])
@@ -427,63 +418,3 @@ def view_execution_add():
     return { "success":  False, "message": "ADD EXECUTION. ⚠️ Не все поля заполнены" }, 200
 
 
-@app.route('/execution_fragment', methods=['GET','POST'])
-@login_required
-def view_execution_fragment():
-    if request.method=='POST':
-        data = extract_payload()
-        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
-        order_num = data.get('order_num', '')
-    else:
-        order_num = request.args.get('order_num','')
-
-    execution_items = get_execution_items(order_num) if order_num else []
-    log.debug(f"EXECUTION_FRAGMENT\n\tORDER_NUM: {order_num}\n\tEXECUTION_ITEMS: {execution_items}")
-    return render_template("partials/_execution_fragment.html", execution_items=execution_items, selected_order=order_num)
-
-
-@app.route('/recalc_refunding')
-@login_required
-def view_recalc_refunding():
-    log.info(f'----->\n\tRECALC REFUNDING\n\tUSER: {g.user.full_name}')
-    if g.user.top_control and g.user.full_name:
-        recalc_refunding()
-    return redirect(url_for('view_list_overpayments'))
-
-
-@app.route('/refunding_fragment', methods=['GET','POST'])
-@login_required
-def view_refunding_fragment():
-    if request.method=='POST':
-        data = extract_payload()
-        log.debug(f"REFUNDING_FRAGMENT. Data: {data}")
-        order_num = data.get('order_num', '')
-    else:
-        order_num = request.args.get('order_num','')
-
-    refunding_items = get_refunding_items(order_num) if order_num else []
-    log.info(f"REFUNDING_FRAGMENT. ORDER_NUM: {order_num}\n\tREFUNDING_ITEMS: {refunding_items}")
-    return render_template("partials/_refunding_fragment.html", refunding_items=refunding_items, selected_order=order_num)
-
-
-@app.route('/update-field', methods=['POST'])
-@login_required
-def view_update_field():
-    data = request.get_json()
-    field = data.get('field')
-    value = data.get('value')
-    op_id = data.get('id')
-
-    match field:
-        case 'risk_date':
-            update_risk_date(op_id, value, g.user.full_name)
-        case 'sum_civ_amount':
-            update_sum_civ(op_id, value, g.user.full_name)
-        case 'region':
-            region_name = regions[value]['ldap_name']
-            update_region(op_id, value, region_name, g.user.full_name)
-        case 'last_solution':
-            update_last_solution(op_id, value, g.user.full_name)
-        case _: log.info(f"Обновление {value} не предусмотрено")
-
-    return { "success": True }, 200

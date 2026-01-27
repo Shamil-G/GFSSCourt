@@ -165,8 +165,8 @@ def get_excel(args: dict):
 	stmt=get_stmt(args)
 
 	log.debug(f'GET EXCEL. STMT:\n{stmt}')
-	user_rfbn = args.get('user_rfbn', '')
-	dep_name = args.get('user_dep_name', '')
+	user_rfbn = args.get('user_rfbn', None)
+	dep_name = args.get('user_dep_name', None)
 
 	results = []
 	mistake = 0

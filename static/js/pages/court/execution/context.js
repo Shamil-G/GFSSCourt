@@ -18,8 +18,13 @@ export const executionTabContext = {
     request: {
         content: {
             method: 'POST',
-            url: '/execution_fragment',
+            url: '/get_fragment',
             params: orderNum => ({ order_num: orderNum })
+        },
+        form: {
+            method: 'POST',
+            url: '/get_form',
+            params: orderNum => ({ form: 'execution', order_num: orderNum })
         }
     },
     bindScope: {

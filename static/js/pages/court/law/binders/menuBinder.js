@@ -73,9 +73,9 @@ export const MenuBinder = {
         dropdowns.forEach(dropdown => {
             const tag = dropdown.tagName;
             //console.log('MenuBinder: TAG_NAME:', tag);
-            const allowedTags = ['DIV', 'SECTION'];
+            const allowedTags = ['DIV', 'SECTION', 'LABEL'];
             if (!allowedTags.includes(tag)) {
-                console.warn(`⚠️ MenuBinder: skipping non-DIV element <${tag}>`, dropdown);
+                console.warn(`⚠️ MenuBinder. for role ${this.role} skipping non-DIV, SECTION, LABEL element <${tag}>`, dropdown);
                 return;
             }
             this.attach(dropdown);

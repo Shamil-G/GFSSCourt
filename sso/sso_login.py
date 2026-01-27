@@ -1,7 +1,7 @@
 from flask import session
 from util.ip_addr import ip_addr
 from util.logger import log
-from app_config import list_admins, admin_deps, permit_post
+from app_config import list_admins, admin_deps, permits_post
 
      
 class SSO_User:
@@ -29,27 +29,28 @@ class SSO_User:
                 log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tDEP_NAME is empty\n<---")
                 return None
 
-            # if src_user['dep_name'] not in admin_deps and src_user['dep_name'] not in deps:
-            #     log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tDEP_NAME {src_user['dep_name']} have not rigth<---")
-            #     return None
-
             if 'post' not in src_user:
                 log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tPOST in \n{src_user}\n\tis empty\n<---")
                 return None
 
-            if src_user['post'] not in permit_post:
+            # post
+            self.post = src_user.get('post','')
+            session['post']=self.post
+
+            if self.post not in permits_post:
                 log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tPOST in \n{src_user} have not rigth\n<---")
                 return None
-            # end Required fields check
+
+            if permits_post[self.post] != '*' and src_user.get('dep_name','') != permits_post[self.post]:
+                log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tPOST in \n{src_user} have not rigth\n<---")
+                return None
 
             # RFBN_ID
             self.rfbn_id=src_user.get('rfbn_id','')
             # dep_name
             self.dep_name = src_user.get('dep_name','')
             session['dep_name']=self.dep_name
-            # post
-            self.post = src_user.get('post','')
-            session['post']=self.post
+
             # FIO
             self.fio = src_user.get('fio','')
             session['fio'] = self.fio

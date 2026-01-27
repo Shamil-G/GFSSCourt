@@ -21,10 +21,81 @@
 
 
 {% block body %}
-<div class="container">
+<div class="container" style="padding: 0px; display: flex; flex-direction: column; min-height: 100%;">
     <!-- Верхняя область: список документов -->
-    <div class="documents">
-        <table id="court_mainTable">
+    <div id="court_filterZone" style="display: flex; gap: 24px; align-items: center; z-index:20; font-size: 18px">
+        <label style="margin-left: 12px; min-width: 170px; padding: 4px 2px; text-align: left; font-weight: bold">
+            {{ res_value('IIN_OVERPAY') }}: &nbsp;
+            <input class="input_s_form"
+                   style="width: 130px; font-size: 16px; border: 1px solid #ccc; padding: 7px"
+                   inputmode="numeric"
+                   pattern="\d{1,12}"
+                   maxlength="12"
+                   type="text"
+                   name="iin_filter"
+                   id="iinInput"
+                   placeholder="ИИН"
+                   data-role="filter-iin"
+                   data-url="/filter-iin-overpayments"
+                   data-target="court_mainBody">
+            <button type="button"
+                    data-role="filter-iin"
+                    data-url="/filter-iin-overpayments"
+                    data-target="court_mainBody"
+                    id="filterButton"
+                    style="margin-left: 3px" class="tiny-btn">
+                🔍
+            </button>
+        </label>
+        <div class="dropdown"
+             data-role="filter-period"
+             data-url="/filter-period-overpayments"
+             data-target="court_mainBody"
+             style="margin-left: 5px; min-width: 216px; padding: 4px 0px; text-align: center; font-weight: bold">
+            {{ res_value('FILTER_PERIOD') }}: &nbsp;
+            <input type="hidden" name="menuValuePeriod" id="menuValuePeriod">
+            <div class="dropdown-inner">
+                <button id="menuButton"
+                        class="dropdown-button period-button"
+                        data-track="true"
+                        style="display: inline-block; border: 1px solid lightgray; min-width: 160px" type="button">
+                    <i class="fas fa-filter" style="color: green;"></i>
+                    <span class="label">{{ res_value('SELECT_PERIOD') }}</span>
+                    <span style="display: inline-block; margin-left: 5px;" class="caret"></span>
+                </button>
+                <div style="min-width: 180px;" class="dropdown-content">
+                    <a data-value="{{res_value('PERIOD_MONTH')}}" data-label="{{res_value('PERIOD_MONTH')}}"><i class="fas fa-hourglass-start" style="color: green;"></i>{{res_value('PERIOD_MONTH')}}</a>
+                    <a data-value="{{res_value('PERIOD_YEAR')}}" data-label="{{res_value('PERIOD_YEAR')}}"><i class="fas fa-hourglass-half" style="color: green;"></i>{{res_value('PERIOD_YEAR')}}</a>
+                    <a data-value="{{res_value('PERIOD_ALL')}}" data-label="{{res_value('PERIOD_ALL')}}"><i class="fas fa-hourglass-end" style="color: green;"></i>{{res_value('PERIOD_ALL')}}</a>
+                </div>
+            </div>
+        </div>
+        <div data-help="filter_active" data-role="helper" class="has-helper"
+             style="margin-left: 5px; min-width: 216px; padding: 4px 0px; text-align: center; font-weight: bold; display: flex; align-items: center;">
+            <span data-show="show">{{ 'К завершенным делам' if session['active'] == 'active' else 'К незавершенным делам' }}</span>
+            : &nbsp;
+            <a href="#"
+               data-role="filter-active-close"
+               data-url="/filter-active"
+               data-target="court_mainBody"
+               data-icon-active="🟡"
+               data-icon-closed="✅"
+               style="text-decoration: none;">
+                <span id="activeIcon" data-value="active" style="font-size: 22px">
+                    {{ '✅' if session['active'] == 'active' else '🟡' }}
+                </span>
+            </a>
+        </div>
+        {% if 'top_control' in session and session['top_control'] == 1 %}
+        <div data-help="refund_all" data-role="helper" class="has-helper"
+             style="margin-left: 5px; min-width: 216px; padding: 4px 0px; text-align: center; font-weight: bold; display: flex; align-items: center;">
+            <span>{{res_value('RECALC_REFUND')}}: &nbsp;</span>
+            <a style="text-decoration: none; font-size: 24px" href="/recalc_refunding">🔄</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="documents" style="flex: 1 1 auto; overflow: auto; position: relative;">
+        <table id="court_mainTable" style="display: block; width: 100%; border-collapse: separate; border-spacing: 0;">
             <colgroup><col style="width: 80px;"><col><col><col style="width: 140px;"><col style="width: 140px;"><col><col><col><col><col><col></colgroup>
             <thead class="my_stick_head">
                 <tr>
@@ -43,82 +114,6 @@
                     <th data-help="last_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
                 </tr>
             </thead>
-            <tbody class="my_stick" id="court_filterZone">
-                <tr data-persistent id="court_filterRow">
-                    <td>
-                        <a style="text-decoration: none; font-size: 24px" href="/add_op">➕</a>
-                    </td>
-                    <td />
-                    <td />
-                    <td style="min-width: 170px; padding: 4px 2px; text-align: left">
-                        <!--<form method="GET" style="padding: 0px; margin: 0px; border:none" action="{{ url_for('filter_iin_list_op') }}">-->
-                        <input class="input_s_form"
-                               style="width: 130px; font-size: 16px; border: 1px solid #ccc; padding: 7px"
-                               inputmode="numeric"
-                               pattern="\d{1,12}"
-                               maxlength="12"
-                               type="text"
-                               name="iin_filter"
-                               id="iinInput"
-                               placeholder="ИИН"
-                               data-role="filter-iin"
-                               data-url="/filter-iin-overpayments"
-                               data-target="court_mainBody">
-                        <button type="button"
-                                data-role="filter-iin"
-                                data-url="/filter-iin-overpayments"
-                                data-target="court_mainBody"
-                                id="filterButton"
-                                style="margin-left: 3px" class="tiny-btn">
-                            🔍
-                        </button>
-                        <!--</form>-->
-                    </td>
-                    <td style="padding: 4px 0px; text-align:center">
-                        <div data-role="menu"
-                             data-track="true"
-                             data-url="/filter-period-overpayments"
-                             data-target="court_mainBody"
-                             style="min-width: 216px" class="dropdown">
-                            <input type="hidden" name="menuValuePeriod" id="menuValuePeriod">
-                            <button style="display: inline-block; border: 1px solid lightgray; min-width: 160px" type="button" class="dropdown-button period-button" id="menuButton">
-                                <i class="fas fa-filter" style="color: green;"></i>
-                                <span class="label">{{ res_value('SELECT_PERIOD') }}</span>
-                                <span style="display: inline-block; margin-left: 5px;" class="caret"></span>
-                            </button>
-                            <div style="min-width: 180px; margin-left: 20px" class="dropdown-content">
-                                <a data-value="{{res_value('PERIOD_MONTH')}}" data-label="{{res_value('PERIOD_MONTH')}}"><i class="fas fa-hourglass-start" style="color: green;"></i>{{res_value('PERIOD_MONTH')}}</a>
-                                <a data-value="{{res_value('PERIOD_YEAR')}}" data-label="{{res_value('PERIOD_YEAR')}}"><i class="fas fa-hourglass-half" style="color: green;"></i>{{res_value('PERIOD_YEAR')}}</a>
-                                <a data-value="{{res_value('PERIOD_ALL')}}" data-label="{{res_value('PERIOD_ALL')}}"><i class="fas fa-hourglass-end" style="color: green;"></i>{{res_value('PERIOD_ALL')}}</a>
-                            </div>
-                        </div>
-                    </td>
-                    <td />
-                    <td />
-                    <td data-help="refund_all" data-role="helper" class="has-helper">
-                        <a style="text-decoration: none; font-size: 24px" href="/recalc_refunding">🔄</a>
-                    </td>
-                    <td data-help="filter_active" data-role="helper" class="has-helper">
-                        <input type="hidden" id="activeState" value="{{ 'active' if session['active'] == 'closed' else 'active' }}">
-                        <a href="#"
-                           data-role="filter-active-close"
-                           data-url="/filter-active"
-                           data-target="court_mainBody"
-                           data-icon-active="🟡"
-                           data-icon-closed="✅"
-                           style="font-size: 24px; text-decoration: none;">
-                            <span id="activeIcon">
-                                {{ '✅' if session['active'] == 'closed' else '🟡' }}
-                            </span>
-                        </a>
-                    </td>
-
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                </tr>
-            </tbody>
             <!--<tbody id="court_mainBody" data-action="filterByOrder">-->
             <tbody id="court_mainBody" data-role="edit-row row-click menu-region-edit" data-action="filterByOrder">
             </tbody>
@@ -152,7 +147,6 @@
         <div id="court_tabs_content" class="tab-content active">
 
             <div data-tab="scammer" class="tab-panel">
-                {% if 'top_control' in session and session['top_control'] == 1 %}
                 <button data-form="scammerForm"
                         id="scammerVisibleButton"
                         data-role="toggle-visible-form"
@@ -162,7 +156,6 @@
                         data-label-close="❌ {{ res_value('BUTTON_CLOSE') }}">
                     ➕ {{ res_value('BUTTON_ADD') }}
                 </button>
-                {% endif %}
                 <button class="refresh-btn" data-role="refresh-content" data-tab="scammer" id="scammerRefreshButton">🔄 Обновить</button>
                 <!--<button id="scammerRefreshButton" onclick="API.refreshTab('scammer')">🔄 Обновить</button>-->
 

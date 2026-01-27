@@ -132,6 +132,7 @@ function showTab(tabName) {
 
     console.log('Tabs in page:', PageManager.get().list());
 
+    TabUtil.setTheme();
     setTimeout(() => {
         console.log('Script finished');
     }, 1000);

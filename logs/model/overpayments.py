@@ -1,22 +1,22 @@
 from    util.logger import log
-from    db.connect import get_connection, select
+from    db.connect import get_connection
 from decimal import Decimal
 
 stmt_list_op_orig = """
-    select op.op_id order_num,
-            op.region region, 
-            p.lastname||' '||p.firstname||' '||p.middlename as fio,
-            op.iin as iin,  
-            to_char(op.risk_date,'dd.mm.yyyy') as risk_date,  
-            to_char(op.sum_civ_amount,'999999990.99') as sum_civ_amount,
-            to_char(coalesce(op.compensated_amount,0),'9999990.99') compensated_amount,
-            op.rfpm_id,
-            op.last_status,
-            to_char(op.verdict_date,'dd.mm.yyyy') verdict_date,
-            to_char(op.effective_date,'dd.mm.yyyy') as effective_date,
-            op.last_source_solution,
-            op.last_solution,
-            op.employee
+    select op.op_id "Номер",
+            op.region "Регион", 
+            p.lastname||' '||p.firstname||' '||p.middlename as "ФИО",
+            op.iin "ИИН",  
+            to_char(op.risk_date,'dd.mm.yyyy') as "Дата задолженности",  
+            to_char(op.sum_civ_amount,'999999990.99') "Сумма задолженности",
+            to_char(coalesce(op.compensated_amount,0),'9999990.99') "Возвращенная сумма",
+            op.rfpm_id "Код выплаты",
+            op.last_status "Текущий статус",
+            to_char(op.verdict_date,'dd.mm.yyyy') "Дата принятия решения",
+            to_char(op.effective_date,'dd.mm.yyyy') "Дата вступления в силу",
+            op.last_source_solution "Орган принятия последнего решения",
+            op.last_solution "Последнее решение",
+            op.employee "Сотрудник Фонда"
     from overpayments op, loader.person p
     where op.iin=p.iin(+)
     """
@@ -48,33 +48,32 @@ def list_overpayments(args: dict):
     else:
         stmt_list_op = stmt_list_op + ' and op.sum_civ_amount<=coalesce(op.compensated_amount,0)'
 
-    log.debug(f"1. LIST_OVERPAYMENTS. USER_REGION: '{user_region}'\n\tRESULT {stmt_list_op}")
-    if user_top_control:
-        if not iin_filter:
-            status, result = select(stmt_list_op)
-        else:
-            args = { 'iin_filter': f'{iin_filter}%' }
-            status, result = select(stmt_list_op, args)
-    else:
-        if not iin_filter:
-            args = { 'region': user_region }
-            status, result = select(stmt_list_op, args)
-            # cursor.execute(stmt_list_op, region=user_region)
-        else:
-            args = { 'iin_filter': f'{iin_filter}%', 'region': user_region }
-            status, result = select(stmt_list_op, args)
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            log.debug(f"---> LIST_OVERPAYMENTS. STMT:\n{stmt_list_op}\n<---")
+            if user_top_control:
+                if not iin_filter:
+                    cursor.execute(stmt_list_op)
+                else:
+                    cursor.execute(stmt_list_op, iin_filter=f'{iin_filter}%')
+            else:
+                if not iin_filter:
+                    cursor.execute(stmt_list_op, region=user_region)
+                else:
+                    cursor.execute(stmt_list_op, region=user_region, iin_filter=f'{iin_filter}%')
             
-    if status=='success':
-        log.debug(f'LIST_OVERPAYMENTS: RESULT {result}')
-        # Заменим None на пустую строку
-        for p in result:
-            for key, value in p.items(): 
-                if value is None: p[key] = ''
-
-    if status=='fail':
-        return []
-
-    return result
+            result = []
+            records = cursor.fetchall()
+            for rec in records:
+                res = {'order_num': rec[0], 'region': rec[1], 'fio': rec[2], 'iin': rec[3], 'risk_date': rec[4], 
+                       'sum_civ_amount': rec[5], 'compensated_amount': rec[6],
+                       'rfpm_id': rec[7], 'last_status': rec[8] or '', 
+                       'verdict_date': rec[9] or '', 'effective_date': rec[10] or '', 
+                       'last_source_solution': rec[11] or '-//-', 
+                       'last_solution': rec[12] or '-//-',
+                       'employee': rec[13]}
+                result.append(res)
+            return result
 
 
 def get_pretrial_items(order_num):
@@ -444,5 +443,5 @@ def update_last_solution(op_id, last_solution, employee):
             try:
                 cursor.execute("begin op.update_last_solution(:op_id, :last_solution, :employee); end;", op_id=op_id, last_solution=last_solution, employee=employee)
             finally:
-                log.info(f'UPDATE REGION\n\tOP_ID: {op_id}\n\tLAST_SOLUTION: {last_solution}')
+                log.info(f'UPDATE REGION\n\tOP_ID: {op_id}\n\LAST_SOLUTION: {last_solution}')
 

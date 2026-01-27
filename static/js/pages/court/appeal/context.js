@@ -1,4 +1,4 @@
-import { MenuBinder } from '/static/js/pages/court/appeal/binders/menuBinder.js';
+import { MenuBinder } from '/static/js/binders/standart/menuBinder.js';
 import { RefreshDirectContentTabBinder } from '/static/js/binders/standart/refreshDirectContentTabBinder.js';
 import { ToggleVisibleFormBinder } from '/static/js/binders/standart/toggleVisibleFormBinder.js';
 import { HelperBinder } from '/static/js/binders/standart/helperBinder.js';
@@ -19,8 +19,13 @@ export const appealTabContext = {
     request: {
         content: {
             method: 'POST',
-            url: '/pretrial_fragment',
+            url: '/get_fragment',
             params: orderNum => ({ order_num: orderNum })
+        },
+        form: {
+            method: 'POST',
+            url: '/get_form',
+            params: orderNum => ({ form: 'appeal', order_num: orderNum })
         }
     },
     bindScope: {

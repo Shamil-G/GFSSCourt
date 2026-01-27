@@ -13,7 +13,7 @@ export const refundingTabContext = {
     request: {
         content: {
             method: 'POST',
-            url: '/refunding_fragment',
+            url: '/get_fragment',
             params: orderNum => ({ order_num: orderNum })
         }
     },

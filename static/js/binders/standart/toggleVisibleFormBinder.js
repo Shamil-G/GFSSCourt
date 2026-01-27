@@ -1,5 +1,7 @@
 ﻿//import * as TabUtil from '/static/js//tabUtil.js';
 import { PageManager } from '/static/js/core/PageContext.js';
+import { fadeInsert, getZoneData, getOrderNum } from '/static/js/_aux/tabUtil.js';
+
 
 export const ToggleVisibleFormBinder = {
     role: 'toggle-visible-form',
@@ -18,7 +20,7 @@ export const ToggleVisibleFormBinder = {
             console.warn("tabName undefined");
             return;
         }
-        el.addEventListener('click', (event) => {
+        el.addEventListener('click', async (event) => {
             event.preventDefault();
             const btnTarget = event.target;
             const tabName = btnTarget.dataset.tab;
@@ -53,60 +55,58 @@ export const ToggleVisibleFormBinder = {
                     console.log("--- toggle-visible-form. orderNum is empty!");
                     return;
                 }
-                fetch(`/form_fragment?form=${tabName}`)
-                //fetch(`/form_fragment?form=${tabName}&order_num=${TabUtil.getOrderNum()}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        container.innerHTML = html;
 
-                        const form = document.getElementById(formName);
+            const params = { form: tabName, order_num: orderNum }
+            const html = await getZoneData(tabName, 'form', params);
+            console.log('ToogleVisibleForm. tabName:',tabName);
+            fadeInsert(container, html);
 
-                        if (form) {
-                            PageManager.get().attachZoneBinders(tabName, 'form');
+            //const form = document.getElementById(formName);
+            console.log('toggleVisible. formName: ', formName, ', form: ', form, 'document: ', document, ', el: ', el);
+            if (form) {
+                PageManager.get().attachZoneBinders(tabName, 'form');
 
-                            // На форме есть "action="/add_", но надо добавить поле order_num
-                            // Мы переопределяем поведение submit на форме со свойством "action"
-                            form.addEventListener('submit', async event => {
-                                // ❗ Не даём браузеру самому перезагрузить страницу
-                                event.preventDefault();
+                // На форме есть "action="/add_", но надо добавить поле order_num
+                // Мы переопределяем поведение submit на форме со свойством "action"
+                form.addEventListener('submit', async event => {
+                    // ❗ Не даём браузеру самому перезагрузить страницу
+                    event.preventDefault();
 
-                                const form = event.target;
-                                const formData = new FormData(form);
+                    const form = event.target;
+                    const formData = new FormData(form);
 
-                                formData.append('order_num', orderNum);
-                                //console.log("ToggleVisibleForm. SUBMIT. order_num:\t", orderNum, "\n\t\t\tformData:\t", formData)
-                                try {
-                                    const response = await fetch(form.action, {
-                                        method: 'POST',
-                                        body: formData
-                                    });
+                    formData.append('order_num', getOrderNum());
+                    console.log("ToggleVisibleForm. SUBMIT. order_num:\t", orderNum, "\n\t\t\tformData:\t", formData)
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData
+                        });
 
-                                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                                    const result = await response.json();
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        const result = await response.json();
 
-                                    console.log('[FormSubmit] Успешный ответ:', result);
-                                    // 🔸 Здесь можно обновить UI, скрыть форму, показать статус и т.д.
-                                    const tabName = form.closest('[data-tab]')?.dataset.tab;
-                                    const refreshBtn = document.querySelector(`[data-role="refresh-content"][data-tab="${tabName}"]`);
-                                    if (refreshBtn) {
-                                        refreshBtn.click();
-                                    } else {
-                                        console.warn(`Кнопка обновления не найдена для tabName = ${tabName}`);
-                                    }
-                                } catch (err) {
-                                    console.error('[FormSubmit] Ошибка отправки:', err);
-                                    // 🔸 Покажите ошибку пользователю, если нужно
-                                }
-
-                            });
-                        };
-
-                        if (btnTarget) {
-                            btnTarget.textContent = btnTarget.dataset.labelClose;
+                        console.log('[FormSubmit] Успешный ответ:', result);
+                        // 🔸 Здесь можно обновить UI, скрыть форму, показать статус и т.д.
+                        const tabName = form.closest('[data-tab]')?.dataset.tab;
+                        const refreshBtn = document.querySelector(`[data-role="refresh-content"][data-tab="${tabName}"]`);
+                        if (refreshBtn) {
+                            refreshBtn.click();
+                        } else {
+                            console.warn(`Кнопка обновления не найдена для tabName = ${tabName}`);
                         }
+                    } catch (err) {
+                        console.error('[FormSubmit] Ошибка отправки:', err);
+                        // 🔸 Покажите ошибку пользователю, если нужно
+                    }
 
-                    })
-                    .catch(error => console.error('Error load fragment form: ${tabName}:', error));
+                });
+            };
+
+            if (btnTarget) {
+                btnTarget.textContent = btnTarget.dataset.labelClose;
+            }
+
             }
         });
     },

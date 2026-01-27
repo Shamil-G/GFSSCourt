@@ -19,9 +19,14 @@ export const scammerTabContext = {
     request: {
         content: {
             method: 'POST',
-            url: '/scammer_fragment',
-            params: orderNum => ({ order_num: orderNum })
-        }
+            url: '/get_fragment',
+            params: orderNum => ({ fragment: 'scammer', order_num: orderNum })
+        },
+        form: {
+            method: 'POST',
+            url: '/get_form',
+            params: orderNum => ({ form: 'scammer', order_num: orderNum })
+        },
     },
     bindScope: {
         content: 'local',     // искать только в загруженном фрагменте

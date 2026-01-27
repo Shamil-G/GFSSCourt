@@ -1,7 +1,6 @@
-﻿import { MenuBinder } from '/static/js/pages/court/binders/menuBinder.js';
+﻿import { FilterPeriodBinder } from '/static/js/pages/court/binders/filterPeriodBinder.js';
 import { FilterActiveCloseRefundBinder } from '/static/js/pages/court/binders/filterActiveCloseRefundBinder.js';
 import { FilterIinBinder } from '/static/js/pages/court/binders/filterIINBinder.js';
-import { MenuRegionBinder } from '/static/js/pages/court/binders/menuRegionBinder.js';
 import { MenuRegionEditBinder } from '/static/js/pages/court/binders/menuRegionEditBinder.js';
 import { EditRowTableBinder } from '/static/js/pages/court/binders/editRowTableBinder.js';
 
@@ -26,9 +25,8 @@ export const courtTabContext = {
     binders: {
         mainTableHelper: [HelperBinder],
         fragment: [EditRowTableBinder, RowClickBinder, MenuRegionEditBinder], //RowClickBinder, 
-        filters: [FilterIinBinder, FilterActiveCloseRefundBinder, MenuBinder],
-        tabs: [ TabSwitchBinder ],
-        tabs_content: [MenuBinder, MutualExclusiveBinder]
+        filters: [FilterIinBinder, FilterActiveCloseRefundBinder, FilterPeriodBinder],
+        tabs: [ TabSwitchBinder ]
     },
 
     request: {

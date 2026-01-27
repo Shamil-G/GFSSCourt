@@ -55,7 +55,7 @@ export const FilterIinBinder = {
         if (isInteractive) {
             const url = el.dataset.url;
             const targetId = el.dataset.target;
-            const input = el.closest('td')?.querySelector('input');
+            const input = el.closest('label')?.querySelector('input');
 
             if (!url || !targetId || !input) {
                 console.warn('❌ FilterIinBinder: missing url, targetId, or input', el);
