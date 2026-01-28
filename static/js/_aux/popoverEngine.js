@@ -63,10 +63,16 @@ export function showTooltipPopover(target, html) {
   pop.style.top = `${rect.bottom + window.scrollY + 6}px`;
   pop.style.left = `${Math.max(left, 6)}px`;
 
-  // 🎯 Удаление при уходе мыши
-  const remove = () => pop.remove();
-  target.addEventListener('mouseleave', remove, { once: true });
-  pop.addEventListener('mouseleave', remove, { once: true });
+  // ❗ Удаляем только по клику вне
+  setTimeout(() => {
+    document.addEventListener('click', function outsideClick(e) {
+      if (!pop.contains(e.target) && e.target !== target) {
+        pop.remove();
+        document.removeEventListener('click', outsideClick);
+      }
+    });
+  }, 0);
 }
+
 
 

@@ -1,22 +1,21 @@
-﻿<form style="display: grid; grid-template-columns: 200px 1fr; row-gap: 8px; column-gap: 12px; align-items: center; max-width:480px" class="form_op" id="pretrialForm" method="POST" action="/add_pretrial">
-    <!--<div data-mutual-exclusive 
-            data-info-a="'Поле <📆 Дата погашения> будет недоступно, пока указано значение дня" 
-            data-info-b="Поле <Каждый месяц до> будет недоступно, пока указана дата <📆 Дата погашения>">-->
+﻿<form style="display: grid; grid-template-columns: 200px 1fr; row-gap: 8px; column-gap: 12px; align-items: center; max-width:497px" 
+      class="form_op" id="pretrialForm" method="POST" action="/add_pretrial"
+      data-mutual-exclusive
+      data-info-b="Поле <Каждый месяц до> стало недоступным" 
+      data-info-a="'Поле <📆 Дата погашения> стало недоступным">
         <div class="form-row">
             <label for="agreement_date" style="border: none; width: 260px; text-align: left; font-size: 18px;">
                 📅 * {{ res_value('AGREEMENT_DATE') }}
             </label>
             <input class="input_d" style="font-size: 18px; max-width: 150px;" type="date" name="agreement_date" id="agreement_date" required>
         </div>
-        <div class="form-row">
+        <div class="form-row" >
             <label for="until_day" style="border: none; text-align: left; font-size: 18px;">{{ res_value('UNTIL_DAY') }}</label>
-            <input data-role="inputA" type="number" name="until_day" id="until_day" class="input_d" style="font-size: 18px; text-align: left; width: 60px" max="31" maxlength="2" >
+            <input data-role="inputA" type="number" name="until_day" id="until_day" class="input_d" style="font-size: 18px; text-align: left; width: 60px" max="31" maxlength="2">
         </div>
         <div class="form-row">
             <label for="execution_date" style="border: none; text-align: left; font-size: 18px;">📆 {{ res_value('MATURITY_DATE') }}</label>
             <input  data-role="inputB" type="date" name="execution_date" id="execution_date" class="input_d" style="font-size: 18px; max-width: 150px; text-align: left">
         </div>
-
-    <!--</div>-->
     <button type="submit">💾 {{ res_value('BUTTON_SAVE') }}</button>
 </form>
