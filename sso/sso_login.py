@@ -62,6 +62,7 @@ class SSO_User:
                 if '*' in list_view_dep or self.dep_name in list_view_dep:
                     self.roles='Guest'
                 else:
+                    log.info(f'SSO. Undefined ROLE for: {self.username}')
                     return None
 
             # FIO
