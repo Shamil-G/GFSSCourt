@@ -63,7 +63,7 @@
                     <span class="label">{{ res_value('SELECT_PERIOD') }}</span>
                     <span style="display: inline-block; margin-left: 5px;" class="caret"></span>
                 </button>
-                <div style="min-width: 180px;" class="dropdown-content">
+                <div style="min-width: 262px;" class="dropdown-content visible">
                     <a data-value="{{res_value('PERIOD_MONTH')}}" data-label="{{res_value('PERIOD_MONTH')}}"><i class="fas fa-hourglass-start" style="color: green;"></i>{{res_value('PERIOD_MONTH')}}</a>
                     <a data-value="{{res_value('PERIOD_YEAR')}}" data-label="{{res_value('PERIOD_YEAR')}}"><i class="fas fa-hourglass-half" style="color: green;"></i>{{res_value('PERIOD_YEAR')}}</a>
                     <a data-value="{{res_value('PERIOD_ALL')}}" data-label="{{res_value('PERIOD_ALL')}}"><i class="fas fa-hourglass-end" style="color: green;"></i>{{res_value('PERIOD_ALL')}}</a>
@@ -86,7 +86,7 @@
                 </span>
             </a>
         </div>
-        {% if 'top_control' in session and session['top_control'] == 1 %}
+        {% if 'top_control' in session and session['top_control'] == 2 %}
         <div data-help="refund_all" data-role="helper" class="has-helper"
              style="margin-left: 5px; min-width: 216px; padding: 4px 0px; text-align: center; font-weight: bold; display: flex; align-items: center;">
             <span>{{res_value('RECALC_REFUND')}}: &nbsp;</span>
@@ -95,23 +95,23 @@
         {% endif %}
     </div>
     <div class="documents" style="flex: 1 1 auto; overflow: auto; position: relative;">
-        <table id="court_mainTable" style="display: block; width: 100%; border-collapse: separate; border-spacing: 0;">
+        <table id="court_mainTable" style="display: block; width: 100%; border-collapse: collapse; border-spacing: 0;">
             <colgroup><col style="width: 80px;"><col><col><col style="width: 140px;"><col style="width: 140px;"><col><col><col><col><col><col></colgroup>
-            <thead class="my_stick_head">
+            <thead style="position: sticky; top: 0; z-index: 2;">
                 <tr>
-                    <th data-help="overpayment_id" data-role="helper" class="has-helper">{{ res_value('ORDER_NUM') }}</th>
-                    <th data-help="region" data-role="helper" class="has-helper">{{ res_value('FILIAL_NAME') }}</th>
-                    <th>{{ res_value('FIO_OVERPAY') }}</th>
-                    <th data-help="iin" data-role="helper" class="has-helper">{{ res_value('IIN_OVERPAY') }}</th>
-                    <th data-help="risk_date" data-role="helper" class="has-helper">{{ res_value('RISK_DATE') }}</th>
-                    <th data-help="rfpm_id" data-role="helper" class="has-helper">{{ res_value('RFPM_ID') }}</th>
-                    <th data-help="sum_civ_amount" data-role="helper" class="has-helper">{{ res_value('SUM_CIV_AMOUNT') }}</th>
-                    <th>{{ res_value('COMPENSATED_AMOUNT') }}</th>
-                    <th data-help="last_status" data-role="helper" class="has-helper">{{ res_value('STATUS_OVERPAY') }}</th>
-                    <th data-help="court_date" data-role="helper" class="has-helper">{{ res_value('COURT_DATE') }}</th>
-                    <th data-help="effective_date" data-role="helper" class="has-helper">{{ res_value('EFFECTIVE_DATE') }}</th>
-                    <th data-help="last_source_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
-                    <th data-help="last_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
+                    <th style="padding: 6px 10px" data-help="overpayment_id" data-role="helper" class="has-helper">{{ res_value('ORDER_NUM') }}</th>
+                    <th style="padding: 6px 10px" data-help="region" data-role="helper" class="has-helper">{{ res_value('FILIAL_NAME') }}</th>
+                    <th style="padding: 6px 10px">{{ res_value('FIO_OVERPAY') }}</th>
+                    <th style="padding: 6px 10px" data-help="iin" data-role="helper" class="has-helper">{{ res_value('IIN_OVERPAY') }}</th>
+                    <th style="padding: 6px 10px" data-help="risk_date" data-role="helper" class="has-helper">{{ res_value('RISK_DATE') }}</th>
+                    <th style="padding: 6px 10px" data-help="rfpm_id" data-role="helper" class="has-helper">{{ res_value('RFPM_ID') }}</th>
+                    <th style="padding: 6px 10px" data-help="sum_civ_amount" data-role="helper" class="has-helper">{{ res_value('SUM_CIV_AMOUNT') }}</th>
+                    <th style="padding: 6px 10px">{{ res_value('COMPENSATED_AMOUNT') }}</th>
+                    <th style="padding: 6px 10px" data-help="last_status" data-role="helper" class="has-helper">{{ res_value('STATUS_OVERPAY') }}</th>
+                    <th style="padding: 6px 10px" data-help="court_date" data-role="helper" class="has-helper">{{ res_value('COURT_DATE') }}</th>
+                    <th style="padding: 6px 10px" data-help="effective_date" data-role="helper" class="has-helper">{{ res_value('EFFECTIVE_DATE') }}</th>
+                    <th style="padding: 6px 10px" data-help="last_source_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOURCE_SOLUTION') }}</th>
+                    <th style="padding: 6px 10px" data-help="last_solution" data-role="helper" class="has-helper">{{ res_value('LAST_SOLUTION') }}</th>
                 </tr>
             </thead>
             <!--<tbody id="court_mainBody" data-action="filterByOrder">-->

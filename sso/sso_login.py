@@ -1,7 +1,7 @@
 from flask import session
 from util.ip_addr import ip_addr
 from util.logger import log
-from app_config import admin_post, permit_post
+from app_config import admin_post, work_post, view_post
 
      
 class SSO_User:
@@ -46,14 +46,22 @@ class SSO_User:
             list_admin_dep = admin_post.get(self.post,[])
             if self.dep_name in list_admin_dep:
                 self.roles='Admin'
-                self.top_control=1
+                self.top_control=2
 
             log.info(f'SSO. list_admin_dep: {list_admin_dep}. top_control: {self.top_control}')
             # check user right
             if self.top_control==0:
-                list_permin_dep = permit_post.get(self.post,[])
-                if '*' not in list_permin_dep and self.dep_name not in list_permin_dep:
-                    log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tPOST in \n{src_user} have not rigth\n<---")
+                list_work_dep = work_post.get(self.post,[])
+                if '*' in list_work_dep or self.dep_name in list_work_dep:
+                    self.roles='Operator'
+                    self.top_control=1
+
+            # check user right
+            if self.top_control==0:
+                list_view_dep = view_post.get(self.post,[])
+                if '*' in list_view_dep or self.dep_name in list_view_dep:
+                    self.roles='Guest'
+                else:
                     return None
 
             # FIO

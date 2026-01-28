@@ -527,7 +527,7 @@ button:hover, .button:hover {
     transition: transform 0.2s ease;
 }
 
-.dropdown:hover .dropdown-content {
+.dropdown:hover .dropdown-content.visible {
     display: block;
 }
 .caret {
