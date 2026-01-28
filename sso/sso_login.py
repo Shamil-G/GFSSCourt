@@ -1,7 +1,7 @@
 from flask import session
 from util.ip_addr import ip_addr
 from util.logger import log
-from app_config import list_admins, admin_deps, permits_post
+from app_config import admin_post, permit_post
 
      
 class SSO_User:
@@ -33,47 +33,45 @@ class SSO_User:
                 log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tPOST in \n{src_user}\n\tis empty\n<---")
                 return None
 
-            # post
-            self.post = src_user.get('post','')
-            session['post']=self.post
-
-            if self.post not in permits_post:
-                log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tPOST in \n{src_user} have not rigth\n<---")
-                return None
-
-            if permits_post[self.post] != '*' and src_user.get('dep_name','') != permits_post[self.post]:
-                log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tPOST in \n{src_user} have not rigth\n<---")
-                return None
-
             # RFBN_ID
             self.rfbn_id=src_user.get('rfbn_id','')
             # dep_name
             self.dep_name = src_user.get('dep_name','')
             session['dep_name']=self.dep_name
 
+            # post
+            self.post = src_user.get('post','')
+            session['post']=self.post
+            # check admin right
+            list_admin_dep = admin_post.get(self.post,[])
+            if self.dep_name in list_admin_dep:
+                self.roles='Admin'
+                self.top_control=1
+
+            log.info(f'SSO. list_admin_dep: {list_admin_dep}. top_control: {self.top_control}')
+            # check user right
+            if self.top_control==0:
+                list_permin_dep = permit_post.get(self.post,[])
+                if '*' not in list_permin_dep and self.dep_name not in list_permin_dep:
+                    log.info(f"---> SSO\n\tUSER {self.username} not Registred\n\tPOST in \n{src_user} have not rigth\n<---")
+                    return None
+
             # FIO
             self.fio = src_user.get('fio','')
             session['fio'] = self.fio
             #
-            if self.fio in list_admins:
-                log.info(f'---> SSO\n\tUSER: {self.fio}\n\tpost: {self.post}, dep_name: {self.dep_name}\n\tis Admin\n<---')
-                self.roles='Admin'
-            session['roles'] = self.roles
 
             if 'roles' in src_user:
                 self.roles.append(src_user['roles'])
                 session['roles']=self.roles
                 
-            if self.dep_name in admin_deps or 'Admin' in self.roles:
-                self.top_control=1
-
             session['top_control']=self.top_control
 
             self.full_name = self.fio
             session['full_name'] = self.fio
 
             self.ip_addr = ip
-            log.info(f"--->\n\tSSO SUCCESS\n\tUSERNAME: {self.username}\n\tIP_ADDR: {self.ip_addr}\n\tFIO: {self.fio}\n\tROLES: {self.roles}, POST: {self.post}\n\tDEP_NAME: {self.dep_name}\n<---")
+            log.info(f"--->\n\tSSO SUCCESS\n\tUSERNAME: {self.username}\n\tIP_ADDR: {self.ip_addr}\n\tFIO: {self.fio}\n\tROLES: {self.roles}, POST: {self.post}\n\tRFBN: {self.rfbn_id}\n\tDEP_NAME: {self.dep_name}\n<---")
             return self
         log.info(f"---> SSO FAIL. USERNAME: {src_user}\n\tip_addr: {ip}, password: {session['password']}\n<---")
         return None

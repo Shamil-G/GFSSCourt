@@ -52,17 +52,17 @@ export const ToggleVisibleFormBinder = {
                 // Загружаем HTML по fetch
                 const orderNum = document.getElementById('sharedOrderNum')?.value || '';
                 if (!orderNum) {
-                    console.log("--- toggle-visible-form. orderNum is empty!");
+                    console.warn("--- toggle-visible-form. orderNum is empty!");
                     return;
                 }
 
             const params = { form: tabName, order_num: orderNum }
             const html = await getZoneData(tabName, 'form', params);
-            console.log('ToogleVisibleForm. tabName:',tabName);
-            fadeInsert(container, html);
+            //console.log('ToogleVisibleForm. tabName:',tabName);
+            await fadeInsert(container, html);
 
-            //const form = document.getElementById(formName);
-            console.log('toggleVisible. formName: ', formName, ', form: ', form, 'document: ', document, ', el: ', el);
+            const form = document.getElementById(formName);
+            //console.log('toggleVisible. formName: ', formName, ', form: ', form, 'document: ', document, ', el: ', el);
             if (form) {
                 PageManager.get().attachZoneBinders(tabName, 'form');
 
@@ -76,7 +76,7 @@ export const ToggleVisibleFormBinder = {
                     const formData = new FormData(form);
 
                     formData.append('order_num', getOrderNum());
-                    console.log("ToggleVisibleForm. SUBMIT. order_num:\t", orderNum, "\n\t\t\tformData:\t", formData)
+                    //console.log("ToggleVisibleForm. SUBMIT. order_num:\t", orderNum, "\n\t\t\tformData:\t", formData)
                     try {
                         const response = await fetch(form.action, {
                             method: 'POST',
@@ -86,7 +86,7 @@ export const ToggleVisibleFormBinder = {
                         if (!response.ok) throw new Error(`HTTP ${response.status}`);
                         const result = await response.json();
 
-                        console.log('[FormSubmit] Успешный ответ:', result);
+                        //console.log('[FormSubmit] Успешный ответ:', result);
                         // 🔸 Здесь можно обновить UI, скрыть форму, показать статус и т.д.
                         const tabName = form.closest('[data-tab]')?.dataset.tab;
                         const refreshBtn = document.querySelector(`[data-role="refresh-content"][data-tab="${tabName}"]`);
