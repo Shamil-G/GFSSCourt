@@ -42,7 +42,7 @@ class SSO_User:
             # post
             self.post = src_user.get('post','')
             session['post']=self.post
-            # check admin right
+            # check admin right!
             list_admin_dep = admin_post.get(self.post,[])
             if self.dep_name in list_admin_dep:
                 self.roles='Admin'
