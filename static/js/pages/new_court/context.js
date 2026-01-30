@@ -4,13 +4,14 @@ import { HelperBinder } from '/static/js/binders/standart/helperBinder.js';
 export const courtTabContext = {
     // Значения zone определяют id=""
     zones: {
-        mainTableHelper: '#court_mainHelper',
-        menu: '#court_MenuZone'
+        /*mainTableHelper: '#court_mainHelper',*/
+        /*menu: '[data-role="menu"]',*/
+        form: '#form_NewDeal'
     },
 
     binders: {
         mainTableHelper: [HelperBinder],
-        menu: [MenuBinder],
+        form: [MenuBinder, HelperBinder],
     },
 
     request: {

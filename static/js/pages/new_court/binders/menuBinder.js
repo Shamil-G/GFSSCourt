@@ -19,14 +19,32 @@ export const MenuBinder = {
         const targetId = dropdown.dataset.target;
         const actionName = dropdown.dataset.action;
 
+        // 🔹 Открытие/закрытие меню по кнопке
+        button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('open');
+        });
+
+        // 🔹 Закрытие меню при клике вне dropdown
+        document.addEventListener('click', (e) => {
+            // Если клик был не внутри dropdown — закрываем
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        console.log("button: ", button, 'items: ', items, 'dropdown: ', dropdown);
+
+        // 🔹 Обработка кликов по пунктам меню
         items.forEach(item => {
             item.addEventListener('click', () => {
                 const value = item.dataset.value || item.textContent.trim();
                 const label = item.dataset.label || value;
 
-                // 🔹 Стандартное поведение
                 hiddenInput.value = value;
                 if (labelSpan) labelSpan.textContent = label;
+
+                console.log("item: ", item, 'value: ', value, 'label: ', label);
 
                 items.forEach(i => i.classList.remove('selected'));
                 item.classList.add('selected');
@@ -36,34 +54,30 @@ export const MenuBinder = {
                     detail: { value, label }
                 }));
 
-                // 🔹 Проверка на повторное значение
                 if (dropdown.__lastValue === value) {
                     console.log(`⚠️ MenuBinder: duplicate value (${value}) — handler call skipped`);
+                    dropdown.classList.remove('open');
                     return;
                 }
                 dropdown.__lastValue = value;
 
-                //console.log(`MenuBinder. Dropdown: ${value}`);
+                console.log(`MenuBinder. Dropdown: ${value}`);
 
                 if (actionName) {
-                    console.log("MenuBinder. actionName: ", actionName);
                     const fn = window[actionName] || API?.[actionName];
-                    //console.log("MenuBinder. FN: ", fn);
                     if (typeof fn === 'function') {
                         fn(value, label, dropdown);
-                        //console.log('MenuBinder. run function: ', value, label, dropdown);
-                        //return;
                     } else {
                         console.warn(`❌ MenuBinder: handler '${actionName}' not found`);
                     }
                 }
 
-                // Не всегда при изменении пункта меню надо что то обновлять
                 if (targetId && url) {
-                    //console.log('MenuBinder. CALL TableLoader.load. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
                     TableLoader.load(url, targetId, { value });
                 }
-                //else console.log('MenuBinder. SKIP  TableLoader.load. targetId: ', targetId, ", URL: ", url, ", VALUE: ", value);
+
+                // Закрываем меню после выбора
+                dropdown.classList.remove('open');
             });
         });
     },
@@ -72,10 +86,9 @@ export const MenuBinder = {
         const dropdowns = zone.querySelectorAll(`[data-role="${this.role}"]`);
         dropdowns.forEach(dropdown => {
             const tag = dropdown.tagName;
-            //console.log('MenuBinder: TAG_NAME:', tag);
-            const allowedTags = ['DIV', 'SECTION'];
+            const allowedTags = ['DIV', 'SECTION', 'LABEL'];
             if (!allowedTags.includes(tag)) {
-                console.warn(`⚠️ MenuBinder: skipping non-DIV element <${tag}>`, dropdown);
+                console.warn(`⚠️ MenuBinder. for role ${this.role} skipping non-DIV, SECTION, LABEL element <${tag}>`, dropdown);
                 return;
             }
             this.attach(dropdown);
